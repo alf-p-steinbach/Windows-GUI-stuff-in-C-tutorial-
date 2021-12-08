@@ -2,13 +2,13 @@
 
 ## Part 1 – A Windows GUI “Hello, world!”.
 
-Many things that can seem mysterious here are explained in later parts of the tutorial, because this part is only about getting you up and running.
-
-“Up and running”: the main purpose is to get you up and running wrt.
+The main purpose of this first part is to get you up and running wrt.
 
 * basic *concepts*, *tools* usage, basic *starter code*, and *documentation*,
 
 so that you can explore further.
+
+Some things that can seem mysterious are therefore explained in later parts of the tutorial, and not here.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
