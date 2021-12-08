@@ -35,7 +35,7 @@ A message box presents a title, a text, one or more buttons (by default just “
 
 This particular message box is produced by a call of Windows’ `MessageBox` function:
 
-*hello.cpp*:
+[*hello.cpp*](part-01/code/hello.cpp):
 ~~~cpp
 #include <windows.h>
 
