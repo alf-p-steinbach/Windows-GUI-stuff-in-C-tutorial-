@@ -14,18 +14,19 @@ Some things that can seem mysterious are therefore explained in later parts of t
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [1. Message boxes.](#1-message-boxes)
-- [2. About modern C++ syntax.](#2-about-modern-c-syntax)
-- [3. Windows subsystems.](#3-windows-subsystems)
-- [4. Building for the GUI subsystem.](#4-building-for-the-gui-subsystem)
-- [5. Find required libraries and headers.](#5-find-required-libraries-and-headers)
-- [6. Run the program via commands and via mouse clicking.](#6-run-the-program-via-commands-and-via-mouse-clicking)
-- [7. Varying behaviors of programs when you run them in Windows 11.](#7-varying-behaviors-of-programs-when-you-run-them-in-windows-11)
+- [1.1. Message boxes.](#11-message-boxes)
+- [1.2. About modern C++ syntax.](#12-about-modern-c-syntax)
+- [1.3. Windows subsystems.](#13-windows-subsystems)
+- [1.4. Building for the GUI subsystem.](#14-building-for-the-gui-subsystem)
+- [1.5. Find required libraries and headers.](#15-find-required-libraries-and-headers)
+- [1.6. Run the program via commands and via mouse clicking.](#16-run-the-program-via-commands-and-via-mouse-clicking)
+- [1.7. Varying behaviors of programs when you run them in Windows 11.](#17-varying-behaviors-of-programs-when-you-run-them-in-windows-11)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+
 ---
-### 1. Message boxes.
+### 1.1. Message boxes.
 
 The simplest code for a GUI “Hello, world!” just produces a special restricted kind of window called a **message box**, like this:
 
@@ -51,7 +52,7 @@ auto main() -> int
 We’ll build this program in section 4, and we’ll run it — in various ways — in section 6.
 
 ---
-### 2. About modern C++ syntax.
+### 1.2. About modern C++ syntax.
 
 All the `auto` stuff in that code may seem mysterious and complex, perhaps a little frightening!, especially if you’re the victim of education that teaches C instead of C++. But the code is simply ordinary modern C++, as opposed to C89. C++11 introduced a new syntax for function declarations, and a syntax for variable declarations where you just want the compiler to fill in the variable’s type.
 
@@ -60,7 +61,7 @@ First, modern `auto main() -> int` means exactly the same as old C syntax `int m
 The `title` and `text` names of literals are declared as simple `&` references, which means that all the type information, including the string sizes, is retained, which is good. Using `auto` for the array type is then practically required because the array sizes depend on the literals. Instead of naming these literals they could have been specified directly in the function call, but that would’ve been a slightly too longish line of code.
 
 ---
-### 3. Windows subsystems.
+### 1.3. Windows subsystems.
 
 Every Windows executable contains a little number that specifies broadly what kind of environment it needs or is designed for. This is called the executable’s Windows **subsystem**. For example, nearly all beginners’s exercise and exploration programs need console windows to present text in. And such a program is therefore built with subsystem value 3 that tells Windows to if necessary create a new console window for the program. I.e. Windows will then ensure that any running instance of the program always has an associated console window.
 
@@ -73,7 +74,7 @@ In contrast, subsystem value 2 says that the program should *not* get an automat
 Subsystem #3 is called the **console subsystem**, and subsystem #2 is called the **GUI subsystem** because it’s generally better suited for a GUI (Graphical User Interface) program.
 
 ---
-### 4. Building for the GUI subsystem.
+### 1.4. Building for the GUI subsystem.
 
 You can build any ordinary program with either console or GUI subsystem, depending on whether you want the program to have a console window. Even for a GUI program a console window can be useful in development, to see text output about what’s going on inside the program. I.e. the categories are not mutually exclusive: a program designed as pure GUI can still do console text output, and a program designed as mainly console text i/o oriented can still e.g. pop up a message box, and both these mixed possibilities can be quite useful.
 
@@ -114,7 +115,7 @@ hello.cpp
 Here `user32.lib` is the library that for Visual C++ provides the Windows `MessageBox` function. The corresponding library for g++ is `libuser32.a`, which you can specify via option `-luser32`, which however is done by default for a g++ GUI subsystem build. In both cases the compiler specific library just causes linking with Windows’ `user32.dll` library, which is the one that actually provides the function.
 
 ---
-### 5. Find required libraries and headers.
+### 1.5. Find required libraries and headers.
 
 You can find out which library is needed for a function by checking Microsoft’s documentation. This also tells you if you need to include any special header in addition to `<windows.h>`. Usually `<windows.h>` suffices.
 
@@ -133,7 +134,7 @@ The online documentation is moved around a lot, but googling e.g. “Microsoft M
 The documentation needs to be read with the understanding that it's often imperfect. For example, Windows 2000 is mentioned but Microsoft’s current tools do not support building for anything earlier than Windows Vista, and in the other direction the `MessageBox` function has been in Windows from the very start. Anyway, the **DLL** row says that `MessageBox` is provided by `User32.dll`, which for Visual C++ means specifying `user32.lib`, and for g++ means (if necessary, e.g. for a console subsystem build) specifying `-luser32`.
 
 ---
-### 6. Run the program via commands and via mouse clicking.
+### 1.6. Run the program via commands and via mouse clicking.
 
 In Windows Cmd you can run an executable by using the file name as a command, e.g. command `hello` to run `hello.exe` in the current directory.
 
@@ -143,7 +144,7 @@ You can also run an executable by double-clicking it in Windows Explorer.
 
 
 ---
-### 7. Varying behaviors of programs when you run them in Windows 11.
+### 1.7. Varying behaviors of programs when you run them in Windows 11.
 
 The detailed behavior of the program in Windows 11 depends on how you run it, and when that’s via a command interpreter, how you ran that command interpreter.
 
