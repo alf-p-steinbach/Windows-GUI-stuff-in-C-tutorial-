@@ -153,7 +153,7 @@ AFAIK undocumented but very much worth knowing: a module handle is simply the me
 
 ### 2.5 Build the executable with resources embedded.
 
-BUilding is the same as for part 1’s “Hello, world!” message box program, except that now you also need to specify the binary linker friendly resources file as a compiler or linker argument.
+Building is the same as for part 1’s “Hello, world!” message box program, except that now you also need to specify the binary linker friendly resources file as a compiler or linker argument.
 
 For completeness I now include also the earlier shown commands for generating that binary from an “.rc” resource script.
 
@@ -180,7 +180,7 @@ With the Visual C++ toolchain:
 > set LINK=/entry:mainCRTStartup
 
 [T:\tutorial\part-02\code\messagebox-with-icon]
-> cl hello.cpp resources.res user32.lib /link /subsystem:windows
+> cl hello.cpp resources.res user32.lib
 hello.cpp
 
 [T:\tutorial\part-02\code\messagebox-with-icon]
