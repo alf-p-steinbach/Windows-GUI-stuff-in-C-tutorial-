@@ -153,7 +153,40 @@ AFAIK undocumented but very much worth knowing: a module handle is simply the me
 
 ### 2.5 Build the executable with resources embedded.
 
+BUilding is the same as for part 1’s “Hello, world!” message box program, except that now you also need to specify the binary linker friendly resources file as a compiler or linker argument.
 
+For completeness I now include also the earlier shown commands for generating that binary from an “.rc” resource script.
 
-asdasd
+With the MingW g++ toolchain:
 
+~~~txt
+[T:\tutorial\part-02\code\messagebox-with-icon]
+> windres resources.rc -o resources.o
+
+[T:\tutorial\part-02\code\messagebox-with-icon]
+> g++ hello.cpp resources.o -mwindows
+
+[T:\tutorial\part-02\code\messagebox-with-icon]
+> a.exe_
+~~~
+
+With the Visual C++ toolchain:
+
+~~~txt
+[T:\tutorial\part-02\code\messagebox-with-icon]
+> rc /nologo resources.rc
+
+[T:\tutorial\part-02\code\messagebox-with-icon]
+> set LINK=/entry:mainCRTStartup
+
+[T:\tutorial\part-02\code\messagebox-with-icon]
+> cl hello.cpp resources.res user32.lib
+hello.cpp
+
+[T:\tutorial\part-02\code\messagebox-with-icon]
+> hello.exe_
+~~~
+
+In any case, result:
+
+![Message box with custom icon](part-02/images/sshot.part-2-message-box.png)
