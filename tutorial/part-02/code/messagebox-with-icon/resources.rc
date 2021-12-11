@@ -1,2 +1,2 @@
-//  #include <windows.h>
+#include <windows.h>
 100     ICON    "resources/globe.ico"
