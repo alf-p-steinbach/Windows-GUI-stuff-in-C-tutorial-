@@ -76,7 +76,7 @@ The ordinary linking approach involves packaging the resource(s) in a file that 
 
 Line 1, the `#include` directive, is an ordinary C language `#include` directive. And yes it’s the ordinary C or C++ preprocessor that’s applied. Happily, considering that `<windows.h>` is a gigantic several hundred thousand lines header, the resource compiler defines the macro symbol **`RC_INVOKED`** which excludes most of the contents of that header.
 
-With Microsoft’s Visual C++ 2022 compiler `RC_INVOKED` reduces the include from 303 818 lines to 9355 lines. And with the MinGW g++ 9.2 compiler it reduces the include from 80 287 lines to 119 lines. Most of the resulting lines are blank or just line number adjustments, with apparently nothing that’s actually used, and the script compiles fine without this `#include`, so it may be that including `<windows.h>` (or for Visual C++ perhaps `<winres.h>`) in a resource script is a practice that once was useful or required, but no more as of 2021.
+With Microsoft’s Visual C++ 2022 compiler `RC_INVOKED` reduces the include from 303 818 lines to 9355 lines. And with the MinGW g++ 9.2 compiler it reduces the include from 80 287 lines to 119 lines. I originally wrote here that the resulting text appeared to have nothing that was used, mostly blank lines, but while not present in the produced text the include does define macros such as `IDOK` that are useful (it not strictly necessary) for some resource definitions.
 
 Line 2, the resource inclusion statement, starts with an arbitrary id number, `100`; then a specification of the resource type, `ICON`; and then a quoted path to the resource file.
 
