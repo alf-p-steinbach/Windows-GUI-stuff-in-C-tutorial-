@@ -180,7 +180,7 @@ With the Visual C++ toolchain:
 > set LINK=/entry:mainCRTStartup
 
 [T:\tutorial\part-02\code\messagebox-with-icon]
-> cl hello.cpp resources.res user32.lib
+> cl hello.cpp resources.res user32.lib /link /subsystem:windows
 hello.cpp
 
 [T:\tutorial\part-02\code\messagebox-with-icon]
