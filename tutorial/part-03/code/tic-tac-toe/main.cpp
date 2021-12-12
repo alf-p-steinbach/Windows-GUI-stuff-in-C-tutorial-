@@ -7,6 +7,13 @@
 
 const HINSTANCE this_exe = GetModuleHandle( nullptr );
 
+// A Windows 11 workaround hack. The window is assumed to presently be a “topmost” window.
+// The effect is to bring the window to the top of ordinary window z-order and activate it.
+void remove_topmost_style_for( const HWND window )
+{
+    SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+}
+
 void on_close( const HWND window )
 {
     EndDialog( window, IDOK );
@@ -21,6 +28,9 @@ auto on_initdialog( const HWND window, const HWND focus, const LPARAM ell_param 
     LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
     const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
     SetWindowText( rules_display, text );
+
+    remove_topmost_style_for( window );
+
     return true;    // `true` sets focus to the control specified by the `focus` param.
 }
 
