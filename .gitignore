@@ -2,3 +2,6 @@
 *.obj
 *.o
 *.res
+*.aps
+tutorial/part-03/code/tic-tac-toe/vs-resource-editing/.vs/*
+tutorial/part-03/code/tic-tac-toe/vs-resource-editing/x64/*
