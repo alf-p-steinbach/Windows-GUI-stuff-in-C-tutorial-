@@ -18,7 +18,7 @@ auto on_initdialog( const HWND window )
     return true;    // `true` sets focus to the control specified by the `w_param`.
 }
 
-auto message_handler(
+auto CALLBACK message_handler(
     const HWND      window,
     const UINT      msg_id,
     const WPARAM    w_param,

@@ -3,7 +3,7 @@
 
 const HINSTANCE this_exe = GetModuleHandle( nullptr );
 
-auto message_handler(
+auto CALLBACK message_handler(
     const HWND      window,
     const UINT      msg_id,
     const WPARAM    w_param,
