@@ -8,7 +8,7 @@
 const HINSTANCE this_exe = GetModuleHandle( nullptr );
 
 // A Windows 11 workaround hack. The window is assumed to presently be a “topmost” window.
-// The effect is to bring the window to the top of ordinary window z-order and activate it.
+// The effect is to bring the window to the top of ordinary window z-order.
 void remove_topmost_style_for( const HWND window )
 {
     SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
