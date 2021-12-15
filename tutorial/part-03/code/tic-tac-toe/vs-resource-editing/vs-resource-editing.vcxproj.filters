@@ -29,4 +29,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\main.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\app.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

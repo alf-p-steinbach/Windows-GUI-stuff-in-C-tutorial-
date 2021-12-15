@@ -50,13 +50,13 @@ END
 // Dialog
 //
 
-IDD_MAIN_WINDOW DIALOGEX 0, 0, 350, 132
-STYLE DS_SETFONT | DS_CENTER | WS_CAPTION | WS_SYSMENU
+IDD_MAIN_WINDOW DIALOGEX 0, 0, 344, 132
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST
 CAPTION "Tic-tac-toe (mostly random)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Click a place on the board, or type its digit 1 through 9.",0,7,7,313,11
+    LTEXT           "Click a place on the board, or type its digit 1 through 9.",0,7,7,313,11,SS_NOPREFIX
     PUSHBUTTON      "7",107,5,24,36,32,BS_FLAT
     PUSHBUTTON      "8",108,43,24,36,32,BS_FLAT
     PUSHBUTTON      "9",109,81,24,36,32,BS_FLAT
@@ -66,7 +66,7 @@ BEGIN
     PUSHBUTTON      "1",101,5,93,36,32,BS_FLAT
     PUSHBUTTON      "2",102,43,93,36,32,BS_FLAT
     PUSHBUTTON      "3",103,81,93,36,32,BS_FLAT
-    LTEXT           "<The rules should be displayed here>",IDC_RULES_DISPLAY,125,25,212,96,SS_NOPREFIX
+    LTEXT           "<The rules should be displayed here>",IDC_RULES_DISPLAY,123,25,217,96,SS_NOPREFIX
 END
 
 
@@ -81,7 +81,7 @@ BEGIN
     IDD_MAIN_WINDOW, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 347
+        RIGHTMARGIN, 341
         TOPMARGIN, 7
         BOTTOMMARGIN, 125
     END
@@ -98,6 +98,16 @@ IDD_MAIN_WINDOW AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APP                 ICON                    "resources/app.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////

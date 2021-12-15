@@ -1,16 +1,15 @@
 ﻿#include <windows.h>
 #include "resources.h"
 
-const HINSTANCE this_exe = GetModuleHandle( nullptr );
+using C_str = const char*;
 
 auto CALLBACK message_handler(
     const HWND      window,
     const UINT      msg_id,
-    const WPARAM    w_param,
-    const LPARAM    ell_param
+    const WPARAM    /*w_param*/,
+    const LPARAM    /*ell_param*/
     ) -> INT_PTR
 {
-    (void) w_param; (void) ell_param;
     switch( msg_id ) {
         case WM_CLOSE: {
             EndDialog( window, IDOK );      // Without this the window won't close.
@@ -22,5 +21,8 @@ auto CALLBACK message_handler(
 
 auto main() -> int
 {
-    DialogBox( this_exe, MAKEINTRESOURCE( IDD_MAIN_WINDOW ), HWND(), &message_handler );
+    const HINSTANCE this_executable     = GetModuleHandle( nullptr );
+    const C_str     dialog_resource_id  = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
+
+    DialogBox( this_executable, dialog_resource_id, HWND(), &message_handler );
 }

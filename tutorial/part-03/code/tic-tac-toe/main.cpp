@@ -1,18 +1,57 @@
-#include <windows.h>
+ï»¿#include <windows.h>
 #include <windowsx.h>       // HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
 #include "resources.h"      // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
 
+//------------------------------------------------ Support machinery:
+
 // Invokes various <windowsx.h> macros that in turn invoke specified message handler funcs:
-#define CALL_HANDLER_OF( msg_name, args, func )  HANDLE_##msg_name( args, func )
+#define CALL_HANDLER( msg_name, handler_func ) \
+    HANDLE_##msg_name( ch_params.hwnd, ch_params.wParam, ch_params.lParam, handler_func )
 
-const HINSTANCE this_exe = GetModuleHandle( nullptr );
+struct Standard_gui_font
+{
+    HFONT   handle;
 
-// A Windows 11 workaround hack. The window is assumed to presently be a “topmost” window.
+    ~Standard_gui_font()
+    {
+        DeleteFont( handle );
+    }
+
+    Standard_gui_font()
+    {
+        // Get the system message box font
+        const auto ncm_size = sizeof( NONCLIENTMETRICS );
+        NONCLIENTMETRICS metrics = {ncm_size};
+        SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm_size, &metrics, 0 );
+        handle = CreateFontIndirect( &metrics.lfMessageFont );
+    }
+};
+
+const auto      std_gui_font    = Standard_gui_font();
+
+// A Windows 11 workaround hack. The window is assumed to presently be a â€œtopmostâ€ window.
 // The effect is to bring the window to the top of ordinary window z-order.
 void remove_topmost_style_for( const HWND window )
 {
     SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
 }
+
+void set_standard_gui_font( const HWND window )
+{
+    const auto callback = []( HWND control, LPARAM ) -> BOOL
+    {
+        SetWindowFont( control, std_gui_font.handle, true );
+        return true;
+    };
+
+    SetWindowFont( window, std_gui_font.handle, true );
+    EnumChildWindows( window, callback, 0 );
+}
+
+
+//------------------------------------------------ App:
+
+const HINSTANCE this_exe        = GetModuleHandle( nullptr );
 
 void on_close( const HWND window )
 {
@@ -24,13 +63,14 @@ auto on_initdialog( const HWND window, const HWND focus, const LPARAM ell_param 
 {
     (void) focus;  (void) ell_param;
     
+    remove_topmost_style_for( window );
+    set_standard_gui_font( window );
+
+    // Init rules_display
     char text[2048];
     LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
     const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
     SetWindowText( rules_display, text );
-
-    remove_topmost_style_for( window );
-
     return true;    // `true` sets focus to the control specified by the `focus` param.
 }
 
@@ -41,12 +81,11 @@ auto CALLBACK message_handler(
     const LPARAM    ell_param
     ) -> INT_PTR
 {
-    #define PARAMS     window, w_param, ell_param
+    const MSG ch_params = {window, msg_id, w_param, ell_param};
     switch( msg_id ) {
-        case WM_CLOSE:          return CALL_HANDLER_OF( WM_CLOSE, PARAMS, on_close );
-        case WM_INITDIALOG:     return CALL_HANDLER_OF( WM_INITDIALOG, PARAMS, on_initdialog );
+        case WM_CLOSE:          return CALL_HANDLER( WM_CLOSE, &on_close );
+        case WM_INITDIALOG:     return CALL_HANDLER( WM_INITDIALOG, on_initdialog );
     }
-    #undef PARAMS
     return false;   // Didn't process the message, want default processing.
 }
 

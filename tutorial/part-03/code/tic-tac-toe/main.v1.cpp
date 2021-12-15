@@ -1,4 +1,4 @@
-#include <windows.h>
+﻿#include <windows.h>
 #include "resources.h"      // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
 
 const HINSTANCE this_exe = GetModuleHandle( nullptr );
