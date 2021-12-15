@@ -69,5 +69,5 @@ auto CALLBACK message_handler(
 auto main() -> int
 {
     const C_str resource_id_as_ptr = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
-    DialogBox( this_exe, resource_id_as_ptr, HWND(), &message_handler );
+    DialogBox( this_exe, resource_id_as_ptr, HWND(), message_handler );
 }

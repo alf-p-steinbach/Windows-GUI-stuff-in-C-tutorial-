@@ -26,5 +26,5 @@ auto main() -> int
     const HINSTANCE this_executable     = GetModuleHandle( nullptr );
     const C_str     resource_id_as_ptr  = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
 
-    DialogBox( this_executable, resource_id_as_ptr, HWND(), &message_handler );
+    DialogBox( this_executable, resource_id_as_ptr, HWND(), message_handler );
 }

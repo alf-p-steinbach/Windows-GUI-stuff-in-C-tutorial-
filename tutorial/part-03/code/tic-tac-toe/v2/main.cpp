@@ -9,7 +9,7 @@
 //------------------------------------------- Support machinery:
 
 // Invokes various <windowsx.h> macros that in turn invoke specified message handler funcs:
-#define CALL_HANDLER_OF( msg_name, handler_func ) \
+#define HANDLER_OF( msg_name, handler_func ) \
     HANDLE_##msg_name( ch_params.hwnd, ch_params.wParam, ch_params.lParam, handler_func )
 
 const HINSTANCE this_exe = GetModuleHandle( nullptr );
@@ -64,13 +64,14 @@ auto CALLBACK message_handler(
 {
     const MSG ch_params = {window, msg_id, w_param, ell_param}; // Used by CALL_HANDLER_OF.
     switch( msg_id ) {
-        case WM_CLOSE:          return CALL_HANDLER_OF( WM_CLOSE, &on_close );
-        case WM_INITDIALOG:     return CALL_HANDLER_OF( WM_INITDIALOG, on_initdialog );
+        case WM_CLOSE:          return HANDLER_OF( WM_CLOSE, on_close );
+        case WM_INITDIALOG:     return HANDLER_OF( WM_INITDIALOG, on_initdialog );
     }
     return false;   // Didn't process the message, want default processing.
 }
 
 auto main() -> int
 {
-    DialogBox( this_exe, MAKEINTRESOURCE( IDD_MAIN_WINDOW ), HWND(), &message_handler );
+    const C_str resource_id_as_ptr = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
+    DialogBox( this_exe, resource_id_as_ptr, HWND(), message_handler );
 }
