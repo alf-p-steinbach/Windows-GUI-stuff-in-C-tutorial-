@@ -1,4 +1,4 @@
-﻿// v1 - Code to add the missing window things: the game's rule text, the window icon.
+﻿// v1 - Missing window parts added programmatically: the rules text; the window icon.
 // v0 - Roughly minimum code to display a window based on a dialog template resource.
 
 #include <windows.h>
@@ -68,6 +68,6 @@ auto CALLBACK message_handler(
 
 auto main() -> int
 {
-    const C_str resource_id_as_ptr = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
-    DialogBox( this_exe, resource_id_as_ptr, HWND(), message_handler );
+    const C_str id_as_ptr = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
+    DialogBox( this_exe, id_as_ptr, HWND(), message_handler );
 }
