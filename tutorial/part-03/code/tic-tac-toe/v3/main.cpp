@@ -1,6 +1,6 @@
-﻿// v2 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
-// v1 - Missing window parts added programmatically: the rules text; the window icon.
-// v0 - Roughly minimum code to display a window based on a dialog template resource.
+﻿// v3 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
+// v2 - Missing window parts added programmatically: the rules text; the window icon.
+// v1 - Roughly minimum code to display a window based on a dialog template resource.
 
 #include "wrapped-windows-h.hpp"    // Safer and faster. Safe = e.g. no `small` macro.    
 #include <windowsx.h>               // HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG

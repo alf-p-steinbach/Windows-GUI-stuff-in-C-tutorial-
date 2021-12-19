@@ -1,5 +1,5 @@
-﻿// v1 - Missing window parts added programmatically: the rules text; the window icon.
-// v0 - Roughly minimum code to display a window based on a dialog template resource.
+﻿// v2 - Missing window parts added programmatically: the rules text; the window icon.
+// v1 - Roughly minimum code to display a window based on a dialog template resource.
 
 #include <windows.h>
 #undef small    // MSVC <windows.h> includes <rpcndr.h> which defines `small` as macro. :(

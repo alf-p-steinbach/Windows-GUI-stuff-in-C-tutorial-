@@ -1,4 +1,4 @@
-﻿// v0 - Roughly minimum code to display a window based on a dialog template resource.
+﻿// v1 - Roughly minimum code to display a window based on a dialog template resource.
 
 #include <windows.h>
 #include "resources.h"

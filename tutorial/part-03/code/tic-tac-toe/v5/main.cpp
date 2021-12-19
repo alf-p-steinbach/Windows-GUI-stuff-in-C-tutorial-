@@ -1,11 +1,16 @@
-﻿// v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode.
+﻿// v5 - Buttons do things.
+// v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode.
 // v3 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
 // v2 - Missing window parts added programmatically: the rules text; the window icon.
 // v1 - Roughly minimum code to display a window based on a dialog template resource.
 
+#include "State.hpp"
+
 #include "wrapped-windows-h.hpp"    // Safer and faster. Safe = e.g. no `small` macro.    
 #include <windowsx.h>               // HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
+
+#include <string>       // std::to_string
 
 
 //------------------------------------------- Support machinery:
@@ -75,53 +80,72 @@ void set_standard_gui_font( const HWND window )
     EnumChildWindows( window, callback, 0 );
 }
 
+
 //------------------------------------------- App code:
 
-void set_app_icon( const HWND window )
-{
-    set_icon( window, Icon_kind::small, Resource_id{ IDI_APP } );
-    set_icon( window, Icon_kind::big, Resource_id{ IDI_APP } );
-}
+namespace app {
+    using std::to_string;
 
-void set_rules_text( const HWND window )
-{
-    char text[2048];
-    LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
-    const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
-    SetWindowText( rules_display, text );
-}
+    ttt::State  state;
 
-void on_close( const HWND window )
-{
-    EndDialog( window, IDOK );
-}
-
-auto on_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
-    -> bool
-{
-    set_app_icon( window );
-    set_standard_gui_font( window );
-    set_rules_text( window );
-    remove_topmost_style_for( window );
-    return true;    // `true` sets focus to the `focus` control.
-}
-
-auto CALLBACK message_handler(
-    const HWND      window,
-    const UINT      msg_id,
-    const WPARAM    w_param,
-    const LPARAM    ell_param
-    ) -> INT_PTR
-{
-    const MSG msg = {window, msg_id, w_param, ell_param};   // Used by HANDLER_OF.
-    switch( msg_id ) {
-        case WM_CLOSE:          return HANDLER_OF( WM_CLOSE, on_close );
-        case WM_INITDIALOG:     return HANDLER_OF( WM_INITDIALOG, on_initdialog );
+    void set_app_icon( const HWND window )
+    {
+        set_icon( window, Icon_kind::small, Resource_id{ IDI_APP } );
+        set_icon( window, Icon_kind::big, Resource_id{ IDI_APP } );
     }
-    return false;   // Didn't process the message, want default processing.
-}
+
+    void set_rules_text( const HWND window )
+    {
+        char text[2048];
+        LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
+        const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
+        SetWindowText( rules_display, text );
+    }
+
+    void on_close( const HWND window )
+    {
+        EndDialog( window, IDOK );
+    }
+
+    void on_command(
+        const HWND      window,
+        const int       id,
+        const HWND      /*control*/,
+        const UINT      /*notification*/
+        )
+    {
+        MessageBox( window, to_string( id ).c_str(), "Command:", MB_ICONINFORMATION );
+    }
+
+    auto on_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
+        -> bool
+    {
+        set_app_icon( window );
+        set_standard_gui_font( window );
+        set_rules_text( window );
+        remove_topmost_style_for( window );
+        return true;    // `true` sets focus to the `focus` control.
+    }
+
+    auto CALLBACK message_handler(
+        const HWND      window,
+        const UINT      msg_id,
+        const WPARAM    w_param,
+        const LPARAM    ell_param
+        ) -> INT_PTR
+    {
+        const MSG msg = {window, msg_id, w_param, ell_param};   // Used by HANDLER_OF.
+        switch( msg_id ) {
+            case WM_CLOSE:          return HANDLER_OF( WM_CLOSE, on_close );
+            case WM_COMMAND:        return HANDLER_OF( WM_COMMAND, on_command );
+            case WM_INITDIALOG:     return HANDLER_OF( WM_INITDIALOG, on_initdialog );
+        }
+        return false;   // Didn't process the message, want default processing.
+    }
+}  // namespace app
 
 auto main() -> int
 {
-    DialogBox( this_exe, Resource_id{ IDD_MAIN_WINDOW }.as_ptr(), HWND(), message_handler );
+    const auto window_definition = Resource_id{ IDD_MAIN_WINDOW }.as_ptr();
+    DialogBox( this_exe, window_definition, HWND(), app::message_handler );
 }
