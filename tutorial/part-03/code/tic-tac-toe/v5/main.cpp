@@ -1,151 +1,95 @@
-﻿// v5 - Buttons do things.
-// v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode.
+﻿// v5 - Keyboard interaction.
+// v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode;
+//      modern look ’n feel via application manifest resource and initcontrolsex.
 // v3 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
+//      <winapi_util.hpp> introduced as place for simple Windows API utility stuff.
 // v2 - Missing window parts added programmatically: the rules text; the window icon.
 // v1 - Roughly minimum code to display a window based on a dialog template resource.
 
-#include "State.hpp"
-
-#include "wrapped-windows-h.hpp"    // Safer and faster. Safe = e.g. no `small` macro.    
-#include <windowsx.h>               // HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
+#include "winapi_util.hpp"          // HANDLER_OF_WM, winapi_util::*
+#include "cpp_util.hpp"             // cpp_util::*
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
 
-#include <string>       // std::to_string
+namespace wu    = winapi_util;
+namespace cpp   = cpp_util;
 
+using cpp::P_;
 
-//------------------------------------------- Support machinery:
-
-// Invokes various <windowsx.h> “message cracker” macros like `HANDLE_WM_CLOSE`.
-#define HANDLER_OF( msg_name, handler_func ) \
-    HANDLE_##msg_name( msg.hwnd, msg.wParam, msg.lParam, handler_func )
-
-const HINSTANCE this_exe = GetModuleHandle( nullptr );
-
-using C_str = const char*;
-struct Icon_kind{ enum Enum{ small = ICON_SMALL, big = ICON_BIG }; };
-
-struct Resource_id
+void set_app_icon( const HWND window )
 {
-    int value;
-    auto as_ptr() const -> C_str { return MAKEINTRESOURCE( value ); }
-};
-
-void set_icon( const HWND window, const Icon_kind::Enum kind, const Resource_id id )
-{
-    const int       size    = (kind == Icon_kind::small? 16 : 32);
-    const HANDLE    icon    = LoadImage( this_exe, id.as_ptr(), IMAGE_ICON, size, size, {} );
-    SendMessage( window, WM_SETICON, kind, reinterpret_cast<LPARAM>( icon ) );
+    wu::set_icon( window, wu::Resource_id{ IDI_APP } );
 }
 
-// A Windows 11 workaround hack. The window is assumed to presently be a “topmost” window.
-// The effect is then to bring the window to the top of the ordinary window Z-order.
-void remove_topmost_style_for( const HWND window )
+void set_rules_text( const HWND window )
 {
-    SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+    char text[2048];
+    LoadString( wu::this_exe, IDS_RULES, text, sizeof( text ) );
+    const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
+    SetWindowText( rules_display, text );
 }
 
-struct Standard_gui_font
+void on_close( const HWND window )
 {
-    Standard_gui_font( const Standard_gui_font& ) = delete;
-    auto operator=( const Standard_gui_font& ) -> Standard_gui_font& = delete;
-
-    HFONT   handle;
-
-    ~Standard_gui_font()
-    {
-        DeleteFont( handle );
-    }
-
-    Standard_gui_font()
-    {
-        // Get the system message box font
-        const auto ncm_size = sizeof( NONCLIENTMETRICS );
-        NONCLIENTMETRICS metrics = {ncm_size};
-        SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm_size, &metrics, 0 );
-        handle = CreateFontIndirect( &metrics.lfMessageFont );
-    }
-};
-
-const auto      std_gui_font    = Standard_gui_font();
-
-void set_standard_gui_font( const HWND window )
-{
-    const auto callback = []( HWND control, LPARAM ) -> BOOL
-    {
-        SetWindowFont( control, std_gui_font.handle, true );
-        return true;
-    };
-
-    SetWindowFont( window, std_gui_font.handle, true );
-    EnumChildWindows( window, callback, 0 );
+    EndDialog( window, IDOK );
 }
 
+auto on_getdlgcode( const HWND window, const P_<MSG> p_msg )
+    -> UINT
+{ return DLGC_WANTARROWS; }
 
-//------------------------------------------- App code:
+auto on_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
+    -> bool
+{
+    wu::set_standard_gui_font( window );
+    wu::remove_topmost_style_for( window );
+    set_app_icon( window );
+    set_rules_text( window );
+    return true;    // `true` sets focus to the `focus` control.
+}
 
-namespace app {
-    using std::to_string;
+void on_key_down(
+    const HWND          window,
+    const UINT          vk,
+    const int           repeat_count,
+    const UINT          flags
+    )
+{
+    MessageBox( window, "key_down", "poI", MB_ICONINFORMATION );
+}
 
-    ttt::State  state;
+void on_key(
+    const HWND          window,
+    const UINT          vk,
+    const bool          is_down,
+    const int           repeat_count,
+    const UINT          flags
+    )
+{ if( is_down or true ) { on_key_down( window, vk, repeat_count, flags ); } }
 
-    void set_app_icon( const HWND window )
-    {
-        set_icon( window, Icon_kind::small, Resource_id{ IDI_APP } );
-        set_icon( window, Icon_kind::big, Resource_id{ IDI_APP } );
+auto CALLBACK message_handler(
+    const HWND      window,
+    const UINT      msg_id,
+    const WPARAM    w_param,
+    const LPARAM    ell_param
+    ) -> INT_PTR
+{
+    const MSG params = {window, msg_id, w_param, ell_param};   // Used by HANDLER_OF_WM.
+    switch( msg_id ) {
+        case WM_CLOSE:      return HANDLER_OF_WM( CLOSE, params, on_close );
+        case WM_GETDLGCODE: return HANDLER_OF_WM( GETDLGCODE, params, on_getdlgcode );
+        case WM_INITDIALOG: return HANDLER_OF_WM( INITDIALOG, params, on_initdialog );
+        case WM_KEYUP:      return HANDLER_OF_WM( KEYUP, params, on_key );
+        case WM_KEYDOWN:    return HANDLER_OF_WM( KEYDOWN, params, on_key );
     }
-
-    void set_rules_text( const HWND window )
-    {
-        char text[2048];
-        LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
-        const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
-        SetWindowText( rules_display, text );
-    }
-
-    void on_close( const HWND window )
-    {
-        EndDialog( window, IDOK );
-    }
-
-    void on_command(
-        const HWND      window,
-        const int       id,
-        const HWND      /*control*/,
-        const UINT      /*notification*/
-        )
-    {
-        MessageBox( window, to_string( id ).c_str(), "Command:", MB_ICONINFORMATION );
-    }
-
-    auto on_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
-        -> bool
-    {
-        set_app_icon( window );
-        set_standard_gui_font( window );
-        set_rules_text( window );
-        remove_topmost_style_for( window );
-        return true;    // `true` sets focus to the `focus` control.
-    }
-
-    auto CALLBACK message_handler(
-        const HWND      window,
-        const UINT      msg_id,
-        const WPARAM    w_param,
-        const LPARAM    ell_param
-        ) -> INT_PTR
-    {
-        const MSG msg = {window, msg_id, w_param, ell_param};   // Used by HANDLER_OF.
-        switch( msg_id ) {
-            case WM_CLOSE:          return HANDLER_OF( WM_CLOSE, on_close );
-            case WM_COMMAND:        return HANDLER_OF( WM_COMMAND, on_command );
-            case WM_INITDIALOG:     return HANDLER_OF( WM_INITDIALOG, on_initdialog );
-        }
-        return false;   // Didn't process the message, want default processing.
-    }
-}  // namespace app
+    return false;   // Didn't process the message, want default processing.
+}
 
 auto main() -> int
 {
-    const auto window_definition = Resource_id{ IDD_MAIN_WINDOW }.as_ptr();
-    DialogBox( this_exe, window_definition, HWND(), app::message_handler );
+    wu::init_common_controls();
+    DialogBox(
+        wu::this_exe, wu::Resource_id{ IDD_MAIN_WINDOW }.as_ptr(),
+        HWND(),             // Parent window, a zero handle is "no parent".
+        message_handler
+        );
 }
