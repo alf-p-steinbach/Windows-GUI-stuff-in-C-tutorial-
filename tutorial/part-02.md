@@ -6,7 +6,11 @@ In Windows programming data that’s embedded in the executable are called **res
 
 There is an original resource handling scheme that deals with binary resources such as icons, and, using that original scheme to embed a text file in the executable, there is a newer XML text based resource scheme that must be used to deal with crucial stuff like UTF-8 support and modern look ’n feel.
 
-In this part we’ll only use the original “Windows API” resource scheme, namely to add a custom icon to the “Hello, world!” message box. The actual result in itself is just very marginal progress: a message box with a custom icon, plus the same icon for the executable. The important aspect is *how* that’s accomplished, namely by using resources, which enables us to next (in part 3) tackle general windows with contents & layout defined by a resource. It also enables us to tackle the problems of modern look ’n feel and UTF-8 text and version information for the executable, but that perfection right now would be yet another very marginal advance of the actual result, so, I guess it wouldn’t be very motivating. Hence we’ll postpone that perfection and do the icon resource thing now and do window contents specification, called a “dialog template” — more directly visible progress yay! — in the next part.
+In this part we’ll only use the original “Windows API” resource scheme, namely to add a custom icon to the “Hello, world!” message box.
+
+The actual result in itself is just very marginal progress: a message box with a custom icon, plus the same icon for the executable. The important aspect is *how* that’s accomplished, namely by using resources, which later (in part 3) will enable us to tackle general windows with contents & layout defined by a resource. In an even later part it will also enable us to tackle the problems of modern look ’n feel, providing version information, and using UTF-8 Unicode text.
+
+However, that perfection right now would be yet another very marginal advance of the actual result. Hence we’ll postpone these perfections and do just the icon resource thing now. We’ll use window contents specification, called a “dialog template” — more directly visible progress yay! — in part 3.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -41,7 +45,7 @@ The default icons can change a little with each Windows version; the above is fo
 ---
 ### 2.2. Icon files.
 
-Compared to images in general, an icon image (1) is typically of a very small standard square size, e.g. 16×16 or 32×32 pixels, and (2) can have transparent areas. Since icons are so small, with so course-grained graphics, automatic scaling will generally not do a good job. Instead icons are handcrafted in the standard sizes that one supports, and an **“.ico” file** contains a set of such standard size specially crafted adapations of the image (in some cases the smallest image can be quite different to make it look good, less awful, or even recognizable).
+Compared to images in general, an icon image (1) is typically of a very small standard square size, e.g. 16×16 or 32×32 pixels, and (2) can have transparent areas. Windows 11 supports icons up to 256×256 pixels, called “extra large icons”. But since icons generally are very small, with very course-grained graphics, automatic scaling will generally not do a good job. Instead icons are handcrafted in the standard sizes that one supports, and an **“.ico” file** contains a set of such standard size specially crafted adapations of the image; just providing 16×16 and 32×32 pixel variants go a long way. In some cases the smallest image can be quite different to make it look good, less awful, or even recognizable.
 
 An icon resource is the same format as an “.ico” file: a collection of standard size icon images.
 

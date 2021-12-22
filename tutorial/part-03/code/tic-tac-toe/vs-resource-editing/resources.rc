@@ -13,26 +13,6 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// Neutral resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEU)
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-#pragma code_page(0)
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Icon
-//
-
-// Icon with lowest ID value placed first to ensure application icon
-// remains consistent on all systems.
-IDI_APP                 ICON                    "resources/app.ico"
-
-#endif    // Neutral resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
 // English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
@@ -70,13 +50,13 @@ END
 // Dialog
 //
 
-IDD_MAIN_WINDOW DIALOGEX 0, 0, 344, 132
-STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CAPTION | WS_SYSMENU
+IDD_MAIN_WINDOW DIALOGEX 0, 0, 340, 132
+STYLE DS_SETFONT | DS_CENTER | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST
 CAPTION "Tic-tac-toe (mostly random)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Click a place on the board, or type its digit 1 through 9.",0,7,7,313,11,SS_NOPREFIX
+    LTEXT           "Click a place on the board,  or type its digit 1 through 9.",0,7,7,313,11,SS_NOPREFIX
     PUSHBUTTON      "7",1007,5,24,36,32,BS_FLAT
     PUSHBUTTON      "8",1008,43,24,36,32,BS_FLAT
     PUSHBUTTON      "9",1009,81,24,36,32,BS_FLAT
@@ -86,7 +66,7 @@ BEGIN
     PUSHBUTTON      "1",1001,5,93,36,32,BS_FLAT
     PUSHBUTTON      "2",1002,43,93,36,32,BS_FLAT
     PUSHBUTTON      "3",1003,81,93,36,32,BS_FLAT
-    LTEXT           "<The rules should be displayed here>",IDC_RULES_DISPLAY,123,25,217,96,SS_NOPREFIX
+    LTEXT           "<The rules should be displayed here>",IDC_RULES_DISPLAY,123,24,214,110,SS_NOPREFIX
 END
 
 
@@ -101,7 +81,7 @@ BEGIN
     IDD_MAIN_WINDOW, DIALOG
     BEGIN
         LEFTMARGIN, 7
-        RIGHTMARGIN, 341
+        RIGHTMARGIN, 349
         TOPMARGIN, 7
         BOTTOMMARGIN, 125
     END
@@ -131,6 +111,26 @@ BEGIN
 END
 
 #endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral (Sys. Default) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_NEUSD)
+LANGUAGE LANG_NEUTRAL, SUBLANG_SYS_DEFAULT
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APP                 ICON                    "resources/app.ico"
+
+#endif    // Neutral (Sys. Default) resources
 /////////////////////////////////////////////////////////////////////////////
 
 

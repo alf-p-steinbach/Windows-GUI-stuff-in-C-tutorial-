@@ -9,7 +9,7 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 // The icon with lowest ID value should be placed first to ensure that the
 // application icon (executable's file icon) remains consistent on all systems.
-IDI_APP                 ICON                    "resources/app.ico"
+IDI_APP     ICON    "resources/app.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
