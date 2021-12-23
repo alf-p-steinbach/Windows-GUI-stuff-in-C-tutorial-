@@ -1,4 +1,4 @@
-﻿// v5 - Basic interaction.
+﻿// v5 - Basic interaction (working game play, but no notification of win, or restart).
 // v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode;
 //      modern look ’n feel via application manifest resource and initcontrolsex.
 // v3 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
@@ -22,17 +22,7 @@ namespace cu    = cpp_util;
 using   cu::squared, cu::Range, cu::is_in;
 using   std::array, std::optional, std::to_string;
 
-struct Cell
-{
-    struct State
-    {
-        enum Enum{ empty, cross, circle };
-        
-        static auto opposite_of( const Enum state )
-            -> Enum
-        { return array{ empty, circle, cross }[state]; }
-    };
-};
+struct Cell{ struct State{ enum Enum{ empty, cross, circle }; }; };
 
 struct Board
 {
