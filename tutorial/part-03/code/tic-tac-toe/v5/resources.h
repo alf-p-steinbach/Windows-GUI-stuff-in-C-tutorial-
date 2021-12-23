@@ -6,5 +6,6 @@
 #define IDC_RULES_DISPLAY               102
 #define IDS_RULES                       103
 #define IDI_APP                         104
+#define IDC_STATUS_DISPLAY              105
 
 #define BOARD_BUTTON_BASE               1000

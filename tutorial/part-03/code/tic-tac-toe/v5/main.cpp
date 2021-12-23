@@ -1,4 +1,4 @@
-﻿// v5 - Basic interaction (working game play, but no notification of win, or restart).
+﻿// v5 - Basic interaction (working game play, notification of win/lose/tie, restart).
 // v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode;
 //      modern look ’n feel via application manifest resource and initcontrolsex.
 // v3 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
@@ -6,141 +6,92 @@
 // v2 - Missing window parts added programmatically: the rules text; the window icon.
 // v1 - Roughly minimum code to display a window based on a dialog template resource.
 
+#include "ttt-Game.hpp"             // ttt::Game
 #include "winapi_util.hpp"          // HANDLER_OF_WM, winapi_util::*
 #include "cpp_util.hpp"
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
 
 #include <assert.h>
-
-#include <array>
-#include <optional>
 #include <string>
 
 namespace wu    = winapi_util;
 namespace cu    = cpp_util;
 
-using   cu::squared, cu::Range, cu::is_in;
-using   std::array, std::optional, std::to_string;
+using   cu::Range, cu::is_in;
+using   std::string, std::to_string;
+using   ttt::Cell, ttt::Board, ttt::Game;
 
-struct Cell{ struct State{ enum Enum{ empty, cross, circle }; }; };
+constexpr int cell_1_id = BOARD_BUTTON_BASE + 1;
+constexpr int cell_9_id = BOARD_BUTTON_BASE + 9;
 
-struct Board
+constexpr auto empty    = Cell::State::empty;
+constexpr auto cross    = Cell::State::cross;
+constexpr auto circle   = Cell::State::circle;
+
+Game    the_game;
+string  the_original_status_text;       // Initialized by `on_wm_initdialog`.
+
+void set_status_text( const HWND window, const string& text )
 {
-    enum{ size = 3, n_cells = squared( size ), max_index = n_cells - 1 };
-
-    struct Line{ int start; int stride; };
-    static constexpr Line lines[] =
-    {
-        {0, 1}, {3, 1}, {6, 1}, {0, 3}, {1, 3}, {2, 3}, {0, 4}, {2, 2}
-    };
-
-    array<Cell::State::Enum, n_cells>   cells   = {};
-    
-    auto win_line_with( const Cell::State::Enum state ) const
-        -> optional<Line>
-    {
-        for( const Line& line: lines ) {
-            int count = 0;
-            for( int offset = 0; offset < size*line.stride; offset += line.stride ) {
-                count += (cells[line.start + offset] == state);
-            }
-            if( count == size ) { return line; }
-        }
-        return {};
-    }
-};
-
-struct Game
-{
-    Board                   board       = {};
-    int                     n_moves     = 0;
-    optional<Board::Line>   win_line    = {};
-
-    void note_any_win( const Cell::State::Enum state )
-    {
-        if( const auto new_win_line = board.win_line_with( state ) ) {
-            win_line = new_win_line;
-            return;
-        }
-    }
-    
-    auto is_over() const -> bool { return n_moves == Board::n_cells or win_line; }
-    
-    auto find_computer_move() const
-        -> int
-    {
-        assert( not is_over() );
-        // Choose direct win if possible.
-        for( int i = 0; i < Board::n_cells; ++i ) {
-            if( board.cells[i] == Cell::State::empty ) {
-                Board a_copy = board;
-                a_copy.cells[i] = Cell::State::circle;
-                if( a_copy.win_line_with( Cell::State::circle ) ) {
-                    return i;
-                }
-            }
-        }
-        // Else block user win if any.
-        for( int i = 0; i < Board::n_cells; ++i ) {
-            if( board.cells[i] == Cell::State::empty ) {
-                Board a_copy = board;
-                a_copy.cells[i] = Cell::State::cross;
-                if( a_copy.win_line_with( Cell::State::cross ) ) {
-                    return i;
-                }
-            }
-        }
-        // Else choose a move at random.
-        const int n_possibles = Board::n_cells - n_moves;
-        const int which_free_cell = cu::random_up_to( n_possibles );
-        int count = 0;
-        for( int i = 0; i < Board::n_cells; ++i ) {
-            if( board.cells[i] == Cell::State::empty ) {
-                if( count == which_free_cell ) {
-                    return i;
-                }
-                ++count;
-            }
-        }
-        for( ;; );  // Should never get here.
-    }
-};
-
-Game the_game;
+    const HWND status_display = GetDlgItem( window, IDC_STATUS_DISPLAY );
+    SetWindowText( status_display, text.c_str() );
+}
 
 auto button_for_cell_index( const int i, const HWND window )
     -> HWND
 { return GetDlgItem( window, BOARD_BUTTON_BASE + i + 1 ); }
 
-void mark_if_win( const HWND window )
+void make_a_new_game( const HWND window )
 {
+    the_game = {};
+    for( int i = 1; i <= 9; ++i ) {
+        const HWND control = button_for_cell_index( i - 1, window );
+        const string text = "&" + to_string( i );
+        SetWindowText( control, text.c_str() );
+        wu::enable( control );
+    }
+    wu::enable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
+    SetFocus( GetDlgItem( window, BOARD_BUTTON_BASE + 7 ) );
+    set_status_text( window, the_original_status_text );
+}
+
+void indicate_game_over( const HWND window )
+{
+    for( int id = cell_1_id; id <= cell_9_id; ++id ) {
+        wu::disable( GetDlgItem( window, id ) );
+    }
+    wu::disable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
     if( the_game.win_line ) {
-        const Board::Line& wl = the_game.win_line.value();
-        for( int offset = 0; offset < Board::size*wl.stride; offset += wl.stride ) {
-            const int win_i = wl.start + offset;
-            (void) win_i; (void) window; // TODO: Image? Bold font?
+        const bool user_won = (the_game.board.cells[the_game.win_line->start] == cross);
+        if( user_won ) {
+            set_status_text( window, "You won! Yay! Click anywhere for a new game." );
+        } else {
+            set_status_text( window, "I won. Better luck next time. Just click anywhere." );
         }
+    } else {
+        set_status_text( window, "It's a tie.  Click anywhere for a new game." );
     }
 }
 
 void on_user_move( const HWND window, const int user_move )
 {
-    if( the_game.board.cells[user_move] != Cell::State::empty or the_game.is_over() ) {
+    if( the_game.board.cells[user_move] != empty or the_game.is_over() ) {
         FlashWindow( window, true );    // Documentation per late 2021 is misleading/wrong.
         return;
     }
 
-    the_game.board.cells[user_move] = Cell::State::cross;
-    the_game.note_any_win( Cell::State::cross );
+    the_game.board.cells[user_move] = cross;
+    the_game.note_any_win( cross );
     ++the_game.n_moves;
     SetWindowText( button_for_cell_index( user_move, window ), "X" );
     if( not the_game.is_over() ) {
         const int computer_move = the_game.find_computer_move();
-        the_game.board.cells[computer_move] = Cell::State::circle;
-        the_game.note_any_win( Cell::State::circle );
+        the_game.board.cells[computer_move] = circle;
+        the_game.note_any_win( circle );
         ++the_game.n_moves;
         SetWindowText( button_for_cell_index( computer_move, window ), "O" );
     }
+    if( the_game.is_over() ) { indicate_game_over( window ); }
 }
 
 void set_app_icon( const HWND window )
@@ -163,8 +114,6 @@ void on_wm_close( const HWND window )
 
 void on_wm_command( const HWND window, const int id, const HWND control, const UINT notification )
 {
-    const int cell_1_id = BOARD_BUTTON_BASE + 1;
-    const int cell_9_id = BOARD_BUTTON_BASE + 9;
     if( is_in( Range{ cell_1_id, cell_9_id }, id ) and notification == BN_CLICKED ) {
         const int cell_index = id - cell_1_id;
         on_user_move( window, cell_index );
@@ -179,7 +128,21 @@ auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*e
     wu::remove_topmost_style_for( window );
     set_app_icon( window );
     set_rules_text( window );
+    the_original_status_text = wu::text_of( GetDlgItem( window, IDC_STATUS_DISPLAY ) );
     return true;    // `true` sets focus to the `focus` control.
+}
+
+void on_wm_lbuttondown(
+    const HWND          window,
+    const bool          /*is_double_click*/,
+    const int           /*x*/,
+    const int           /*y*/,
+    const unsigned      /*key_flags*/
+    )
+{
+    if( the_game.is_over() ) {
+        make_a_new_game( window );
+    }
 }
 
 auto CALLBACK message_handler(
@@ -189,11 +152,12 @@ auto CALLBACK message_handler(
     const LPARAM    ell_param
     ) -> INT_PTR
 {
-    const MSG params = {window, msg_id, w_param, ell_param};   // Used by HANDLER_OF_WM.
+    const MSG params = {window, msg_id, w_param, ell_param};
     switch( msg_id ) {
-        case WM_CLOSE:      return HANDLER_OF_WM( CLOSE, params, on_wm_close );
-        case WM_COMMAND:    return HANDLER_OF_WM( COMMAND, params, on_wm_command );
-        case WM_INITDIALOG: return HANDLER_OF_WM( INITDIALOG, params, on_wm_initdialog );
+        case WM_CLOSE:          return HANDLER_OF_WM( CLOSE, params, on_wm_close );
+        case WM_COMMAND:        return HANDLER_OF_WM( COMMAND, params, on_wm_command );
+        case WM_INITDIALOG:     return HANDLER_OF_WM( INITDIALOG, params, on_wm_initdialog );
+        case WM_LBUTTONDOWN:    return HANDLER_OF_WM( LBUTTONDOWN, params, on_wm_lbuttondown );
     }
     return false;   // Didn't process the message, want default processing.
 }

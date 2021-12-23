@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <assert.h>
 #include <random>
 
 namespace cpp_util {

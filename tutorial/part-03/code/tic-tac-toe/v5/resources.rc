@@ -24,7 +24,7 @@ EXSTYLE WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST
 CAPTION "Tic-tac-toe (mostly random)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Click a place on the board,  or type its digit 1 through 9.", 0, 7, 7, 313, 11, SS_NOPREFIX
+    LTEXT           "Click a place on the board,  or type its digit 1 through 9.", IDC_STATUS_DISPLAY, 7, 7, 313, 11, SS_NOPREFIX
     PUSHBUTTON      "&7", BOARD_BUTTON_BASE + 7, 5, 24, 36, 32, BS_FLAT
     PUSHBUTTON      "&8", BOARD_BUTTON_BASE + 8, 43, 24, 36, 32, BS_FLAT
     PUSHBUTTON      "&9", BOARD_BUTTON_BASE + 9, 81, 24, 36, 32, BS_FLAT

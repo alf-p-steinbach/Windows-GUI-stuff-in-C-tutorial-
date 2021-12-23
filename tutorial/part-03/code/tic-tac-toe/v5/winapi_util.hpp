@@ -4,8 +4,10 @@
 #include <commctrl.h>               // InitCommonControlsEx
 
 #include <initializer_list>         // For using range-based `for` over initializer list.
+#include <string>
 
 namespace winapi_util {
+    using std::string;
 
     // Invokes various <windowsx.h> “message cracker” macros like `HANDLE_WM_CLOSE`. Each such
     // macro interprets WPARAM and LPARAM depending on the message id, and in turn invokes a
@@ -92,4 +94,18 @@ namespace winapi_util {
         return !!InitCommonControlsEx( &params );
     }
 
+    inline void enable( const HWND window ) { EnableWindow( window, true ); }
+    inline void disable( const HWND window ) { EnableWindow( window, false ); }
+    
+    inline auto text_of( const HWND window )
+        -> string
+    {
+        const int buffer_size = 1 + GetWindowTextLength( window );
+        auto result = string( buffer_size, '\0' );
+        if( buffer_size > 0 ) {
+            const int length = GetWindowText( window, &result[0], buffer_size );
+            result.resize( length );
+        }
+        return result;
+    }
 }  // namespace winapi_util
