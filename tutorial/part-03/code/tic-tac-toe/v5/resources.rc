@@ -39,5 +39,5 @@ END
 
 STRINGTABLE
 BEGIN
-  IDS_RULES         "You win with 3 croses in a line, either horizontally, vertically or diagonally.\n\nPlace a cross by clicking an empty board position, or type that position’s digit (‘1’ through ‘9’). The computer will respond with a circle as counter move. The computer's response is random except that it will exploit a direct winning opportunity, and likewise if possible will block a direct winning opportunity for you.\n\nHave fun. May the force be with you!"
+  IDS_RULES         "You win with 3 crosses in a line, either horizontally, vertically or diagonally.\n\nPlace a cross by clicking an empty board position, or type that position’s digit (‘1’ through ‘9’). The computer will respond with a circle as counter move. The computer's response is random except that it will exploit a direct winning opportunity, and likewise if possible will block a direct winning opportunity for you.\n\nHave fun. May the force be with you!"
 END
