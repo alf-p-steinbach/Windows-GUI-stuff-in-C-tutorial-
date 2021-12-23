@@ -4,7 +4,7 @@
 
 In Windows programming data that’s embedded in the executable are called **resources**.
 
-There is an original resource handling scheme that deals with binary resources such as icons, and, using that original scheme to embed a text file in the executable, there is a newer XML text based resource scheme that must be used to deal with crucial stuff like UTF-8 support and modern look ’n feel.
+There is an original resource handling scheme that deals with binary resources such as icons, and, using that original scheme to embed a text file in the executable, there is a newer XML text based resource scheme that must be used to deal with crucial stuff like UTF-8 support and modern look ’n feel. The original binary resource scheme is the “Windows API” scheme, and as of Windows 11 it’s still the scheme used to provide information such as file icon and file details to Windows Explorer. The XML based scheme is closely tied to .NET programming, but is also used for API level resolution of “side by side” DLLs.
 
 In this part we’ll only use the original “Windows API” resource scheme, namely to add a custom icon to the “Hello, world!” message box.
 
