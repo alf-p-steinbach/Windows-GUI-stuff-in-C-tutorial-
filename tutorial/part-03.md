@@ -8,7 +8,7 @@ That window contains two text areas and nine flat buttons, specified by the dial
 
 ![The Tic-Tac-Toe game window](part-03/images/sshot-1.the-final-window.png)
 
-The game itself is just a little detail at the end, though. Mainly the five (!) versions of the program I discuss here exemplify general Windows programming techniques and issues, a kind of **event based programming**, with the game logic added in as a final touch in the fifth version. The parts of the Windows API used here are all C oriented, and I chose to present this with C++ used as “a better C”, which yields a very common kind of paradoxical hybrid C++ code that uses primitive C style techniques to adapt an object oriented design that’s akin to use of virtual functions in C++…
+The game itself is just a little detail at the end, though. Mainly the five (!) versions of the program I discuss here exemplify general Windows programming techniques and issues, a kind of C style **event based programming**, with the game logic added in as a final touch in the fifth version. The parts of the Windows API used here are all C oriented, and I chose to present this with C++ used as “a better C”, which yields a very common kind of paradoxical hybrid C++ code that uses primitive C style techniques to adapt an object oriented design that’s akin to use of virtual functions in C++…
 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
