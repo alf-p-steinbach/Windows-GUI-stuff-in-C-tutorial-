@@ -15,11 +15,7 @@ The game itself is just a little detail at the end, though. Mainly the five (!) 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [2.1. File icons.](#21-file-icons)
-- [2.2. Icon files.](#22-icon-files)
-- [2.3. Package the icon in a linker friendly binary file, via a resource script.](#23-package-the-icon-in-a-linker-friendly-binary-file-via-a-resource-script)
-- [2.4. The C++ side: identify the resource via a *pseudo-pointer* and a *module handle*.](#24-the-c-side-identify-the-resource-via-a-pseudo-pointer-and-a-module-handle)
-- [2.5 Build the executable with resources embedded.](#25-build-the-executable-with-resources-embedded)
+- [3.1. File xxx.](#31-file-xxx)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -28,7 +24,9 @@ The game itself is just a little detail at the end, though. Mainly the five (!) 
 
 ### 3.1. File xxx.
 
-# sdf 
+
+
+--- 
 
 Versions 1 is minimal code to get the window up and running, based on the dialog template. Essentially this uses Windows’s `DialogBox` function to launch the window, and provides a callback function to handle window closing, customizing that. For unfortunately the default functionality doesn’t let the user close the window…
 
