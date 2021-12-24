@@ -15,7 +15,7 @@ The game logic is just a little detail at the end, though. Mainly the five (!) v
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [3.1. File xxx.](#31-file-xxx)
+- [3.1. Creating and running a dialog template based general window.](#31-creating-and-running-a-dialog-template-based-general-window)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -24,14 +24,18 @@ The game logic is just a little detail at the end, though. Mainly the five (!) v
 
 ### 3.1. Creating and running a dialog template based general window.
 
-In this version 1 we’re only concerned with displaying a window with contents defined by a dialog template resource. It’s like a “Hello, world!” program: near simplest possible in order to learn tool usage etc. without complications. Except that now it’s for a general window instead of console text display, so even the simplest is a bit complicated…
+In this version 1 we’re only concerned with displaying a window with contents defined by a dialog template resource. It’s like a “Hello, world!” program: near simplest possible in order to learn tool usage etc. without complications. Except that now it’s for a general Windows API level window instead of console text display, so even the simplest is a bit complicated…
 
-So, in order to keep things simple now, there will be a host of things that will need fixing in later versions. I.e. version 1 is a quite imperfect window; even without a window icon! Only two absolutely crucial things are addressed in this version:
+So, in order to keep things simple now, there will be a host of things that will need fixing in later versions. So version 1 is a quite imperfect window. It’s even without a custom window icon!
 
-* The window is placed in **topmost** mode, where it’s above all normal windows. That’s a way (and perhaps the only way) to ensure that it becomes visible when you run the program in Windows 11. The topmost mode is specified in the dialog resource, and we’ll remove it programmatically in version 4.
+![The v1 window](part-03/images/sshot-2.main-window-v1.png)
+
+Only two absolutely crucial problems are addressed in this version:
+
+* The window is placed in **topmost** mode, where it’s above all normal windows. That’s a way (and perhaps the only way) to ensure that it becomes visible when you run the program in Windows 11. The topmost mode is specified in the dialog resource, and we’ll remove that mode programmatically in version 4.
 * The default behavior is customized to let the window close when the user attempts to close it.
 
-Making the window closable is not *absolutely* crucial, because when you build the program with console subsystem and run it from a command interpreter, you can usually terminate it via `Ctrl C` in the command interpreter. Which is an additional reason to build a GUI program with console subsystem during development. However, it’s nice to not have to be aware of that, to be able to close the window in the normal way such as clicking the ✖ symbol.
+Making the window closable is not *absolutely* crucial, because when you build the program with console subsystem and run it from a command interpreter, you can usually terminate it via `Ctrl`+`C` in the command interpreter. Which is an additional reason to build a GUI program with console subsystem during development. However, it’s nice to not have to be aware of that, to be able to close the window in the normal way such as clicking the ✖ symbol.
 
 
 ---
