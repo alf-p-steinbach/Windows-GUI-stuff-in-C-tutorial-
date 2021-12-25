@@ -15,7 +15,7 @@ The game logic is just a little detail at the end, though. Mainly the five (!) v
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [3.1. Creating and running a dialog template based general window.](#31-creating-and-running-a-dialog-template-based-general-window)
+- [3.1. A general window based on a dialog template.](#31-a-general-window-based-on-a-dialog-template)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
