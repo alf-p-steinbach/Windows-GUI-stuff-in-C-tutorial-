@@ -2,13 +2,13 @@
 
 ## Part 3 – A Tic-Tac-Toe game in a general window.
 
-In the previous part we saw that an application’s icon is provided via data embedded in the executable, called a resource. Now we’ll additionally use a resource called a dialog template, that describes the contents of a simple window. As a concrete example we’ll use that for a simple Tic-Tac-Toe (tree in a row) game in a general window.
+In the previous part we saw that an application’s icon is provided via data embedded in the executable, called a resource. Now we’ll additionally use a resource called a **dialog template**, that describes the contents of a simple window. As a concrete example we’ll use that for a simple Tic-Tac-Toe (tree in a row) game in a general window.
 
 That window contains two text areas and nine flat buttons, specified by the dialog template:
 
 ![The Tic-Tac-Toe game window](part-03/images/sshot-1.the-final-window.png)
 
-The game logic is just a little detail at the end, though. Mainly the five (!) versions of the program exemplify general Windows programming techniques and issues, a kind of C style **event based programming**, with the game logic added in as a final touch in the fifth version. The parts of the Windows API used here are all designed for use from C, and we’ll use this API more or less directly with C++ as just a “better C”.
+The game logic is just a little detail at the end, though. Mainly the five (!) versions of the program exemplify general Windows programming techniques and issues, a kind of C style **event based programming**. The parts of the Windows API used here are all designed for use from C, and we’ll use this API more or less directly with C++ as just a “better C”.
 
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -22,20 +22,22 @@ The game logic is just a little detail at the end, though. Mainly the five (!) v
 
 ---
 
-### 3.1. Creating and running a dialog template based general window.
+### 3.1. A general window based on a dialog template.
 
-In this version 1 we’re only concerned with displaying a window with contents defined by a dialog template resource. It’s like a “Hello, world!” program: near simplest possible in order to learn tool usage etc. without complications. Except that now it’s for a general Windows API level window instead of console text display, so even the simplest is a bit complicated…
-
-So, in order to keep things simple now, there will be a host of things that will need fixing in later versions. So version 1 is a quite imperfect window. It’s even without a custom window icon!
+In order to keep things simple now, there will be a host of issues that are deferred, problems that will need fixing in later versions. So version 1 is an incomplete and quite imperfect window. It’s even without a custom window icon!
 
 ![The v1 window](part-03/images/sshot-2.main-window-v1.png)
 
 Only two absolutely crucial problems are addressed in this version:
 
-* The window is placed in **topmost** mode, where it’s above all normal windows. That’s a way (and perhaps the only way) to ensure that it becomes visible when you run the program in Windows 11. The topmost mode is specified in the dialog resource, and we’ll remove that mode programmatically in version 4.
-* The default behavior is customized to let the window close when the user attempts to close it.
+* The default behavior is, quite unreasonably, that any attempt to close the window has *no effect*.
+* Windows 11 often fails to [**activate**](https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#active-window) a new window, so that in many situations running a program has *no visible effect* where you’re looking (though an icon may appear in the taskbar).
 
-Making the window closable is not *absolutely* crucial, because when you build the program with console subsystem and run it from a command interpreter, you can usually terminate it via `Ctrl`+`C` in the command interpreter. Which is an additional reason to build a GUI program with console subsystem during development. However, it’s nice to not have to be aware of that, to be able to close the window in the normal way such as clicking the ✖ symbol.
+For now and until version 4 we’ll deal with the activation problem by just specifying in the dialog template that the window should be in **topmost** mode, where it always is very visible above all normal mode window. The problem with that is that the window also appears above existing topmost windows, such as on my machine the on-screen analog clock. Version 4 will turn off topmost mode after the window has been created, leaving the window above other normal mode windows but allowing it to slip beneath topmost windows that you really want to see.
+
+
+
+The window closing problem requires a programmatic solution. 
 
 
 ---
