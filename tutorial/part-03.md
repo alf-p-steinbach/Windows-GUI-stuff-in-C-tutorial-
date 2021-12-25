@@ -33,12 +33,92 @@ Only two absolutely crucial problems are addressed in this version:
 * The default behavior is, quite unreasonably, that any attempt to close the window has *no effect*.
 * Windows 11 often fails to [**activate**](https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#active-window) a new window, so that in many situations running a program has *no visible effect* where you’re looking (though an icon may appear in the taskbar).
 
-For now and until version 4 we’ll deal with the activation problem by just specifying in the dialog template that the window should be in **topmost** mode, where it’s always very visible above all normal mode window. The main problem with that is that the window also appears above existing topmost windows, such as on my machine above the on-screen analog clock. Version 4 will turn off topmost mode after the window has been created, leaving the window above other normal mode windows but allowing it to slip beneath topmost windows that you really want to see.
+For now and until version 4 we’ll deal with the activation problem by just specifying in the dialog template that the window should be in **topmost** mode, where it’s always very visible above all normal mode windows. The main problem with that is that the window also appears above existing topmost windows, such as on my machine above the on-screen analog clock. For that reason version 4 will turn off topmost mode after the window has been created.
 
-To address the window closing problem we need to programmatically override the default handling of a window close attempt. Normally in C++ one would do that by overriding some virtual function, preferably using the C++ `override` keyword, and indeed that’s the way to do it with some C++ GUI frameworks. However, here we’re dealing with a C oriented part of the Windows API, so it needs to be done in a C-ish way via a **callback function**:
+To address the window no-close problem we need to programmatically override the default handling of a window close attempt. Normally in C++ one would do that by overriding some virtual function, preferably using the C++ `override` keyword, and indeed that’s the way to do it with some C++ GUI frameworks. However, here we’re dealing with a C oriented part of the Windows API, where it needs to be done in a C-ish way via a freestanding function:
 
+~~~ cpp
+auto CALLBACK message_handler(
+    const HWND              window,
+    const UINT              msg_id,
+    const WPARAM            ,       // w_param
+    const LPARAM                    // ell_param
+    ) -> INT_PTR
+{
+    if( msg_id == WM_CLOSE ) {
+        EndDialog( window, IDOK );  // Without this the window won't close.
+        return true;
+    }
+    return false;       // Didn't process the message, want default.
+}
+~~~
 
+This function is specified in the call to **`DialogBox`** that creates and runs the window,
 
+~~~ cpp
+DialogBox( ⋯, message_handler );
+~~~
+
+The Windows code that runs the window then calls the function each time something happens that application code can customize or react to, i.e. this is a **callback** function.
+
+Which window a call is about is specified by the `window` argument, and exactly what happened or is about to happen is specied by the `msg_id` argument, a window **message**. That’s old Smalltalk and (subsequently) Windows programming terminology. With modern terminology, which however is rarely used in Windows API-level window programming, it’s called an **event id**.
+
+The **`WM_CLOSE`** message (event id) is received when the user has attempted to close the window, e.g. by clicking the ✖ close button or via the `Alt`+`F4` keyboard shortcut. The default is that nothing happens. Calling **`EndDialog`** is the proper way to close a window that was created via `DialogBox`.
+
+The `DialogBox` call returns when the window is closed, and the argument to `EndDialog`, here `IDOK`, specifies the value that `DialogBox` should return. `IDOK`, `IDCANCEL` etc. are the id numbers of the possible buttons in a message box, and serve as standard return values from dialog windows. It’s just an `int` return value that you can use for whatever.
+
+Note about [the documentation of `DialogBox`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-dialogboxa): it currently states that `DialogBoxA` is a macro. But `DialogBoxA` is a function. It’s `DialogBox` that is a macro, that by default resolves to `DialogBoxA`. Microsoft’s documentation used to be of less severe ungoodness. It’s worth keeping in mind that it needs to be read with a lot of understanding and sometimes *testing*, and an assumption that those technical writers that maintain it, don’t know the first thing about programming (as an example, as of late 2021 the documentation is still full of invalid-in-C++ `void main` beginners’ mistakes).
+
+Full C++ code:
+
+[*part-03/code/tic-tac-toe/v1/main.cpp*](part-03/code/tic-tac-toe/v1/main.cpp)
+~~~ cpp
+// v1 - Roughly minimal code to display a window based on a dialog template resource.
+
+#include <windows.h>
+#include "resources.h"
+
+auto CALLBACK message_handler(
+    const HWND              window,
+    const UINT              msg_id,
+    const WPARAM            ,       // w_param
+    const LPARAM                    // ell_param
+    ) -> INT_PTR
+{
+    if( msg_id == WM_CLOSE ) {
+        EndDialog( window, IDOK );  // Without this the window won't close.
+        return true;
+    }
+    return false;       // Didn't process the message, want default.
+}
+
+auto main() -> int
+{
+    using C_str = const char*;
+    const HINSTANCE this_executable     = GetModuleHandle( nullptr );
+    const C_str     resource_id_as_ptr  = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
+
+    DialogBox( this_executable, resource_id_as_ptr, HWND(), message_handler );
+}
+~~~
+
+Here the `"resources.h"` file just specifies the `IDD_MAIN_WINDOW` macro that resolves to a number that — together with a specification of which executable the resource is in — identifies the dialog template resource. It’s a macro because the resource compiler understands C macros but not C or C++ typed constants. In essence the C and C++ preprocessor is the glue, a common shared little language, that connects the C++ code with the resource script.
+
+[*part-03/code/tic-tac-toe/v1/resources.h*](part-03/code/tic-tac-toe/v1/resources.h)
+~~~ cpp
+#pragma once
+
+#define IDC_STATIC                      -1
+
+#define IDD_MAIN_WINDOW                 101
+#define IDC_RULES_DISPLAY               102
+#define IDS_RULES                       103
+#define IDI_APP                         104
+
+#define BOARD_BUTTON_BASE               1000
+~~~
+
+asd
 
 ---
 asdasdasd
