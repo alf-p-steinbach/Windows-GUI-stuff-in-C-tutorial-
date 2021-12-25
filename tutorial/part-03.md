@@ -33,11 +33,11 @@ Only two absolutely crucial problems are addressed in this version:
 * The default behavior is, quite unreasonably, that any attempt to close the window has *no effect*.
 * Windows 11 often fails to [**activate**](https://docs.microsoft.com/en-us/windows/win32/winmsg/window-features#active-window) a new window, so that in many situations running a program has *no visible effect* where you’re looking (though an icon may appear in the taskbar).
 
-For now and until version 4 we’ll deal with the activation problem by just specifying in the dialog template that the window should be in **topmost** mode, where it always is very visible above all normal mode window. The problem with that is that the window also appears above existing topmost windows, such as on my machine the on-screen analog clock. Version 4 will turn off topmost mode after the window has been created, leaving the window above other normal mode windows but allowing it to slip beneath topmost windows that you really want to see.
+For now and until version 4 we’ll deal with the activation problem by just specifying in the dialog template that the window should be in **topmost** mode, where it’s always very visible above all normal mode window. The main problem with that is that the window also appears above existing topmost windows, such as on my machine above the on-screen analog clock. Version 4 will turn off topmost mode after the window has been created, leaving the window above other normal mode windows but allowing it to slip beneath topmost windows that you really want to see.
+
+To address the window closing problem we need to programmatically override the default handling of a window close attempt. Normally in C++ one would do that by overriding some virtual function, preferably using the C++ `override` keyword, and indeed that’s the way to do it with some C++ GUI frameworks. However, here we’re dealing with a C oriented part of the Windows API, so it needs to be done in a C-ish way via a **callback function**:
 
 
-
-The window closing problem requires a programmatic solution. 
 
 
 ---
