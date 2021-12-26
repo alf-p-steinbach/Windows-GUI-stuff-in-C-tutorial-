@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="resources.rc" />
+    <ResourceCompile Include="v1.rc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resources.h" />
