@@ -1,5 +1,5 @@
 ﻿// v2 - Missing window parts added programmatically: the rules text; the window icon.
-// v1 - Roughly minimum code to display a window based on a dialog template resource.
+// v1 - Roughly minimal code to display a window based on a dialog template resource.
 
 #include <windows.h>
 #undef small    // MSVC <windows.h> includes <rpcndr.h> which defines `small` as macro. :(
@@ -12,7 +12,7 @@
 const HINSTANCE this_exe = GetModuleHandle( nullptr );
 
 using C_str = const char*;
-struct Icon_kind{ enum Enum{ small = ICON_SMALL, big = ICON_BIG }; };
+struct Icon_kind{ enum Enum{ small = ICON_SMALL, big = ICON_BIG }; };   // WM_SETICON
 
 void set_icon( const HWND window, const Icon_kind::Enum kind, const int resource_id )
 {
