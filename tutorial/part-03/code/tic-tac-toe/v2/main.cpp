@@ -6,20 +6,25 @@
 
 #include "resources.h"      // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW, IDI_APP
 
+using C_str = const char*;
+
 
 //------------------------------------------- Support machinery:
 
 const HINSTANCE this_exe = GetModuleHandle( nullptr );
 
-using C_str = const char*;
-struct Icon_kind{ enum Enum{ small = ICON_SMALL, big = ICON_BIG }; };   // WM_SETICON
+namespace icon_sizes{
+    enum Enum{ small = ICON_SMALL, large = ICON_BIG };       // WM_SETICON values.
+}  // namespace icon_sizes
 
-void set_icon( const HWND window, const Icon_kind::Enum kind, const int resource_id )
+void set_icon( const HWND window, const icon_sizes::Enum size, const int resource_id )
 {
     const C_str     id_as_ptr   = MAKEINTRESOURCE( resource_id );
-    const int       size        = (kind == Icon_kind::small? 16 : 32);
-    const HANDLE    icon        = LoadImage( this_exe, id_as_ptr, IMAGE_ICON, size, size, {} );
-    SendMessage( window, WM_SETICON, kind, reinterpret_cast<LPARAM>( icon ) );
+    const int       pixel_size  = (size == icon_sizes::small? 16 : 32);
+    const HANDLE    icon        = LoadImage(
+        this_exe, id_as_ptr, IMAGE_ICON, pixel_size, pixel_size, {}
+        );
+    SendMessage( window, WM_SETICON, size, reinterpret_cast<LPARAM>( icon ) );
 }
 
 
@@ -27,8 +32,8 @@ void set_icon( const HWND window, const Icon_kind::Enum kind, const int resource
 
 void set_app_icon( const HWND window )
 {
-    set_icon( window, Icon_kind::small, IDI_APP );
-    set_icon( window, Icon_kind::big, IDI_APP );
+    set_icon( window, icon_sizes::small, IDI_APP );
+    set_icon( window, icon_sizes::large, IDI_APP );
 }
 
 void set_rules_text( const HWND window )
