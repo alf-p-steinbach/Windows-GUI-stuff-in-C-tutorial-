@@ -22,7 +22,7 @@ The game logic is just a little detail at the end, though. Mainly the five (!) v
 
 ---
 
-### 3.1. v1: A general window based on a dialog template.
+### 3.1. A general window based on a dialog template.
 
 In order to keep things simple now, there will be a host of issues that are deferred, problems that will need fixing in later versions. So version 1 is an incomplete and quite imperfect window. It’s even without a custom window icon!
 
@@ -212,10 +212,49 @@ main.cpp
 
 ![The v1 window](part-03/images/sshot-2.main-window-v1.png)
 
-Oh well, one important detail about the dialog resource definition should be mentioned: this window is quite a bit wider than 344 pixels, and quite a bit higher than 132 pixels (the numbers in the definition). That’s because the units in the dialog specification are **dialog units**. A Windows dialog unit is [proportional to the font size](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdialogbaseunits) and is much like the “em” unit in CSS, and was supposed to make dialogs automatically scaleable.
+Oh well, one important detail about the dialog resource definition should be mentioned: this window is quite a bit wider than 344 pixels, and quite a bit higher than 132 pixels (the numbers in the definition). That’s because the units in the dialog template specification are **dialog units**. A Windows dialog unit is [proportional to the font size](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdialogbaseunits) and is much like the “em” unit in CSS, and was supposed to make dialogs automatically scaleable.
 
 ---
-### 3.2. v2: asd.
+### 3.2. Add a window icon and the too longish text by sending window messages.
+
+Windows presents the executable with a custom Tic-Tac-Toe icon because that's in the executable’s resources, but there’s no such automatic use for the program’s main window. Worse, there’s no way to specify the window icon in the dialog template resource. And going beyond sheer unreasonableness, there’s not even a dedicated Windows API function to set the icon.
+
+Instead you specify a window’s icon by sending the window a *message*, namely **`WM_SETICON`** (in passing, “`WM`” is short for *window message*). **Sending** the message means using the `SendMessage` function, which is a blocking call where the message is fully processed at this time, so that any effect is obtained before the call returns. Alternatively the message can be **posted**, using the `PostMessage` function, which means that the message id plus parameters is put in a queue, and is sent to the window and processed later, which is sometimes desirable and sometimes even necessary. Anyway, ultimately the processing ends up somewhere in the deep innards of Windows, in the `DefWindowProc` function, which one *could* call directly instead of `SendMessage`. A conventional `SendMessage` call has the advantage that the processing can be overridden at several stages in the message’s journey towards `DefWindowProc`, including via the dialog proc.
+
+~~~cpp
+using C_str = const char*;
+
+namespace icon_sizes{
+    enum Enum{ small = ICON_SMALL, large = ICON_BIG };       // WM_SETICON values.
+}  // namespace icon_sizes
+
+void set_icon( const HWND window, const icon_sizes::Enum size, const int resource_id )
+{
+    const C_str     id_as_ptr   = MAKEINTRESOURCE( resource_id );
+    const int       pixel_size  = (size == icon_sizes::small? 16 : 32);
+    const HANDLE    icon        = LoadImage(
+        this_exe, id_as_ptr, IMAGE_ICON, pixel_size, pixel_size, {}
+        );
+    SendMessage( window, WM_SETICON, size, reinterpret_cast<LPARAM>( icon ) );
+}
+~~~
+
+The above wrapper function sets a single icon image of either “small” or “large” size. The small 16×16 image is used for the icon in the window’s upper left corner, and the (allegedly, perhaps historically) large 32×32 image is used for e.g. `Alt`+`Tab` switching between windows. Recall that an icon resource contains a number of supported image sizes, usually at minimum 16×16 and 32×32, and that’s how it is for this app.
+
+I just downloaded [a free 32×32 Tic-Tac-Toe icon](https://icon-icons.com/icon/tic-tac-toe/39453) from the nets, and scaled it down for the 16×16 image. And used Visual Studio (as I recall) to embed these images in a single “.ico” file. So the function that sets the main window’s icon uses the same resource id, `IDI_APP`, for both sizes:
+
+![icon image](part-03/images/icon.png) 
+
+
+~~~cpp
+void set_app_icon( const HWND window )
+{
+    set_icon( window, icon_sizes::small, IDI_APP );
+    set_icon( window, icon_sizes::large, IDI_APP );
+}
+~~~
+
+
 
 
 
