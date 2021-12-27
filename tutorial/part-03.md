@@ -15,16 +15,16 @@ The game logic is just a little detail at the end, though. Mainly the five (!) v
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [3.1. A general window based on a dialog template.](#31-a-general-window-based-on-a-dialog-template)
+- [3.1. Create and run a general window based on a dialog template.](#31-create-and-run-a-general-window-based-on-a-dialog-template)
 - [3.2. Add a window icon and the too longish text by sending window messages.](#32-add-a-window-icon-and-the-too-longish-text-by-sending-window-messages)
-- [3.3. Factor out `<windows.h>` inclusion; support machinery; and message cracking.](#33-factor-out-windowsh-inclusion-support-machinery-and-message-cracking)
+- [3.3. Factor out `<windows.h>` inclusion; support machinery; and window message cracking.](#33-factor-out-windowsh-inclusion-support-machinery-and-window-message-cracking)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 ---
 
-### 3.1. A general window based on a dialog template.
+### 3.1. Create and run a general window based on a dialog template.
 
 In order to keep things simple now, there will be a host of issues that are deferred, problems that will need fixing in later versions. So version 1 is an incomplete and quite imperfect window. It’s even without a custom window icon!
 
@@ -312,7 +312,7 @@ Result:
 
 
 ---
-### 3.3. Factor out `<windows.h>` inclusion; support machinery; and message cracking.
+### 3.3. Factor out `<windows.h>` inclusion; support machinery; and window message cracking.
 
 Version 3 is a refactoring of version 2. No new functionality is introduced. But the code is cleaned up to avoid a difficult to maintain mess in later versions; it’s like cleaning a floor *before* it gets very noticably dirty, to avoid getting to that state.
 
