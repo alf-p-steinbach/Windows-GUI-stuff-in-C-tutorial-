@@ -39,7 +39,7 @@ void set_app_icon( const HWND window )
 void set_rules_text( const HWND window )
 {
     char text[2048];
-    LoadString( this_exe , IDS_RULES, text, sizeof( text ) );
+    LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
     const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
     SetWindowText( rules_display, text );
 }

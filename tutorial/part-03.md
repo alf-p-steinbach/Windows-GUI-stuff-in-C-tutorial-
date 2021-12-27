@@ -261,15 +261,15 @@ Anyway, any Windows window, whether a main window or a control, can have a text.
 void set_rules_text( const HWND window )
 {
     char text[2048];
-    LoadString( this_exe , IDS_RULES, text, sizeof( text ) );
+    LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
     const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
     SetWindowText( rules_display, text );
 }
 ~~~
 
-Here the `LoadString` function converts the string resource text from UTF-16 to the process’ ANSI codepage, and copies it to the specified buffer; the `GetDlgItem` function obtains a handle to a child window (control) that’s identified by its parent window and its control identifier, namely `IDC_RULES_DISPLAY` which was specified in the dialog resource; and `SetWindowText` as mentioned just sends a `WM_SETTEXT` message to the specified window, namely to the `IDC_RULES_DISPLAY` control.
+The `LoadString` function converts the string resource text from UTF-16 to the process’ ANSI codepage, and copies it to the specified buffer; the `GetDlgItem` function obtains a handle to a child window (control) that’s identified by its parent window and its control identifier, namely `IDC_RULES_DISPLAY` which was specified in the dialog resource; and `SetWindowText` as mentioned just sends a `WM_SETTEXT` message to the specified window, namely to the `IDC_RULES_DISPLAY` control.
 
-Since both `set_app_icon` and `set_rules_text` require a **handle** to the window, the `HWND` value that identifies the window, they can’t be called before the window is created.
+Since both `set_app_icon` and `set_rules_text` require a **handle** to the window (the `HWND` value that identifies the window), they can’t be called before the window is created.
 
 A good opportunity to call these functions is when the newly created window receives a **`WM_INITDLG`** message:
 
@@ -302,12 +302,63 @@ auto CALLBACK message_handler(
 }
 ~~~
 
+To place this in context you may want to look at [the full code](part-03/code/tic-tac-toe/v2/main.cpp) for this version 2. One important little part not shown above — there was no really natural place to discuss this — is that the macro `small` that `<windows.h>` introduces by default, that would otherwise wreak havoc with the `icon_sizes::Enum` definition, is rendered harmless by an `#undef` directive. In later versions we’ll instead use a subset of `<windows.h>` that is less over the top inconsiderate…
+
+Result:
+
+![The v2 main window](part-03/images/sshot-4.main-window-v2.png)
 
 
+---
+### 3.3. Factor out `<windows.h>` inclusion; support machinery; and message cracking.
+
+Version 3 is a refactoring of version 2. No new functionality is introduced. But the code is cleaned up to avoid a difficult to maintain mess in later versions; it’s like cleaning a floor *before* it gets very noticably dirty, to avoid getting to that state.
+
+First, to use a subset of `<windows.h>` one can define various macros, such as **`NOMINMAX`** and **`WIN32_LEAN_AND_MEAN`**, before including that header. Using `NOMINMAX` one avoids getting the macros `min` and `max`, that like `small` can wreak havoc. Using `WIN32_LEAN_AND_MEAN` one cuts the number of lines roughly in half; in particular it avoids including `<rpcndr.h>`, which is the header that defines the `small` macro, and it also avoids including the `<winsock.h>` header which can have the same include guard as (and hence prevent inclusion of) the `<winsock2.h>` header that one really wants.
+
+So, version 2’s
+
+~~~cpp
+#include <windows.h>
+#undef small    // MSVC <windows.h> includes <rpcndr.h> which defines `small` as macro. :(
+~~~
+
+… is now replaced with use of a **header wrapper** that defines the above two mentioned macros, and more,
+
+~~~cpp
+#include "wrapped-windows-h.hpp"    // Safer and faster. Safe = e.g. no `small` macro.    
+~~~
+
+… where
+
+[*part-03/code/tic-tac-toe/v3/wrapped-windows-h.hpp*](part-03/code/tic-tac-toe/v3/wrapped-windows-h.hpp)
+
+~~~cpp
+#pragma once
+#ifdef UNICODE
+#   error "`UNICODE` should not be defined for a `char` based application."
+#   include <stop-compilation>
+#endif
+
+#undef STRICT
+#undef NOMINMAX
+#undef WIN32_LEAN_AND_MEAN
+
+#define STRICT                  // C++-compatible declarations (the default now).
+#define NOMINMAX                // No `min` and `max` macros, please.
+#define WIN32_LEAN_AND_MEAN     // Excludes about half of `<windows.h>` = faster & safer.
+
+#include <windows.h>
+
+#ifdef small
+#   error "The macro `small` was defined by <windows.h>. Oops."
+#   include <stop-compilation>
+#endif
+~~~
+
+There’s a lot more that can and maybe should go into a `<windows.h>` wrapper, but the above is good enough for our purposes.
 
 
-
-lkjøl
 
 --- 
 
