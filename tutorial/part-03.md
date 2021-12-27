@@ -253,6 +253,55 @@ void set_app_icon( const HWND window )
 }
 ~~~
 
+Setting the text in the rules text field is much the same, ultimately done by sending a window message. Because even though it doesn’t look like a window to the user, technically, on the inside, as viewed from a programming perspective, *also a text field is a window*, called a **child window**. In Windows a child window is also called a **control**, and with more general system-independent terminology it’s called a **widget**.
+
+Anyway, any Windows window, whether a main window or a control, can have a text. A main window usually displays that text in its title bar, a.k.a. its caption; a button control displays the text as the button text; and a text field control, for obscure reasons called a **static** control, just displays the text because that’s its one and only purpose, to display text. To set the text of a window you can send it the **`WM_SETTEXT`** message, but as opposed to the situation for the icon here Windows provides a common wrapper function, `SetWindowText`, which is much easier to use (in particular, no casting required), so:
+
+~~~cpp
+void set_rules_text( const HWND window )
+{
+    char text[2048];
+    LoadString( this_exe , IDS_RULES, text, sizeof( text ) );
+    const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
+    SetWindowText( rules_display, text );
+}
+~~~
+
+Here the `LoadString` function converts the string resource text from UTF-16 to the process’ ANSI codepage, and copies it to the specified buffer; the `GetDlgItem` function obtains a handle to a child window (control) that’s identified by its parent window and its control identifier, namely `IDC_RULES_DISPLAY` which was specified in the dialog resource; and `SetWindowText` as mentioned just sends a `WM_SETTEXT` message to the specified window, namely to the `IDC_RULES_DISPLAY` control.
+
+Since both `set_app_icon` and `set_rules_text` require a **handle** to the window, the `HWND` value that identifies the window, they can’t be called before the window is created.
+
+A good opportunity to call these functions is when the newly created window receives a **`WM_INITDLG`** message:
+
+~~~cpp
+void on_wm_close( const HWND window )
+{
+    EndDialog( window, IDOK );
+}
+
+auto on_wm_initdialog( const HWND window )
+    -> bool
+{
+    set_app_icon( window );
+    set_rules_text( window );
+    return true;    // `true` sets focus to the control specified by the `w_param`.
+}
+
+auto CALLBACK message_handler(
+    const HWND      window,
+    const UINT      msg_id,
+    const WPARAM    /*w_param*/,
+    const LPARAM    /*ell_param*/
+    ) -> INT_PTR
+{
+    switch( msg_id ) {
+        case WM_CLOSE:          on_wm_close( window ); return true;
+        case WM_INITDIALOG:     return on_wm_initdialog( window );
+    }
+    return false;   // Didn't process the message, want default processing.
+}
+~~~
+
 
 
 

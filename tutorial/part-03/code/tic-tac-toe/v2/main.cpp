@@ -44,12 +44,12 @@ void set_rules_text( const HWND window )
     SetWindowText( rules_display, text );
 }
 
-void on_close( const HWND window )
+void on_wm_close( const HWND window )
 {
     EndDialog( window, IDOK );
 }
 
-auto on_initdialog( const HWND window )
+auto on_wm_initdialog( const HWND window )
     -> bool
 {
     set_app_icon( window );
@@ -65,8 +65,8 @@ auto CALLBACK message_handler(
     ) -> INT_PTR
 {
     switch( msg_id ) {
-        case WM_CLOSE:          on_close( window ); return true;
-        case WM_INITDIALOG:     return on_initdialog( window );
+        case WM_CLOSE:          on_wm_close( window ); return true;
+        case WM_INITDIALOG:     return on_wm_initdialog( window );
     }
     return false;   // Didn't process the message, want default processing.
 }
