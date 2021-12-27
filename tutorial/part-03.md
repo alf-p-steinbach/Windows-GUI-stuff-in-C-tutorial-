@@ -16,6 +16,8 @@ The game logic is just a little detail at the end, though. Mainly the five (!) v
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
 - [3.1. A general window based on a dialog template.](#31-a-general-window-based-on-a-dialog-template)
+- [3.2. Add a window icon and the too longish text by sending window messages.](#32-add-a-window-icon-and-the-too-longish-text-by-sending-window-messages)
+- [3.3. Factor out `<windows.h>` inclusion; support machinery; and message cracking.](#33-factor-out-windowsh-inclusion-support-machinery-and-message-cracking)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
