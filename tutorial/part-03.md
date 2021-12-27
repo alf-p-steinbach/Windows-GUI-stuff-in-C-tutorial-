@@ -239,12 +239,11 @@ void set_icon( const HWND window, const icon_sizes::Enum size, const int resourc
 }
 ~~~
 
-The above wrapper function sets a single icon image of either “small” or “large” size. The small 16×16 image is used for the icon in the window’s upper left corner, and the (allegedly, perhaps historically) large 32×32 image is used for e.g. `Alt`+`Tab` switching between windows. Recall that an icon resource contains a number of supported image sizes, usually at minimum 16×16 and 32×32, and that’s how it is for this app.
+The above wrapper function sets a single icon image of either “small” or “large” size, at a time. The small 16×16 image is used for the icon in the window’s upper left corner, and the (allegedly, perhaps historically) large 32×32 image is used for e.g. `Alt`+`Tab` switching between windows. Recall that an icon resource contains a number of supported image sizes, usually at minimum 16×16 and 32×32, and that’s how it is for this app.
 
-I just downloaded [a free 32×32 Tic-Tac-Toe icon](https://icon-icons.com/icon/tic-tac-toe/39453) from the nets, and scaled it down for the 16×16 image. And used Visual Studio (as I recall) to embed these images in a single “.ico” file. So the function that sets the main window’s icon uses the same resource id, `IDI_APP`, for both sizes:
+I just downloaded [a free 32×32 Tic-Tac-Toe icon image](https://icon-icons.com/icon/tic-tac-toe/39453) from the nets, and scaled it down for the 16×16 image. And used Visual Studio (as I recall) to embed these images in a single “.ico” file for the resource. So the function that sets the main window’s icon uses the same resource id, `IDI_APP`, for both sizes:
 
-![icon image](part-03/images/icon.png) 
-
+32×32: ![32×32 icon image](part-03/images/icon.32px.png) &nbsp;&nbsp;&nbsp;&nbsp; 16×16: ![16×16 icon image](part-03/images/icon.16px.png)
 
 ~~~cpp
 void set_app_icon( const HWND window )
