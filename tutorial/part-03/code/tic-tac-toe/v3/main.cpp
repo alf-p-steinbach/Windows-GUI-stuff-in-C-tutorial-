@@ -21,12 +21,12 @@ void set_rules_text( const HWND window )
     SetWindowText( rules_display, text );
 }
 
-void on_close( const HWND window )
+void on_wm_close( const HWND window )
 {
     EndDialog( window, IDOK );
 }
 
-auto on_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
+auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
     -> bool
 {
     set_app_icon( window );
@@ -41,10 +41,10 @@ auto CALLBACK message_handler(
     const LPARAM    ell_param
     ) -> INT_PTR
 {
-    const MSG params = {window, msg_id, w_param, ell_param};   // Used by HANDLER_OF_WM.
+    const MSG params = {window, msg_id, w_param, ell_param};
     switch( msg_id ) {
-        case WM_CLOSE:      return HANDLER_OF_WM( CLOSE, params, on_close );
-        case WM_INITDIALOG: return HANDLER_OF_WM( INITDIALOG, params, on_initdialog );
+        case WM_CLOSE:      return HANDLER_OF_WM( CLOSE, params, on_wm_close );
+        case WM_INITDIALOG: return HANDLER_OF_WM( INITDIALOG, params, on_wm_initdialog );
     }
     return false;   // Didn't process the message, want default processing.
 }
