@@ -490,7 +490,7 @@ auto main() -> int
 }
 ~~~
 
-
+[`MSG`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-msg) is a `struct` defined by `<windows.h>`. In addition to the parameters of a dialog proc it contains a less-than-well-documented [time stamp](https://stackoverflow.com/questions/26722987/what-format-is-the-time-member-of-a-msg-structure) and a mouse cursor position. But in the above code it’s just used as a convenient means of passing the message parameters to the macro.
 
 --- 
 
