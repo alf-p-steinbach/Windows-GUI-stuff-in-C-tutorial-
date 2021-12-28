@@ -374,7 +374,9 @@ In that Windows API support machinery header it’s natural to include a little 
 namespace winapi_util {
     inline const HINSTANCE this_exe = GetModuleHandle( nullptr );
 
-    struct Icon_size{ enum Enum{ small = ICON_SMALL, big = ICON_BIG }; };
+    namespace icon_sizes{
+        enum Enum{ small = ICON_SMALL, big = ICON_BIG };
+    }  // namespace icon_sizes
 
     struct Resource_id
     {
@@ -382,9 +384,9 @@ namespace winapi_util {
         auto as_ptr() const -> const char* { return MAKEINTRESOURCE( value ); }
     };
 
-    inline void set_icon( const HWND window, const Icon_size::Enum size, const Resource_id id )
+    inline void set_icon( const HWND window, const icon_sizes::Enum size, const Resource_id id )
     {
-        const int       pixel_size  = (size == Icon_size::small? 16 : 32);
+        const int       pixel_size  = (size == icon_sizes::small? 16 : 32);
         const HANDLE    icon        = LoadImage(
             this_exe, id.as_ptr(), IMAGE_ICON, pixel_size, pixel_size, {}
             );
@@ -394,7 +396,7 @@ namespace winapi_util {
 
     inline void set_icon( const HWND window, const Resource_id id )
     {
-        for( const auto icon_size: {Icon_size::small, Icon_size::big} ) {
+        for( const auto icon_size: {icon_sizes::small, icon_sizes::big} ) {
             set_icon( window, icon_size, id );
         }
     }
