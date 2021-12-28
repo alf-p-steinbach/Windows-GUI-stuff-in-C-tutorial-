@@ -479,8 +479,6 @@ auto main() -> int
 
 `SetDlgItemText` is a simple wrapper function that obtains the window handle for a control specified by id, and just calls `SetWindowText`, saving 1 line of code relative to version 2.
 
-[`MSG`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-msg) is a `struct` defined by `<windows.h>`. In addition to the parameters of a dialog proc it contains a less-than-well-documented [time stamp](https://stackoverflow.com/questions/26722987/what-format-is-the-time-member-of-a-msg-structure) and a mouse cursor position. But in the above code it’s just used as a convenient means of passing the message parameters to the macro.
-
 --- 
 
 Versions 1 is minimal code to get the window up and running, based on the dialog template. Essentially this uses Windows’s `DialogBox` function to launch the window, and provides a callback function to handle window closing, customizing that. For unfortunately the default functionality doesn’t let the user close the window…
