@@ -8,7 +8,7 @@ namespace winapi_util {
     inline const HINSTANCE this_exe = GetModuleHandle( nullptr );
 
     namespace icon_sizes{
-        enum Enum{ small = ICON_SMALL, big = ICON_BIG };
+        enum Enum{ small = ICON_SMALL, large = ICON_BIG };
     }  // namespace icon_sizes
 
     struct Resource_id
@@ -29,7 +29,7 @@ namespace winapi_util {
 
     inline void set_icon( const HWND window, const Resource_id id )
     {
-        for( const auto icon_size: {icon_sizes::small, icon_sizes::big} ) {
+        for( const auto icon_size: {icon_sizes::small, icon_sizes::large} ) {
             set_icon( window, icon_size, id );
         }
     }
