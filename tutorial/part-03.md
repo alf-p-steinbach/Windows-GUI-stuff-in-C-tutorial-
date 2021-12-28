@@ -411,7 +411,12 @@ namespace winapi_util {
     HANDLE_WM_##msg_name( m.hwnd, m.wParam, m.lParam, handler_func )
 ~~~
 
-The macro definition at the end, `HANDLER_OF_WM`, is to avoid verbosity and to support more [DRY code](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) for dealing with window messages that have parameters. For example, instead of the verbose
+The macro definition at the end, `HANDLER_OF_WM`, takes some explaining because it addresses a problem with a solution to a problem that we haven’t yet encountered…
+
+[…]
+
+<!--
+is to avoid verbosity and to support more [DRY code](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) for dealing with window messages that have parameters. For example, instead of the verbose
 
 ~~~cpp
 HANDLE_WM_COMMAND( window, w_param, ell_param, &on_wm_command )
@@ -426,6 +431,7 @@ HANDLER_OF_WM( COMMAND, params, &on_wm_command )
 … which expands to essentially the former. 
 
 Here `HANDLE_WM_COMMAND` is a macro from `<windowsx.h>` that extracts the logical parameter values from the `WPARAM` and `LPARAM` values of a `WM_COMMAND` message, and that calls the specified function, in this example `on_wm_command`, with the synthesized arguments, and that produces a suitable return value for the message. Not all window messages have such associated macros, but many of the original window messages have. They’re called **message cracker** macros because they sort of crack the message parameter values.
+-->
 
 Complete main program code, now using that macro-based message cracking:
 
@@ -490,6 +496,8 @@ auto main() -> int
         );
 }
 ~~~
+
+`SetDlgItemText` is a simple wrapper function that obtains the window handle for a control specified by id, and just calls `SetWindowText`, saving 1 line of code relative to version 2.
 
 [`MSG`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-msg) is a `struct` defined by `<windows.h>`. In addition to the parameters of a dialog proc it contains a less-than-well-documented [time stamp](https://stackoverflow.com/questions/26722987/what-format-is-the-time-member-of-a-msg-structure) and a mouse cursor position. But in the above code it’s just used as a convenient means of passing the message parameters to the macro.
 
