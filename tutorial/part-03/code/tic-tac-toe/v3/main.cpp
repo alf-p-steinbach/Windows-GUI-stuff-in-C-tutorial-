@@ -6,7 +6,10 @@
 #include "winapi_util.hpp"          // HANDLER_OF_WM, winapi_util::*
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
 
+#include <optional>
+
 namespace wu = winapi_util;
+using   std::optional;
 
 void set_app_icon( const HWND window )
 {
@@ -40,12 +43,20 @@ auto CALLBACK message_handler(
     const LPARAM    ell_param
     ) -> INT_PTR
 {
-    const MSG params = {window, msg_id, w_param, ell_param};
+    optional<INT_PTR> result;
+
+    #define PROCESS_WM( name, handler_func ) \
+        case WM_##name: { \
+            result = HANDLE_WM_##name( window, w_param, ell_param, handler_func );  break; \
+        }
     switch( msg_id ) {
-        case WM_CLOSE:      return HANDLER_OF_WM( CLOSE, params, on_wm_close );
-        case WM_INITDIALOG: return HANDLER_OF_WM( INITDIALOG, params, on_wm_initdialog );
+        PROCESS_WM( CLOSE, on_wm_close )
+        PROCESS_WM( INITDIALOG, on_wm_initdialog )
     }
-    return false;   // Didn't process the message, want default processing.
+    #undef PROCESS_WM
+
+    // `false` => Didn't process the message, want default processing.
+    return (result? SetDlgMsgResult( window, msg_id, result.value() ) : false);
 }
 
 auto main() -> int

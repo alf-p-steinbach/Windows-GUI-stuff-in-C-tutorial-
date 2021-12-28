@@ -34,9 +34,3 @@ namespace winapi_util {
         }
     }
 }  // namespace winapi_util
-
-// Invokes various <windowsx.h> “message cracker” macros like `HANDLE_WM_CLOSE`. Each such
-// macro interprets WPARAM and LPARAM depending on the message id, and in turn invokes a
-// specified handler func with message dependent arguments created from WPARAM and LPARAM.
-#define HANDLER_OF_WM( msg_name, m, handler_func ) \
-    HANDLE_WM_##msg_name( m.hwnd, m.wParam, m.lParam, handler_func )

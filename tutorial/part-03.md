@@ -403,37 +403,9 @@ namespace winapi_util {
         }
     }
 }  // namespace winapi_util
-
-// Invokes various <windowsx.h> “message cracker” macros like `HANDLE_WM_CLOSE`. Each such
-// macro interprets WPARAM and LPARAM depending on the message id, and in turn invokes a
-// specified handler func with message dependent arguments created from WPARAM and LPARAM.
-#define HANDLER_OF_WM( msg_name, m, handler_func ) \
-    HANDLE_WM_##msg_name( m.hwnd, m.wParam, m.lParam, handler_func )
 ~~~
 
-The macro definition at the end, `HANDLER_OF_WM`, takes some explaining because it addresses a problem with a solution to a problem that we haven’t yet encountered…
-
-[…]
-
-<!--
-is to avoid verbosity and to support more [DRY code](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) for dealing with window messages that have parameters. For example, instead of the verbose
-
-~~~cpp
-HANDLE_WM_COMMAND( window, w_param, ell_param, &on_wm_command )
-~~~
-    
-… with this macro one can write just
-
-~~~cpp
-HANDLER_OF_WM( COMMAND, params, &on_wm_command )
-~~~
-     
-… which expands to essentially the former. 
-
-Here `HANDLE_WM_COMMAND` is a macro from `<windowsx.h>` that extracts the logical parameter values from the `WPARAM` and `LPARAM` values of a `WM_COMMAND` message, and that calls the specified function, in this example `on_wm_command`, with the synthesized arguments, and that produces a suitable return value for the message. Not all window messages have such associated macros, but many of the original window messages have. They’re called **message cracker** macros because they sort of crack the message parameter values.
--->
-
-Complete main program code, now using that macro-based message cracking:
+The full version 3 main program:
 
 [*part-03/code/tic-tac-toe/v3/main.cpp*](part-03/code/tic-tac-toe/v3/main.cpp)
 ~~~cpp
@@ -479,12 +451,20 @@ auto CALLBACK message_handler(
     const LPARAM    ell_param
     ) -> INT_PTR
 {
-    const MSG params = {window, msg_id, w_param, ell_param};
+    optional<INT_PTR> result;
+
+    #define PROCESS_WM( name, handler_func ) \
+        case WM_##name: { \
+            result = HANDLE_WM_##name( window, w_param, ell_param, handler_func );  break; \
+        }
     switch( msg_id ) {
-        case WM_CLOSE:      return HANDLER_OF_WM( CLOSE, params, on_wm_close );
-        case WM_INITDIALOG: return HANDLER_OF_WM( INITDIALOG, params, on_wm_initdialog );
+        PROCESS_WM( CLOSE, on_wm_close )
+        PROCESS_WM( INITDIALOG, on_wm_initdialog )
     }
-    return false;   // Didn't process the message, want default processing.
+    #undef PROCESS_WM
+
+    // `false` => Didn't process the message, want default processing.
+    return (result? SetDlgMsgResult( window, msg_id, result.value() ) : false);
 }
 
 auto main() -> int
