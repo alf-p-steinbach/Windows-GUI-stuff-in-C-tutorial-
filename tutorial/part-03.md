@@ -448,8 +448,7 @@ void set_rules_text( const HWND window )
 {
     char text[2048];
     LoadString( wu::this_exe, IDS_RULES, text, sizeof( text ) );
-    const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
-    SetWindowText( rules_display, text );
+    SetDlgItemText( window, IDC_RULES_DISPLAY, text );
 }
 
 void on_wm_close( const HWND window )
