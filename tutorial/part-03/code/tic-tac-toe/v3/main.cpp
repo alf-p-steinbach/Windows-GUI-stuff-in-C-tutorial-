@@ -45,15 +45,13 @@ auto CALLBACK message_handler(
 {
     optional<INT_PTR> result;
 
-    #define PROCESS_WM( name, handler_func ) \
-        case WM_##name: { \
-            result = HANDLE_WM_##name( window, w_param, ell_param, handler_func );  break; \
-        }
+    #define HANDLE_WM( name, handler_func ) \
+        HANDLE_WM_##name( window, w_param, ell_param, handler_func )
     switch( msg_id ) {
-        PROCESS_WM( CLOSE, on_wm_close )
-        PROCESS_WM( INITDIALOG, on_wm_initdialog )
+        case WM_CLOSE:      result = HANDLE_WM( CLOSE, on_wm_close ); break;
+        case WM_INITDIALOG: result = HANDLE_WM( INITDIALOG, on_wm_initdialog ); break;
     }
-    #undef PROCESS_WM
+    #undef HANDLE_WM
 
     // `false` => Didn't process the message, want default processing.
     return (result? SetDlgMsgResult( window, msg_id, result.value() ) : false);
