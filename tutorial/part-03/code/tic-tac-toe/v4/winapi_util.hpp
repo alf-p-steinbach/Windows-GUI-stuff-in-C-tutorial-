@@ -40,13 +40,6 @@ namespace winapi_util {
         }
     }
 
-    // Supports a Windows 11 workaround hack. The window is assumed to presently be a “topmost”
-    // window. The effect is then to bring the window to the top of the ordinary window Z-order.
-    void remove_topmost_style_for( const HWND window )
-    {
-        SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-    }
-
     struct Standard_gui_font
     {
         Standard_gui_font( const Standard_gui_font& ) = delete;
@@ -81,6 +74,13 @@ namespace winapi_util {
 
         SetWindowFont( window, std_gui_font.handle, true );
         EnumChildWindows( window, callback, 0 );
+    }
+
+    // Supports a Windows 11 workaround hack. The window is assumed to presently be a “topmost”
+    // window. The effect is then to bring the window to the top of the ordinary window Z-order.
+    void remove_topmost_style_for( const HWND window )
+    {
+        SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
     }
 
     constexpr DWORD basic_common_controls = ICC_STANDARD_CLASSES | ICC_WIN95_CLASSES;

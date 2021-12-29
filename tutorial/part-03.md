@@ -513,9 +513,156 @@ auto main() -> int
 }
 ~~~
 
-`SetDlgItemText` is a simple wrapper function that obtains the window handle for a control specified by id, and just calls `SetWindowText`, saving 1 line of code relative to version 2.
+Detail: `SetDlgItemText` is a wrapper that obtains the window handle for a control specified by id and calls `SetWindowText`, saving 1 line of code relative to version 2.
 
---- 
+---
+### 3.4. Fix gross imperfections: standard font; window just on top; modern appearance.
+
+As of version 2/3 the window has an old-style font; is in topmost mode that can’t be turned off, as opposed to just being initially on top of other windows; and the appearance is pretty dated, like Windows 2000 with e.g. gray buttons with square corners:
+
+![The v2 main window](part-03/images/sshot-4.main-window-v2.png)
+
+Compare that to the version 5 game, with current Windows 11 GUI font and modern appearance where the buttons have some color and rounded corners:
+
+![The Tic-Tac-Toe game window](part-03/images/sshot-1.the-final-window.png)
+
+As you can see the rules text has been slightly shortened (the “Rules:” line removed) in order to fit when the modern font is used. This problem may be the reason why one cannot simply state in the dialog template that the current standard GUI font, whatever it is, should be used. Still, as I see it one should have that *possibility*, that *freedom* to choose the usually most desirable alternative in a simple way, but Microsoft evidently once didn’t agree with that POV and has now mostly left this technology behind.
+
+The **standard GUI font** is the font that’s used for the text in a message box. It has changed a number of times through the history of Windows, and will probably change again, and again, but a specification of this font is always available via the **`SystemParametersInfo`** function called with `SPI_GETNONCLIENTMETRICS` as the value to retrieve. In passing, two other such functions, sometimes quite useful, are `GetStockObject` and `GetSystemMetrics`, and there are more.
+
+~~~cpp
+struct Standard_gui_font
+{
+    Standard_gui_font( const Standard_gui_font& ) = delete;
+    auto operator=( const Standard_gui_font& ) -> Standard_gui_font& = delete;
+
+    HFONT   handle;
+
+    ~Standard_gui_font()
+    {
+        DeleteFont( handle );
+    }
+
+    Standard_gui_font()
+    {
+        // Get the system message box font
+        const auto ncm_size = sizeof( NONCLIENTMETRICS );
+        NONCLIENTMETRICS metrics = {ncm_size};
+        SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm_size, &metrics, 0 );
+        handle = CreateFontIndirect( &metrics.lfMessageFont );
+    }
+};
+
+inline const auto   std_gui_font    = Standard_gui_font();
+~~~
+
+Every windows keeps track of a default font, with no CSS-like inheritance, so the program has to replace the default font in both the main window and every control. Happily Windows provides a function **`EnumChildWindows`** that calls a specified function for each child window (control). Also, the `<windowsx.h>` header provides the wrapper function `SetWindowFont` that sends a `WM_SETFONT` message to the specified window, simplifying that:
+
+~~~cpp
+inline void set_standard_gui_font( const HWND window )
+{
+    const auto callback = []( HWND control, LPARAM ) -> BOOL
+    {
+        SetWindowFont( control, std_gui_font.handle, true );
+        return true;
+    };
+
+    SetWindowFont( window, std_gui_font.handle, true );
+    EnumChildWindows( window, callback, 0 );
+}
+~~~
+
+Ideally, pedantically, the `std_gui_font` object should have been destroyed at the end of the program via a call to `DeleteObject`, and technically not doing that constitues a **resource leak**, but Windows cleans up also GUI resources when the process exits.
+
+Fixing the problem with this window keeping itself on top of all other windows, including other topmost mode windows such (as on my system) an on-screen clock, likewise involves a general window management function, namely using `SetWindowPos` to just remove topmost mode:
+
+~~~cpp
+// Supports a Windows 11 workaround hack. The window is assumed to presently be a “topmost”
+// window. The effect is then to bring the window to the top of the ordinary window Z-order.
+void remove_topmost_style_for( const HWND window )
+{
+    SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
+}
+~~~
+
+All of the above code snippets are part of the “[part-03/code/tic-tac-toe/v4/winapi_util.hpp](part-03/code/tic-tac-toe/v4/winapi_util.hpp)” file. But of course these functions need to be called in order to have any effect. That’s done in the `WM_INITDIALOG` handler in the main program:
+
+~~~cpp
+auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
+    -> bool
+{
+    wu::set_standard_gui_font( window );
+    wu::remove_topmost_style_for( window );
+    set_app_icon( window );
+    set_rules_text( window );
+    return true;    // `true` sets focus to the `focus` control.
+}
+~~~
+
+However, fixing the appearance — we want modern! — is more involved. There’s a C++ code part, and an XML resource part. The C++ code explicitly initializes the **common controls** library, the library that provides button and text field controls (and many other controls), just because Microsoft’s documentation states or used to state that that’s necessary:
+
+~~~cpp
+constexpr DWORD basic_common_controls = ICC_STANDARD_CLASSES | ICC_WIN95_CLASSES;
+
+inline auto init_common_controls( const DWORD which = basic_common_controls )
+    -> bool
+{
+    const INITCOMMONCONTROLSEX params = {sizeof( params ), which};
+    return !!InitCommonControlsEx( &params );
+}
+~~~
+
+This function is also in the “winapi_util.hpp” file, because it’s reusable general functionality, but because it initializes the library used to create the controls it’s naturally called *before the window is created*, namely in the `main` function:
+
+~~~cpp
+auto main() -> int
+{
+    wu::init_common_controls();
+    DialogBox(
+        wu::this_exe, wu::Resource_id{ IDD_MAIN_WINDOW }.as_ptr(),
+        HWND(),             // Parent window, a zero handle is "no parent".
+        message_handler
+        );
+}
+~~~
+
+
+
+The mentioned XML resource is an **application manifest** that specifies that the program should use version 6 or better of the “comctl32.dll” Windows library. I do not know any rational explanation of why Microsoft chose to let the various DLL versions have the same filename and use a complex resource based scheme to differentiate between them, but at the time their engineers appeared to be quite proud of the, uh, solution, which they called [**SxS**, *side-by-side* DLLs](https://en.wikipedia.org/wiki/Side-by-side_assembly). I.e. having the same name for different versions of the same DLL-based library, and having those versions available at the same time, which Microsoft for unknown reasons appeared to believe would be very desirable.
+
+The version-arbitration application manifest file (that’s embedded as a special resource):
+
+[*part-03/code/tic-tac-toe/v4/resources/app-manifest.xml*](part-03/code/tic-tac-toe/v4/resources/app-manifest.xml)
+~~~xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+<assemblyIdentity
+    version="0.4.0.0"
+    processorArchitecture="*"
+    name="Alfs.CppInPractice.TicTacToe"
+    type="win32"
+/>
+<description>A basic tic-tac-toe game with intentionally limited smarts.</description>
+<dependency>
+    <dependentAssembly>
+        <assemblyIdentity
+            type="win32"
+            name="Microsoft.Windows.Common-Controls"
+            version="6.0.0.0"
+            processorArchitecture="*"
+            publicKeyToken="6595b64144ccf1df"
+            language="*"
+        />
+    </dependentAssembly>
+</dependency>
+</assembly>
+~~~
+
+
+
+asdasd
+
+---
 
 Versions 1 is minimal code to get the window up and running, based on the dialog template. Essentially this uses Windows’s `DialogBox` function to launch the window, and provides a callback function to handle window closing, customizing that. For unfortunately the default functionality doesn’t let the user close the window…
 
