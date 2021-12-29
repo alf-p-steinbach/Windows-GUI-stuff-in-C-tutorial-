@@ -407,7 +407,7 @@ namespace winapi_util {
 
 The **`<windowsx.h>`** header is included here because it adds a lot of convenience macros, including function-like macros such as `SetWindowFont` which we’ll use in version 4.
 
-Here we’ll just avail us of the `HANDLE_VM_COMMAND` and `HANDLE_WM_INITDIALOG` macros, that are examples of **message cracker** macros. They’re called “cracker” macros because they extract message specific parameters from the `WPARAM` and `LPARAM` values, where each such macro calls a specified **message handler** function with the extracted parameter values. And these macros can be used in exactly the same way because every message cracker macro takes the same arguments and produces a return value, even when the message handler is a `void` function.
+Here we’ll just avail us of the `HANDLE_VM_CLOSE` and `HANDLE_WM_INITDIALOG` macros, that are examples of **message cracker** macros. They’re called “cracker” macros because they extract message specific parameters from the `WPARAM` and `LPARAM` values, where each such macro calls a specified **message handler** function with the extracted parameter values. And these macros can be used in exactly the same way because every message cracker macro takes the same arguments and produces a return value, even when the message handler is a `void` function.
 
 It can look like this, in this version’s main program:
 
