@@ -257,7 +257,7 @@ void set_app_icon( const HWND window )
 }
 ~~~
 
-Setting the text in the rules text field is much the same, ultimately done by sending a window message. Because even though it doesn’t look like a window to the user, technically, on the inside, as viewed from a programming perspective, *also a text field is a window*, called a **child window**. In Windows a child window is also called a **control**, and with more general system-independent terminology it’s called a **widget**.
+Setting the text in the rules text field is much the same as for the icon, ultimately done by sending a window message. Because even though it doesn’t look like a window to the user, technically, on the inside, as viewed from a programming perspective, *also a text field is a window*, called a **child window**. In Windows a child window is also called a **control**, and with more general system-independent terminology it’s called a **widget**.
 
 Anyway, any Windows window, whether a main window or a control, can have a text. A main window usually displays that text in its title bar, a.k.a. its caption; a button control displays the text as the button text; and a text field control, for obscure reasons called a **static** control, just displays the text because that’s its one and only purpose, to display text. To set the text of a window you can send it the **`WM_SETTEXT`** message, but as opposed to the situation for the icon here Windows provides a common wrapper function, `SetWindowText`, which is much easier to use (in particular, no casting required), so:
 
@@ -306,7 +306,7 @@ auto CALLBACK message_handler(
 }
 ~~~
 
-To place this in context you may want to look at [the full code](part-03/code/tic-tac-toe/v2/main.cpp) for this version 2. One important little part not shown above — there was no really natural place to discuss this — is that the macro `small` that `<windows.h>` introduces by default, that would otherwise wreak havoc with the `icon_sizes::Enum` definition, is rendered harmless by an `#undef` directive. In later versions we’ll instead jsut use a subset of `<windows.h>` that is less over the top inconsiderate…
+To place this in context you may want to look at [the full code](part-03/code/tic-tac-toe/v2/main.cpp) for this version 2. One important little part not shown above — there was no really natural place to discuss this — is that the macro `small` that `<windows.h>` introduces by default, that would otherwise wreak havoc with the `icon_sizes::Enum` definition, is rendered harmless by an `#undef` directive. In later versions we’ll instead just use a subset of `<windows.h>` that is less over the top inconsiderate…
 
 Result:
 
@@ -361,7 +361,7 @@ So, version 2’s
 
 There’s a lot more that can and maybe should go into a `<windows.h>` wrapper, sometimes crucial “settings” of `<windows.h>` such as the `WIN32_WINNT` version macro, but the above is good enough for our purposes.
 
-A header wrapper’s job is exclusively to provide a clean include of some other party’s header, as if that header were reasonably designed. To make it reliable and easy to understand, and to minimize name pollution, it should not provide additional functionality. Version 2’s general reusable **wrapper function** `set_icon` that provides clarity and convenience, should therefore not go into the `<windows.h>` wrapper but into a separate header that can provide more such support machinery.
+A header wrapper’s job is exclusively to provide a clean include of some other party’s header. To make it reliable and easy to understand, and to minimize name pollution, it should not provide additional functionality. Version 2’s general reusable **wrapper function** `set_icon` that provides clarity and convenience, should therefore not go into the `<windows.h>` wrapper but into a separate header that can provide more such support machinery.
 
 In that Windows API support machinery header it’s natural to include a little class for resource id’s, so that one avoids peppering the code with `MAKEINTRESOURCE` invocations and so that one can overload on resource id as argument, and have some confidence that an integer actually is a resource id. Let’s call it `Resource_id`. With that class in hand it’s also natural to add a reusable overload of `set_icon` that sets both the small and large icon with a given resource id, as we’ve found a need for:
 
@@ -405,7 +405,47 @@ namespace winapi_util {
 }  // namespace winapi_util
 ~~~
 
-jhlkjh
+The **`<windowsx.h>`** header is included here because it adds a lot of convenience macros, including function-like macros such as `SetWindowFont` which we’ll use in version 4.
+
+Here we’ll just avail us of the `HANDLE_VM_COMMAND` and `HANDLE_WM_INITDIALOG` macros, that are examples of **message cracker** macros. They’re called “cracker” macros because they extract message specific parameters from the `WPARAM` and `LPARAM` values, where each such macro calls a specified **message handler** function with the extracted parameter values. And these macros can be used in exactly the same way because every message cracker macro takes the same arguments and produces a return value, even when the message handler is a `void` function.
+
+It can look like this, in this version’s main program:
+
+~~~cpp
+void on_wm_close( HWND window );
+auto on_wm_initdialog( HWND window, HWND focus, LPARAM ell_param ) -> bool;
+
+auto CALLBACK message_handler(
+    const HWND      window,
+    const UINT      msg_id,
+    const WPARAM    w_param,
+    const LPARAM    ell_param
+    ) -> INT_PTR
+{
+    optional<INT_PTR> result;
+
+    #define HANDLE_WM( name, handler_func ) \
+        HANDLE_WM_##name( window, w_param, ell_param, handler_func )
+    switch( msg_id ) {
+        case WM_CLOSE:      result = HANDLE_WM( CLOSE, on_wm_close ); break;
+        case WM_INITDIALOG: result = HANDLE_WM( INITDIALOG, on_wm_initdialog ); break;
+    }
+    #undef HANDLE_WM
+
+    // `false` => Didn't process the message, want default processing.
+    return (result? SetDlgMsgResult( window, msg_id, result.value() ) : false);
+}
+~~~
+
+The local macro `HANDLE_WM` reduces verbosity and increases the [DRY-ness](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) of the code. It would have been nice to be able to limit that measure even further, to just a `PARAMS` macro that expanded to the three first arguments of a message cracker. However, the C and C++ preprocessor works in a convoluted way where such a macro-in-a-macro-call wouldn’t be expanded.
+
+But, what’s with that `optional<INT_PTR> result`, and the call to `SetDlgMsgResult`?
+
+Well, the message cracker results are not directly `return`ed because *the dialog proc return value is generally just a boolean*, with `true` for “I handled this message, no further action required” and `false` for “I want the default handling of this message”. Where a message handling result needs to be communicated back up the call chain, it must therefore generally be done by storing it somewhere accessible to Windows’ calling code, namely via a `SetWindowLongPtr` call with the `DWLP_MSGRESULT` index, that uses storage in the window object. But just to complicate things, or at least to avoid a simple and clear uniform treatment, some messages designed specifically for dialog windows, such as `WM_CTLCOLORBTN`, should have the result value returned directly from the dialogproc. The `<windowsx.h>` macro **`SetDlgMsgResult`** does just that: depending on the message value it either calls `SetWindowLongPtr` to communicate a message handling result, and produces `true`, or produces the message handling result directly so that it’s `return`ed directly. OK, that was complicated, too long too read. Simple version: it’s Microsoft, just do as above.
+
+
+
+
 
 The full version 3 main program:
 
