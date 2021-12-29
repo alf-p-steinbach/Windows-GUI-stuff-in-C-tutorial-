@@ -441,11 +441,7 @@ The local macro `HANDLE_WM` reduces verbosity and increases the [DRY-ness](https
 
 But, what’s with that `optional<INT_PTR> result`, and the call to `SetDlgMsgResult`?
 
-Well, the message cracker results are not directly `return`ed because *the dialog proc return value is generally just a boolean*, with `true` for “I handled this message, no further action required” and `false` for “I want the default handling of this message”. Where a message handling result needs to be communicated back up the call chain, it must therefore generally be done by storing it somewhere accessible to Windows’ calling code, namely via a `SetWindowLongPtr` call with the `DWLP_MSGRESULT` index, that uses storage in the window object. But just to complicate things, or at least to avoid a simple and clear uniform treatment, some messages designed specifically for dialog windows, such as `WM_CTLCOLORBTN`, should have the result value returned directly from the dialogproc. The `<windowsx.h>` macro **`SetDlgMsgResult`** does just that: depending on the message id value it either calls `SetWindowLongPtr` to communicate a message handling result, and produces `true`, or produces the message handling result directly so that it’s `return`ed directly. OK, that was complicated, too long too read. Simple version: it’s Microsoft, just do as above.
-
-
-
-
+Well, the message cracker results are not directly `return`ed because *the dialog proc return value is generally just a boolean*, with `true` for “I handled this message, no further action required” and `false` for “I want the default handling of this message”. Where a message handling result needs to be communicated back up the call chain, it must therefore generally be done by storing it somewhere accessible to Windows’ calling code, namely via a `SetWindowLongPtr` call with the `DWLP_MSGRESULT` index, that uses storage in the window object. But just to complicate things, or at least to avoid a simple and clear uniform treatment, some messages designed specifically for dialog windows, such as `WM_CTLCOLORBTN`, should have the result value returned directly from the dialog proc. The `<windowsx.h>` macro **`SetDlgMsgResult`** does just that: depending on the message id value it either calls `SetWindowLongPtr` to communicate a message handling result, and produces `true`, or produces the message handling result directly so that it’s `return`ed directly. OK, that was complicated, too long too read. Simple version: it’s Microsoft, just do as above.
 
 The full version 3 main program:
 
