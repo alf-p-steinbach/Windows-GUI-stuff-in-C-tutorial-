@@ -359,7 +359,7 @@ So, version 2’s
 #endif
 ~~~
 
-There’s a lot more that can and maybe should go into a `<windows.h>` wrapper, but the above is good enough for our purposes.
+There’s a lot more that can and maybe should go into a `<windows.h>` wrapper, sometimes crucial “settings” of `<windows.h>` such as the `WIN32_WINNT` version macro, but the above is good enough for our purposes.
 
 A header wrapper’s job is exclusively to provide a clean include of some other party’s header, as if that header were reasonably designed. To make it reliable and easy to understand, and to minimize name pollution, it should not provide additional functionality. Version 2’s general reusable **wrapper function** `set_icon`, that provides clarity and convenience, should therefore not go into the `<windows.h>` wrapper but into a separate header that can provide more such support machinery.
 
