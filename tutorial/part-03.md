@@ -271,7 +271,7 @@ void set_rules_text( const HWND window )
 }
 ~~~
 
-The `LoadString` function converts the string resource text from UTF-16 to the process’ ANSI codepage, and copies it to the specified buffer; the `GetDlgItem` function obtains a handle to a child window (control) that’s identified by its parent window and its control identifier, namely `IDC_RULES_DISPLAY` which was specified in the dialog resource; and `SetWindowText` as mentioned just sends a `WM_SETTEXT` message to the specified window, namely to the `IDC_RULES_DISPLAY` control.
+The `LoadString` function converts the string resource text from UTF-16 encoding to the process’ ANSI codepage, and copies it to the specified buffer; the `GetDlgItem` function obtains a handle to a child window (control) that’s identified by its parent window and its control identifier, namely `IDC_RULES_DISPLAY` which was specified in the dialog resource; and `SetWindowText` as mentioned just sends a `WM_SETTEXT` message to the specified window, namely to the `IDC_RULES_DISPLAY` control.
 
 Since both `set_app_icon` and `set_rules_text` require a **handle** to the window (the `HWND` value that identifies the window), they can’t be called before the window is created.
 
@@ -306,7 +306,7 @@ auto CALLBACK message_handler(
 }
 ~~~
 
-To place this in context you may want to look at [the full code](part-03/code/tic-tac-toe/v2/main.cpp) for this version 2. One important little part not shown above — there was no really natural place to discuss this — is that the macro `small` that `<windows.h>` introduces by default, that would otherwise wreak havoc with the `icon_sizes::Enum` definition, is rendered harmless by an `#undef` directive. In later versions we’ll instead use a subset of `<windows.h>` that is less over the top inconsiderate…
+To place this in context you may want to look at [the full code](part-03/code/tic-tac-toe/v2/main.cpp) for this version 2. One important little part not shown above — there was no really natural place to discuss this — is that the macro `small` that `<windows.h>` introduces by default, that would otherwise wreak havoc with the `icon_sizes::Enum` definition, is rendered harmless by an `#undef` directive. In later versions we’ll instead jsut use a subset of `<windows.h>` that is less over the top inconsiderate…
 
 Result:
 
@@ -404,6 +404,8 @@ namespace winapi_util {
     }
 }  // namespace winapi_util
 ~~~
+
+jhlkjh
 
 The full version 3 main program:
 
