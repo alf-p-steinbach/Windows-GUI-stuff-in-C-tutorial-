@@ -556,7 +556,7 @@ struct Standard_gui_font
 inline const auto   std_gui_font    = Standard_gui_font();
 ~~~
 
-Every windows keeps track of a default font, with no CSS-like inheritance, so the program has to replace the default font in both the main window and every control. Happily Windows provides a function **`EnumChildWindows`** that calls a specified function for each child window (control). Also, the `<windowsx.h>` header provides the wrapper function `SetWindowFont` that sends a `WM_SETFONT` message to the specified window, simplifying that:
+Every window keeps track of a default font, with no CSS-like inheritance, so the program has to replace the default font in both the main window and every control. Happily Windows provides a function **`EnumChildWindows`** that calls a specified function for each child window (control). Also, the `<windowsx.h>` header provides the wrapper macro `SetWindowFont` that sends a `WM_SETFONT` message to the specified window, simplifying that:
 
 ~~~cpp
 inline void set_standard_gui_font( const HWND window )
@@ -572,9 +572,9 @@ inline void set_standard_gui_font( const HWND window )
 }
 ~~~
 
-Ideally, pedantically, the `std_gui_font` object should have been destroyed at the end of the program via a call to `DeleteObject`, and technically not doing that constitues a **resource leak**, but Windows cleans up also GUI resources when the process exits.
+Ideally, pedantically, the `std_gui_font` object should have been destroyed at the end of the program via a call to `DeleteObject`, and technically not doing that constitutes a **resource leak**, but Windows cleans up also GUI resources when the process exits.
 
-Fixing the problem with this window keeping itself on top of all other windows, including other topmost mode windows such (as on my system) an on-screen clock, likewise involves a general window management function, namely using `SetWindowPos` to just remove topmost mode:
+Fixing the problem with this window keeping itself on top of all other windows, including other topmost mode windows such as (on my system) an on-screen clock, likewise involves a general window management function, namely using `SetWindowPos` to just remove topmost mode:
 
 ~~~cpp
 // Supports a Windows 11 workaround hack. The window is assumed to presently be a “topmost”
@@ -599,7 +599,7 @@ auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*e
 }
 ~~~
 
-However, fixing the appearance — we want modern! — is more involved. There’s a C++ code part, and an XML resource part. The C++ code explicitly initializes the **common controls** library, the library that provides button and text field controls (and many other controls), just because Microsoft’s documentation states or used to state that that’s necessary:
+However, fixing the appearance — we want modern! — is more involved. There’s a C++ code part, and an XML resource part. The C++ code part explicitly initializes the **common controls** library, the library that provides button and text field controls (and many other controls), just because Microsoft’s documentation states or used to state that that’s necessary:
 
 ~~~cpp
 constexpr DWORD basic_common_controls = ICC_STANDARD_CLASSES | ICC_WIN95_CLASSES;
@@ -612,7 +612,7 @@ inline auto init_common_controls( const DWORD which = basic_common_controls )
 }
 ~~~
 
-This function is also in the “winapi_util.hpp” file, because it’s reusable general functionality, but because it initializes the library used to create the controls it’s naturally called *before the window is created*, namely in the `main` function:
+This function is also in the “winapi_util.hpp” file, because it’s reusable general functionality, but because it initializes the library used to create the controls it’s necessarily called *before the window is created*, namely in the `main` function:
 
 ~~~cpp
 auto main() -> int
@@ -628,9 +628,10 @@ auto main() -> int
 
 
 
-The mentioned XML resource is an **application manifest** that specifies that the program should use version 6 or better of the “comctl32.dll” Windows library. I do not know any rational explanation of why Microsoft chose to let the various DLL versions have the same filename and use a complex resource based scheme to differentiate between them, but at the time their engineers appeared to be quite proud of the, uh, solution, which they called [**SxS**, *side-by-side* DLLs](https://en.wikipedia.org/wiki/Side-by-side_assembly). I.e. having the same name for different versions of the same DLL-based library, and having those versions available at the same time, which Microsoft for unknown reasons appeared to believe would be very desirable.
+The mentioned XML resource is an **application manifest** that specifies that the program should [use version 6 or better of the “comctl32.dll” Windows library](https://docs.microsoft.com/en-us/windows/win32/controls/cookbook-overview#using-comctl32dll-version-6-in-an-application-that-uses-only-standard-extensions
+) (the library that the C++ code initializes). I do not know any rational explanation of why Microsoft chose to let the various DLL versions have the same filename and use a complex resource based scheme to differentiate between them, but at the time their engineers appeared to be quite proud of the, uh, solution, which they called [**SxS**, *side-by-side* DLLs](https://en.wikipedia.org/wiki/Side-by-side_assembly). I.e. having the same name for different versions of the same DLL-based library, and having those versions available at the same time, which Microsoft for unknown reasons appeared to believe would be very desirable.
 
-The version-arbitration application manifest file (that’s embedded as a special resource):
+The version-arbitration application manifest file contents (this is embedded as a special resource):
 
 [*part-03/code/tic-tac-toe/v4/resources/app-manifest.xml*](part-03/code/tic-tac-toe/v4/resources/app-manifest.xml)
 ~~~xml
