@@ -275,7 +275,7 @@ The `LoadString` function converts the string resource text from UTF-16 to the p
 
 Since both `set_app_icon` and `set_rules_text` require a **handle** to the window (the `HWND` value that identifies the window), they can’t be called before the window is created.
 
-A good opportunity to call these functions is when the newly created window receives a **`WM_INITDLG`** message:
+A good opportunity to call these functions is when the newly created window receives a **`WM_INITDIALOG`** message:
 
 ~~~cpp
 void on_wm_close( const HWND window )
@@ -318,7 +318,7 @@ Result:
 
 Version 3 is a refactoring of version 2. No new functionality is introduced. But the code is cleaned up to avoid a difficult to maintain mess in later versions; it’s like cleaning a floor *before* it gets very noticably dirty, to avoid getting to that state.
 
-First, to use a subset of `<windows.h>` one can define various macros, such as **`NOMINMAX`** and **`WIN32_LEAN_AND_MEAN`**, before including that header. Using `NOMINMAX` one avoids getting the macros `min` and `max`, that like `small` can wreak havoc. Using `WIN32_LEAN_AND_MEAN` one cuts the number of lines roughly in half; in particular it avoids including `<rpcndr.h>`, which is the header that defines the `small` macro, and it also avoids including the `<winsock.h>` header which can have the same include guard as (and hence prevent inclusion of) the `<winsock2.h>` header that one really wants.
+First, to exclude some of the irrelevant and sabotage-like stuff from `<windows.h>` one can define various macros, such as **`NOMINMAX`** and **`WIN32_LEAN_AND_MEAN`**, before including that header. Using `NOMINMAX` one avoids getting the macros `min` and `max`, that like `small` can wreak havoc. Using `WIN32_LEAN_AND_MEAN` one cuts the number of lines roughly in half; in particular it avoids including `<rpcndr.h>`, which is the header that defines the `small` macro, and it also avoids including the `<winsock.h>` header which can have the same include guard as (and hence prevent inclusion of) the `<winsock2.h>` header that one really wants.
 
 So, version 2’s
 
