@@ -361,7 +361,7 @@ So, version 2’s
 
 There’s a lot more that can and maybe should go into a `<windows.h>` wrapper, but the above is good enough for our purposes.
 
-A header wrapper’s job is exclusively to provide a clean include of some other party’s header, as if that header was reasonably designed. To make it reliable and easy to understand it should not provide additional functionality. So, version 2’s general reusable **wrapper function** `set_icon`, that provides clarity and convenience, should not go into the `<windows.h>` wrapper but into its own header that can provide more such support machinery.
+A header wrapper’s job is exclusively to provide a clean include of some other party’s header, as if that header were reasonably designed. To make it reliable and easy to understand, and to minimize name pollution, it should not provide additional functionality. Version 2’s general reusable **wrapper function** `set_icon`, that provides clarity and convenience, should therefore not go into the `<windows.h>` wrapper but into a separate header that can provide more such support machinery.
 
 In that Windows API support machinery header it’s natural to include a little class for resource id’s, so that one avoids peppering the code with `MAKEINTRESOURCE` invocations and so that one can overload on resource id as argument, and have some confidence that an integer actually is a resource id. Let’s call it `Resource_id`. With that class in hand it’s also natural to add a reusable overload of `set_icon` that sets both the small and large icon with a given resource id, as we’ve found a need for:
 
