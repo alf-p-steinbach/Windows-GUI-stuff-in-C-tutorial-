@@ -629,9 +629,9 @@ auto main() -> int
 
 
 The mentioned XML resource is an **application manifest** that specifies that the program should [use version 6 or better of the “comctl32.dll” Windows library](https://docs.microsoft.com/en-us/windows/win32/controls/cookbook-overview#using-comctl32dll-version-6-in-an-application-that-uses-only-standard-extensions
-) (the library that the C++ code initializes). I do not know any rational explanation of why Microsoft chose to let the various DLL versions have the same filename and use a complex resource based scheme to differentiate between them, but at the time their engineers appeared to be quite proud of the, uh, solution, which they called [**SxS**, *side-by-side* DLLs](https://en.wikipedia.org/wiki/Side-by-side_assembly). I.e. having the same name for different versions of the same DLL-based library, and having those versions available at the same time, which Microsoft for unknown reasons appeared to believe would be very desirable.
+) (the library that the C++ code initializes). I do not know any rational explanation of why Microsoft chose to let the various DLL versions have the same filename and use a complex resource based scheme to differentiate between them, but at the time their engineers appeared to be quite proud of the, uh, solution, which they called [**SxS**, *side-by-side* DLLs](https://en.wikipedia.org/wiki/Side-by-side_assembly). I.e. having the same name for different versions of the same DLL-based library, and having those versions available at the same time, where an application by default would pick up the oldest version, which Microsoft for unknown reasons appeared to believe would be very desirable.
 
-The version-arbitration application manifest file contents (this is embedded as a special resource):
+An application manifest file can contain much more than just library version specifications, but the following is roughly the minimum needed for styling:
 
 [*part-03/code/tic-tac-toe/v4/resources/app-manifest.xml*](part-03/code/tic-tac-toe/v4/resources/app-manifest.xml)
 ~~~xml
@@ -659,6 +659,17 @@ The version-arbitration application manifest file contents (this is embedded as 
 </assembly>
 ~~~
 
+In the “.rc” resource script the XML file is added as a resource with special resource type `RT_MANIFEST` and an id that for an ordinary executable be the number 1 or that number specified as `CREATEPROCESS_MANIFEST_RESOURCE_ID`.
+
+In [*part-03/code/tic-tac-toe/v4/resources.rc*](part-03/code/tic-tac-toe/v4/resources.rc):
+
+~~~cpp
+CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
+~~~
+
+Note: both macro symbols above are effectively defined as the pointer values from `MAKEINTRESOURCE` instead of just the number values, which limits their use in C++ code.
+
+**\<rant\>** Considering that all this is in order to just get the conventional modern appearance that one would naïvely expect as *the default*, it seems excessively over-engineered. If it was a question of backward compatibility then modern looks could be enabled with a simple yes/no option. And it seems quite likely that instead of these resource shenanigans one could do it programmatically via a call of `SetWindowTheme` with proper argument values, but unfortunately all that [the documentation](https://docs.microsoft.com/en-us/windows/win32/controls/cookbook-overview#turning-off-visual-styles) says about that is an example of how one can call that function to *disable* visual styles: the argument values that would enable the default modern visual styling are left as a mystery… **\</rant\>**
 
 
 asdasd

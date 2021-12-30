@@ -11,12 +11,12 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 // application icon (executable's file icon) remains consistent on all systems.
 IDI_APP     ICON    "resources/app.ico"
 
+CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
+
 
 /////////////////////////////////////////////////////////////////////////////
 // English (United States) resources
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-
-CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
 
 IDD_MAIN_WINDOW DIALOGEX 0, 0, 340, 132
 STYLE DS_SETFONT | DS_CENTER | WS_CAPTION | WS_SYSMENU
