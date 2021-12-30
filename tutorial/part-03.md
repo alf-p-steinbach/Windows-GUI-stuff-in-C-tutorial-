@@ -18,6 +18,7 @@ The game logic is just a little detail at the end, though. Mainly the [five (!) 
 - [3.1. Create and run a general window based on a dialog template.](#31-create-and-run-a-general-window-based-on-a-dialog-template)
 - [3.2. Add a window icon and the too longish text by sending window messages.](#32-add-a-window-icon-and-the-too-longish-text-by-sending-window-messages)
 - [3.3. Factor out: `<windows.h>` inclusion; support machinery; window message cracking.](#33-factor-out-windowsh-inclusion-support-machinery-window-message-cracking)
+- [3.4. Fix gross imperfections: standard font; window just on top; modern appearance.](#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -671,7 +672,7 @@ Note: both macro symbols above are effectively defined as the pointer values fro
 
 **\<rant\>** Considering that all this is in order to just get the conventional modern appearance that one would naïvely expect as *the default*, it seems excessively over-engineered: modern appearance should be the default, but if for some reason that was not practically possible then a  **yes/no option** would suffice. **\</rant\>**
 
-The font fix uses functionality from Windows’ “gdi32.dll” (Graphics Device Interface), and the appearance fix uses functionality from the “comctl32.dll” (Common Controls). For Visual C++ means adding `gdi32.lib` and `comctl32.lib` to the build command. Here I’m building for the console subsystem:
+The font fix uses functionality from Windows’ “gdi32.dll” (the Graphics Device Interface), and the appearance fix uses functionality from the “comctl32.dll” (the Common Controls). For Visual C++ that means adding `gdi32.lib` and `comctl32.lib` to the build command. Here I’m building for the console subsystem:
 
 ~~~txt
 [T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
@@ -710,8 +711,6 @@ Again building for the console subsystem:
 
 Result:
 
-
+![The version 4  window](part-03/images/sshot-5.main-window-v4.png)
 
 ---
-
-
