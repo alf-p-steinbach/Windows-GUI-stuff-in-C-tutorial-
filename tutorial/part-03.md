@@ -686,7 +686,7 @@ main.cpp
 > ttt_
 ~~~
 
-With the MinGW g++ compiler the default libraries depend on the subsystem:
+With the MinGW g++ compiler the default libraries depend on the specified subsystem:
 
 ~~~txt
 [T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
