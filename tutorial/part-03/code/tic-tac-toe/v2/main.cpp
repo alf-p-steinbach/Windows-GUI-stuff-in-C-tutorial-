@@ -60,8 +60,8 @@ auto on_wm_initdialog( const HWND window )
 auto CALLBACK message_handler(
     const HWND      window,
     const UINT      msg_id,
-    const WPARAM    /*w_param*/,
-    const LPARAM    /*ell_param*/
+    const WPARAM    ,       // w_param
+    const LPARAM            // ell_param
     ) -> INT_PTR
 {
     switch( msg_id ) {

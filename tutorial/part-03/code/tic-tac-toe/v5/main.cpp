@@ -18,7 +18,7 @@ namespace wu    = winapi_util;
 namespace cu    = cpp_util;
 
 using   cu::Range, cu::is_in;
-using   std::string, std::to_string;
+using   std::optional, std::string, std::to_string;
 using   ttt::Cell, ttt::Board, ttt::Game;
 
 constexpr int cell_1_id = BOARD_BUTTON_BASE + 1;
@@ -46,8 +46,7 @@ void make_a_new_game( const HWND window )
     the_game = {};
     for( int i = 1; i <= 9; ++i ) {
         const HWND control = button_for_cell_index( i - 1, window );
-        const string text = "&" + to_string( i );
-        SetWindowText( control, text.c_str() );
+        SetWindowText( control, ("&" + to_string( i )).c_str() );
         wu::enable( control );
     }
     wu::enable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
@@ -69,7 +68,11 @@ void indicate_game_over( const HWND window )
             set_status_text( window, "I won. Better luck next time. Just click anywhere." );
         }
     } else {
-        set_status_text( window, "It's a tie.  Click anywhere for a new game." );
+        const char rsquo = '\x92';      // In Windows ANSI Western encoding, codepage 1252.
+        set_status_text(                // Could be better handled using a string resource.
+            window,
+            string() + "It" + rsquo + "s a tie. Click anywhere for a new game."
+            );
     }
 }
 
@@ -103,8 +106,7 @@ void set_rules_text( const HWND window )
 {
     char text[2048];
     LoadString( wu::this_exe, IDS_RULES, text, sizeof( text ) );
-    const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
-    SetWindowText( rules_display, text );
+    SetDlgItemText( window, IDC_RULES_DISPLAY, text );
 }
 
 void on_wm_close( const HWND window )
@@ -124,20 +126,23 @@ void on_wm_command( const HWND window, const int id, const HWND control, const U
 auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
     -> bool
 {
+    // State:
+    the_original_status_text = wu::text_of( GetDlgItem( window, IDC_STATUS_DISPLAY ) );
+
+    // Window:
     wu::set_standard_gui_font( window );
     wu::remove_topmost_style_for( window );
     set_app_icon( window );
     set_rules_text( window );
-    the_original_status_text = wu::text_of( GetDlgItem( window, IDC_STATUS_DISPLAY ) );
     return true;    // `true` sets focus to the `focus` control.
 }
 
 void on_wm_lbuttondown(
     const HWND          window,
-    const bool          /*is_double_click*/,
-    const int           /*x*/,
-    const int           /*y*/,
-    const unsigned      /*key_flags*/
+    const bool          ,   // is_double_click
+    const int           ,   // x
+    const int           ,   // y
+    const unsigned          // key_flags
     )
 {
     if( the_game.is_over() ) {
@@ -152,14 +157,20 @@ auto CALLBACK message_handler(
     const LPARAM    ell_param
     ) -> INT_PTR
 {
-    const MSG params = {window, msg_id, w_param, ell_param};
+    optional<INT_PTR> result;
+
+    #define HANDLE_WM( name, handler_func ) \
+        HANDLE_WM_##name( window, w_param, ell_param, handler_func )
     switch( msg_id ) {
-        case WM_CLOSE:          return HANDLER_OF_WM( CLOSE, params, on_wm_close );
-        case WM_COMMAND:        return HANDLER_OF_WM( COMMAND, params, on_wm_command );
-        case WM_INITDIALOG:     return HANDLER_OF_WM( INITDIALOG, params, on_wm_initdialog );
-        case WM_LBUTTONDOWN:    return HANDLER_OF_WM( LBUTTONDOWN, params, on_wm_lbuttondown );
+        case WM_COMMAND:        result = HANDLE_WM( COMMAND, on_wm_command ); break;
+        case WM_CLOSE:          result = HANDLE_WM( CLOSE, on_wm_close ); break;
+        case WM_INITDIALOG:     result = HANDLE_WM( INITDIALOG, on_wm_initdialog ); break;
+        case WM_LBUTTONDOWN:    result = HANDLE_WM( LBUTTONDOWN, on_wm_lbuttondown ); break;
     }
-    return false;   // Didn't process the message, want default processing.
+    #undef HANDLE_WM
+
+    // `false` => Didn't process the message, want default processing.
+    return (result? SetDlgMsgResult( window, msg_id, result.value() ) : false);
 }
 
 auto main() -> int
