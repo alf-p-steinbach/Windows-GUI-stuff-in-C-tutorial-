@@ -6,10 +6,6 @@
 namespace cpp_util {
     using   std::random_device, std::mt19937, std::uniform_int_distribution;
     
-    template< class T > using T_ = T;
-    template< class T > using P_ = T*;
-    template< class T > using R_ = T&;
-    
     constexpr auto squared( const int v ) -> int { return v*v; }
 
     struct Range
@@ -22,12 +18,17 @@ namespace cpp_util {
         -> bool
     { return range.first <= v and v <= range.last; }
 
-    inline auto random_up_to( const int beyond )
+
+    inline auto random_in( const Range& range )
         -> int
     {
         static random_device    entropy;
         static mt19937          bits( entropy() );
-        return uniform_int_distribution<>( 0, beyond - 1 )( bits );
+        return uniform_int_distribution<>( range.first, range.last )( bits );
     }
+
+    inline auto random_up_to( const int beyond )
+        -> int
+    { return random_in({ 0, beyond + 1 }); }
 
 }  // namespace cpp_util
