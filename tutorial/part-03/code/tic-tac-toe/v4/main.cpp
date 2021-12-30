@@ -8,7 +8,10 @@
 #include "winapi_util.hpp"          // HANDLER_OF_WM, winapi_util::*
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
 
+#include <optional>
+
 namespace wu = winapi_util;
+using   std::optional;
 
 void set_app_icon( const HWND window )
 {
@@ -19,8 +22,7 @@ void set_rules_text( const HWND window )
 {
     char text[2048];
     LoadString( wu::this_exe, IDS_RULES, text, sizeof( text ) );
-    const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
-    SetWindowText( rules_display, text );
+    SetDlgItemText( window, IDC_RULES_DISPLAY, text );
 }
 
 void on_wm_close( const HWND window )
@@ -45,12 +47,18 @@ auto CALLBACK message_handler(
     const LPARAM    ell_param
     ) -> INT_PTR
 {
-    const MSG params = {window, msg_id, w_param, ell_param};   // Used by HANDLER_OF_WM.
+    optional<INT_PTR> result;
+
+    #define HANDLE_WM( name, handler_func ) \
+        HANDLE_WM_##name( window, w_param, ell_param, handler_func )
     switch( msg_id ) {
-        case WM_CLOSE:      return HANDLER_OF_WM( CLOSE, params, on_wm_close );
-        case WM_INITDIALOG: return HANDLER_OF_WM( INITDIALOG, params, on_wm_initdialog );
+        case WM_CLOSE:      result = HANDLE_WM( CLOSE, on_wm_close ); break;
+        case WM_INITDIALOG: result = HANDLE_WM( INITDIALOG, on_wm_initdialog ); break;
     }
-    return false;   // Didn't process the message, want default processing.
+    #undef HANDLE_WM
+
+    // `false` => Didn't process the message, want default processing.
+    return (result? SetDlgMsgResult( window, msg_id, result.value() ) : false);
 }
 
 auto main() -> int

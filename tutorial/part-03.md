@@ -669,10 +669,48 @@ CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
 
 Note: both macro symbols above are effectively defined as the pointer values from `MAKEINTRESOURCE` instead of just the number values, which limits their use in C++ code.
 
-**\<rant\>** Considering that all this is in order to just get the conventional modern appearance that one would naïvely expect as *the default*, it seems excessively over-engineered. If it was a question of backward compatibility then modern looks could be enabled with a simple yes/no option. And it seems quite likely that instead of these resource shenanigans one could do it programmatically via a C++ call of `SetWindowTheme` with proper argument values, but unfortunately all that [the documentation](https://docs.microsoft.com/en-us/windows/win32/controls/cookbook-overview#turning-off-visual-styles) says about that is an example of how one can call that function to *disable* visual styles: the argument values that would enable the default modern visual styling are left as a mystery… **\</rant\>**
+**\<rant\>** Considering that all this is in order to just get the conventional modern appearance that one would naïvely expect as *the default*, it seems excessively over-engineered: modern appearance should be the default, but if for some reason that was not practically possible then a  **yes/no option** would suffice. **\</rant\>**
+
+The font fix uses functionality from Windows’ “gdi32.dll” (Graphics Device Interface), and the appearance fix uses functionality from the “comctl32.dll” (Common Controls). For Visual C++ means adding `gdi32.lib` and `comctl32.lib` to the build command. Here I’m building for the console subsystem:
+
+~~~txt
+[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+> rc /nologo /fo r.res ..\resources.rc
+
+[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+> cl /nologo ..\main.cpp r.res user32.lib gdi32.lib comctl32.lib /Fe"ttt"
+main.cpp
+
+[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+> ttt_
+~~~
+
+With the MinGW g++ compiler the default libraries depend on the subsystem:
+
+~~~txt
+[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+> g++ -dumpspecs 2>&1 | find "user32"
+%{pg:-lgmon} %{!no-pthread:-lpthread} %{pthread: } %{mwindows:-lgdi32 -lcomdlg32} %{fvtable-verify=preinit:-lvtv -lpsapi;         fvtable-verify=std:-lvtv -lpsapi} -ladvapi32 -lshell32 -luser32 -lkernel32
+~~~
+
+This means that in any case you get `‑ladvapi32`, `‑lshell32`, `‑luser32` and `‑lkernel32` as default, and that when `‑mwindows` is specified, i.e. building for the GUI subsystem, you additionally get `‑lgdi32` and `‑lcomdlg32` as default.
+
+Again building for the console subsystem:
+
+~~~txt
+[T:\tutorial\part‑03\code\tic-tac-toe\v4\.build]
+> windres ..\resources.rc -o r.o
+
+[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+> g++ -std=c++17 ..\main.cpp r.o -lgdi32 -lcomctl32 -o ttt
+
+[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+> ttt
+~~~
+
+Result:
 
 
-asdasd
 
 ---
 
