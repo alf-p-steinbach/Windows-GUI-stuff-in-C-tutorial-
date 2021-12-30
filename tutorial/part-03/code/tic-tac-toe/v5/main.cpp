@@ -81,13 +81,13 @@ void on_user_move( const HWND window, const int user_move )
     }
 
     the_game.board.cells[user_move] = cross;
-    the_game.store_any_win_line( cross );
+    the_game.store_any_win_line_with( cross );
     ++the_game.n_moves;
     SetWindowText( button_for_cell_index( user_move, window ), "X" );
     if( not the_game.is_over() ) {
         const int computer_move = the_game.find_computer_move();
         the_game.board.cells[computer_move] = circle;
-        the_game.store_any_win_line( circle );
+        the_game.store_any_win_line_with( circle );
         ++the_game.n_moves;
         SetWindowText( button_for_cell_index( computer_move, window ), "O" );
     }

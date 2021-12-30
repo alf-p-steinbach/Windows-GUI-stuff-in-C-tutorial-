@@ -2,6 +2,7 @@
 #include "cpp_util.hpp"
 
 #include <array>
+#include <initializer_list>
 #include <optional>
 
 namespace ttt {
@@ -47,7 +48,7 @@ namespace ttt {
         int         n_moves     = 0;
         Opt_line    win_line    = {};
 
-        void store_any_win_line( const cell_state::Enum state )
+        void store_any_win_line_with( const cell_state::Enum state )
         {
             if( const Opt_line new_win_line = board.win_line_with( state ) ) {
                 win_line = new_win_line;
@@ -60,14 +61,14 @@ namespace ttt {
             -> int
         {
             assert( not is_over() );
-            for( const auto state: {cell_state::circle, cell_state::cross} ) {
+            for( const auto state_to_check: {cell_state::circle, cell_state::cross} ) {
                 // If state is cell_state::circle: Choose a direct computer win if possible.
                 // Else state is cell_state::cross:  Block the user’s win if any.
                 for( int i = 0; i < Board::n_cells; ++i ) {
                     if( board.cells[i] == cell_state::empty ) {
                         Board a_copy = board;
-                        a_copy.cells[i] = state;
-                        if( a_copy.win_line_with( state ) ) {
+                        a_copy.cells[i] = state_to_check;
+                        if( a_copy.win_line_with( state_to_check ) ) {
                             return i;
                         }
                     }

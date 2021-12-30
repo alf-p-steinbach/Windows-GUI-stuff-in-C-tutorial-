@@ -29,6 +29,6 @@ namespace cpp_util {
 
     inline auto random_up_to( const int beyond )
         -> int
-    { return random_in({ 0, beyond + 1 }); }
+    { return random_in({ 0, beyond - 1 }); }
 
 }  // namespace cpp_util
