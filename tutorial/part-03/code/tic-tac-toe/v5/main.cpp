@@ -16,17 +16,14 @@
 
 namespace wu    = winapi_util;
 namespace cu    = cpp_util;
+using namespace ttt::cell_state;        // empty, cross, circle
 
 using   cu::Range, cu::is_in;
 using   std::optional, std::string, std::to_string;
-using   ttt::Cell, ttt::Board, ttt::Game;
+using   ttt::Board, ttt::Game;
 
 constexpr int cell_1_id = BOARD_BUTTON_BASE + 1;
 constexpr int cell_9_id = BOARD_BUTTON_BASE + 9;
-
-constexpr auto empty    = Cell::State::empty;
-constexpr auto cross    = Cell::State::cross;
-constexpr auto circle   = Cell::State::circle;
 
 Game    the_game;
 string  the_original_status_text;       // Initialized by `on_wm_initdialog`.
@@ -84,13 +81,13 @@ void on_user_move( const HWND window, const int user_move )
     }
 
     the_game.board.cells[user_move] = cross;
-    the_game.note_any_win( cross );
+    the_game.store_any_win_line( cross );
     ++the_game.n_moves;
     SetWindowText( button_for_cell_index( user_move, window ), "X" );
     if( not the_game.is_over() ) {
         const int computer_move = the_game.find_computer_move();
         the_game.board.cells[computer_move] = circle;
-        the_game.note_any_win( circle );
+        the_game.store_any_win_line( circle );
         ++the_game.n_moves;
         SetWindowText( button_for_cell_index( computer_move, window ), "O" );
     }

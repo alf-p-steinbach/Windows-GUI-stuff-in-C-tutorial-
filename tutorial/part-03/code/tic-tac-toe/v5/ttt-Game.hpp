@@ -5,26 +5,27 @@
 #include <optional>
 
 namespace ttt {
-    namespace cu    = cpp_util;
-
-    using   cu::squared;
+    namespace cu = cpp_util;
     using   std::array, std::optional;
 
-    struct Cell{ struct State{ enum Enum{ empty, cross, circle }; }; };
+    namespace cell_state {
+        enum Enum{ empty, cross, circle };
+    }  // namespace cell_state
 
     struct Board
     {
-        enum{ size = 3, n_cells = squared( size ), max_index = n_cells - 1 };
+        enum{ size = 3, n_cells = cu::squared( size ), max_index = n_cells - 1 };
 
-        struct Line{ int start; int stride; };
+        // x is left to right, y is bottom to top, zero-based, i = 3*y + x.
+        struct Line{ int start; int stride; };  // `start` in left col or bottom row.
         static constexpr Line lines[] =
         {
             {0, 1}, {3, 1}, {6, 1}, {0, 3}, {1, 3}, {2, 3}, {0, 4}, {2, 2}
         };
 
-        array<Cell::State::Enum, n_cells>   cells   = {};
+        array<cell_state::Enum, n_cells>    cells   = {};
         
-        auto win_line_with( const Cell::State::Enum state ) const
+        auto win_line_with( const cell_state::Enum state ) const
             -> optional<Line>
         {
             for( const Line& line: lines ) {
@@ -40,15 +41,16 @@ namespace ttt {
 
     struct Game
     {
-        Board                   board       = {};
-        int                     n_moves     = 0;
-        optional<Board::Line>   win_line    = {};
+        using Opt_line = optional<Board::Line>;
 
-        void note_any_win( const Cell::State::Enum state )
+        Board       board       = {};
+        int         n_moves     = 0;
+        Opt_line    win_line    = {};
+
+        void store_any_win_line( const cell_state::Enum state )
         {
-            if( const auto new_win_line = board.win_line_with( state ) ) {
+            if( const Opt_line new_win_line = board.win_line_with( state ) ) {
                 win_line = new_win_line;
-                return;
             }
         }
         
@@ -58,32 +60,26 @@ namespace ttt {
             -> int
         {
             assert( not is_over() );
-            // Choose a direct computer win if possible.
-            for( int i = 0; i < Board::n_cells; ++i ) {
-                if( board.cells[i] == Cell::State::empty ) {
-                    Board a_copy = board;
-                    a_copy.cells[i] = Cell::State::circle;
-                    if( a_copy.win_line_with( Cell::State::circle ) ) {
-                        return i;
+            for( const auto state: {cell_state::circle, cell_state::cross} ) {
+                // If state is cell_state::circle: Choose a direct computer win if possible.
+                // Else state is cell_state::cross:  Block the user’s win if any.
+                for( int i = 0; i < Board::n_cells; ++i ) {
+                    if( board.cells[i] == cell_state::empty ) {
+                        Board a_copy = board;
+                        a_copy.cells[i] = state;
+                        if( a_copy.win_line_with( state ) ) {
+                            return i;
+                        }
                     }
                 }
             }
-            // Else block the user’s win if any.
-            for( int i = 0; i < Board::n_cells; ++i ) {
-                if( board.cells[i] == Cell::State::empty ) {
-                    Board a_copy = board;
-                    a_copy.cells[i] = Cell::State::cross;
-                    if( a_copy.win_line_with( Cell::State::cross ) ) {
-                        return i;
-                    }
-                }
-            }
+            
             // Else choose a move at random.
             const int n_possibles = Board::n_cells - n_moves;
-            const int which_free_cell = 1 + cu::random_up_to( n_possibles );
+            const int which_free_cell = cu::random_in( {1, n_possibles} );
             int count = 0;
             for( int i = 0; i < Board::n_cells; ++i ) {
-                if( board.cells[i] == Cell::State::empty ) {
+                if( board.cells[i] == cell_state::empty ) {
                     ++count;
                     if( count == which_free_cell ) {
                         return i;
