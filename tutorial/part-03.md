@@ -853,5 +853,49 @@ static Game     the_game;
 static string   the_original_status_text;       // Initialized by `on_wm_initdialog`.
 ~~~
 
+Since `the_game` is initialized via its C++ default constructor, `on_wm_initdialog` only needs to deal with `the_original_status_text`, in addition to its version 4 responsibilities:
 
+~~~cpp
+auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
+    -> bool
+{
+    // State:
+    the_original_status_text = wu::text_of( GetDlgItem( window, IDC_STATUS_DISPLAY ) );
 
+    // Window:
+    wu::set_standard_gui_font( window );
+    wu::remove_topmost_style_for( window );
+    set_app_icon( window );
+    set_rules_text( window );
+    return true;    // `true` sets focus to the `focus` control.
+}
+~~~
+
+… where `wu::text_of` is a simple wrapper over Windows’ `GetWindowText` function.
+
+The `WM_COMMAND` message could be caused by many things, e.g. in a future version it could come from a menu item to display an “About”-box. And so, to show the general workings, `on_wm_command` first of all checks whether the message comes from a button press of one of the game board buttons. If so it calculates the corresponding internal board cell index and just calls a function `on_user_move` to handle that move:
+
+~~~cpp
+constexpr int button_1_id = BOARD_BUTTON_BASE + 1;
+constexpr int button_9_id = BOARD_BUTTON_BASE + 9;
+
+    ⋮
+
+void on_wm_command(
+    const HWND      window,
+    const int       id,
+    const HWND      , //control
+    const UINT      notification )
+{
+    static constexpr auto button_ids = Range{ button_1_id, button_9_id };
+
+    if( is_in( button_ids, id ) and notification == BN_CLICKED ) {
+        const int cell_index = id - button_1_id;
+        on_user_move( window, cell_index );
+    }
+}
+~~~
+
+… where `Range` is a little utility class that represents a range of integers.
+
+asdasd
