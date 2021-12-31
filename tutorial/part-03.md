@@ -722,3 +722,74 @@ I’d forgotten that somewhere on the road since I taught Windows programming in
 
 Well, *change of plan*. Instead of a solution with DIY custom keyboard handling, we’ll simply leverage the handling that the `IsDialogMessage` calls already provide. Namely, instead of handling keyboard events we’ll designate the digits “1” through “9” as button [**access keys**](https://docs.microsoft.com/en-us/cpp/windows/defining-mnemonics-access-keys?view=msvc-170#to-define-an-access-key-for-a-control-with-a-visible-caption-push-buttons-check-boxes-and-radio-buttons), also known as “mnemonics”, and more generally as “[keyboard shortcuts](https://en.wikipedia.org/wiki/Keyboard_shortcut)”. And this is very easy to arrange, namely by placing an **“&” ampersand** in front of each digit (or more generally in front of the chosen access key letter) in the button texts:
 
+[*part-03/code/tic-tac-toe/v5/resources.h*](part-03/code/tic-tac-toe/v5/resources.h)
+~~~c
+#pragma once
+
+#define IDC_STATIC                      -1
+
+#define IDD_MAIN_WINDOW                 101
+#define IDC_RULES_DISPLAY               102
+#define IDS_RULES                       103
+#define IDI_APP                         104
+#define IDC_STATUS_DISPLAY              105
+
+#define BOARD_BUTTON_BASE               1000
+~~~
+
+[*part-03/code/tic-tac-toe/v5/resources.rc*](part-03/code/tic-tac-toe/v5/resources.rc)
+~~~c
+#pragma code_page( 1252 )   // Windows ANSI Western encoding, an extension of Latin 1.
+#include "resources.h"
+#include <windows.h>
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+
+// The icon with lowest ID value should be placed first to ensure that the
+// application icon (executable's file icon) remains consistent on all systems.
+IDI_APP     ICON    "resources/app.ico"
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+IDD_MAIN_WINDOW DIALOGEX 0, 0, 340, 132
+STYLE DS_SETFONT | DS_CENTER | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST
+CAPTION "Tic-tac-toe (mostly random)"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Click a place on the board, or type its digit 1 through 9.",
+                    IDC_STATUS_DISPLAY, 7, 7, 313, 11, SS_NOPREFIX
+    PUSHBUTTON      "&7", BOARD_BUTTON_BASE + 7, 5, 24, 36, 32, BS_FLAT
+    PUSHBUTTON      "&8", BOARD_BUTTON_BASE + 8, 43, 24, 36, 32, BS_FLAT
+    PUSHBUTTON      "&9", BOARD_BUTTON_BASE + 9, 81, 24, 36, 32, BS_FLAT
+    PUSHBUTTON      "&4", BOARD_BUTTON_BASE + 4, 5, 58, 36, 32, BS_FLAT
+    PUSHBUTTON      "&5", BOARD_BUTTON_BASE + 5, 43, 58, 36, 32, BS_FLAT
+    PUSHBUTTON      "&6", BOARD_BUTTON_BASE + 6, 81, 58, 36, 32, BS_FLAT
+    PUSHBUTTON      "&1", BOARD_BUTTON_BASE + 1, 5, 93, 36, 32, BS_FLAT
+    PUSHBUTTON      "&2", BOARD_BUTTON_BASE + 2, 43, 93, 36, 32, BS_FLAT
+    PUSHBUTTON      "&3", BOARD_BUTTON_BASE + 3, 81, 93, 36, 32, BS_FLAT
+    LTEXT           "<The rules should be displayed here>",
+                    IDC_RULES_DISPLAY, 123, 24, 214, 110, SS_NOPREFIX
+END
+
+STRINGTABLE
+BEGIN
+  IDS_RULES         "\
+You win with 3 crosses in a line, either horizontally, vertically or diagonally.\
+\n\nPlace a cross by clicking an empty board position, or type that position’s digit (‘1’ \
+through ‘9’). The computer will respond with a circle as counter move. The computer's \
+response is random except that it will exploit a direct winning opportunity, and likewise \
+if possible will block a direct winning opportunity for you.\n\nHave fun. May the force be \
+with you!"
+END
+~~~
+
+asdasd
