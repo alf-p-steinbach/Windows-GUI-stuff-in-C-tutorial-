@@ -295,8 +295,8 @@ auto on_wm_initdialog( const HWND window )
 auto CALLBACK message_handler(
     const HWND      window,
     const UINT      msg_id,
-    const WPARAM    /*w_param*/,
-    const LPARAM    /*ell_param*/
+    const WPARAM    ,       // w_param
+    const LPARAM            // ell_param
     ) -> INT_PTR
 {
     switch( msg_id ) {
@@ -660,7 +660,7 @@ An application manifest file can contain much more than just library version spe
 </assembly>
 ~~~
 
-In the “.rc” resource script the XML file is added as a resource with special resource type `RT_MANIFEST` and an id that for an ordinary executable be the number 1 or that number specified as `CREATEPROCESS_MANIFEST_RESOURCE_ID`.
+In the “.rc” resource script the XML file is added as a resource with special resource type `RT_MANIFEST` and an id that for an ordinary executable should be the number 1 or that number specified as `CREATEPROCESS_MANIFEST_RESOURCE_ID`.
 
 In [*part-03/code/tic-tac-toe/v4/resources.rc*](part-03/code/tic-tac-toe/v4/resources.rc):
 
