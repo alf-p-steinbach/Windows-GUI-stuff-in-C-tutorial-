@@ -792,4 +792,9 @@ with you!"
 END
 ~~~
 
-asdasd
+Another oversight was also corrected here, namely, that up till now there was no place in the dialog to display a status such as “Game over!”. For a modern user interface there better be such a place, to avoid popping up modal message boxes and other annoyances. So now the topmost text field has that rôle, with id `IDC_STATUS_DISPLAY`.
+
+Anyway, by default the access keys in buttons are underlined, like this:
+
+![The version 5  window with access keys underlined](part-03/images/sshot-6.access-keys-underlined.png)
+
