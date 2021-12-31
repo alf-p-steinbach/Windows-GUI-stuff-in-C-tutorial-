@@ -842,7 +842,7 @@ void on_wm_lbuttondown(
 }
 ~~~
 
-Here `the_game` is a **global variable**. It’s the simplest way to associate a program state with a window. Ideally the variable’s scope should have been limited by having it in a namespace, or perhaps in a `struct` instantiated at top level in the program, but for simplicity I just declared it as `static`.
+Here `the_game` is a (module-) **global variable**. It’s the simplest way to associate a program state with a window. Ideally the variable’s scope should have been limited by having it in a namespace, or perhaps in a `struct` instantiated at top level in the program, but for simplicity I just declared it as `static`.
 
 There are plenty of potential problems with using global variables for window-associated state, in particular that they’re initialized before the window exists, and that they can’t easily serve more than one window of the same kind. But for a simple program with just one window, like this one, they’re fine. Or, they’re fine for our C style coding.
 
