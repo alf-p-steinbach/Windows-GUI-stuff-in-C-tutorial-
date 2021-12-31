@@ -714,3 +714,11 @@ Result:
 ![The version 4  window](part-03/images/sshot-5.main-window-v4.png)
 
 ---
+### 3.5. Add the game logic and user interaction.
+
+Dialog windows are designed to do all the work of handling keyboard events for you. For example, moving focus from one control to the next via `Tab`, pressing buttons via the `Space` key, and so on. In the Windows code that calls your dialog proc this functionality is added via calls to `IsDialogMessage`, and this means that adding one’s own more specialized task-specific keyboard handling can be, uh, non-trivial.
+
+I’d forgotten that somewhere on the road since I taught Windows programming in the 1990’s, but when I found that my `WM_KEYDOWN` handler was simply not called some vague memories started to suggest that maybe my plan wasn’t totally perfect, maybe?
+
+Well, *change of plan*. Instead of a solution with DIY custom keyboard handling, we’ll simply leverage the handling that the `IsDialogMessage` calls already provide. Namely, instead of handling keyboard events we’ll designate the digits “1” through “9” as button [**access keys**](https://docs.microsoft.com/en-us/cpp/windows/defining-mnemonics-access-keys?view=msvc-170#to-define-an-access-key-for-a-control-with-a-visible-caption-push-buttons-check-boxes-and-radio-buttons), also known as “mnemonics”, and more generally as “[keyboard shortcuts](https://en.wikipedia.org/wiki/Keyboard_shortcut)”. And this is very easy to arrange, namely by placing an **“&” ampersand** in front of each digit (or more generally in front of the chosen access key letter) in the button texts:
+
