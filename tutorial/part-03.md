@@ -798,7 +798,7 @@ Anyway, by default the access keys in buttons are underlined, like this:
 
 ![The version 5  window with access keys underlined](part-03/images/sshot-6.access-keys-underlined.png)
 
-When a button is logically pressed, either by clicking it with the mouse, or by using the `Space` key when it has focus, or by using its access key (if it has), the parent window receives a `WM_COMMAND` message. This message is also produced by menu items and by “accelerator keys”, so it’s a general way to deal with **user commands**. In addition to `WM_COMMAND` the dialog proc now also handles `WM_LBUTTONDOWN`, a mouse left click, as a way for the user to proceed from game-over-information-state to a new game:
+When a button is logically pressed, either by clicking it with the mouse, or by using the `Space` key when it has focus, or by using its access key (if it has), the parent window receives a **`WM_COMMAND`** message. This message is also produced by menu items and by “accelerator keys”, so it’s a general way to deal with **user commands**. In addition to `WM_COMMAND` the dialog proc now also handles `WM_LBUTTONDOWN`, a mouse left click, as a way for the user to proceed from game-over-information-state to a new game:
 
 ~~~cpp
 auto CALLBACK message_handler(
