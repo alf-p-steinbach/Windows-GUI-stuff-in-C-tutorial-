@@ -22,11 +22,11 @@ using   cu::Range, cu::is_in;
 using   std::optional, std::string, std::to_string;
 using   ttt::Board, ttt::Game;
 
-constexpr int cell_1_id = BOARD_BUTTON_BASE + 1;
-constexpr int cell_9_id = BOARD_BUTTON_BASE + 9;
+constexpr int button_1_id = BOARD_BUTTON_BASE + 1;
+constexpr int button_9_id = BOARD_BUTTON_BASE + 9;
 
-Game    the_game;
-string  the_original_status_text;       // Initialized by `on_wm_initdialog`.
+static Game     the_game;
+static string   the_original_status_text;       // Initialized by `on_wm_initdialog`.
 
 void set_status_text( const HWND window, const string& text )
 {
@@ -53,7 +53,7 @@ void make_a_new_game( const HWND window )
 
 void indicate_game_over( const HWND window )
 {
-    for( int id = cell_1_id; id <= cell_9_id; ++id ) {
+    for( int id = button_1_id; id <= button_9_id; ++id ) {
         wu::disable( GetDlgItem( window, id ) );
     }
     wu::disable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
@@ -111,13 +111,18 @@ void on_wm_close( const HWND window )
     EndDialog( window, IDOK );
 }
 
-void on_wm_command( const HWND window, const int id, const HWND control, const UINT notification )
+void on_wm_command(
+    const HWND      window,
+    const int       id,
+    const HWND      , //control
+    const UINT      notification )
 {
-    if( is_in( Range{ cell_1_id, cell_9_id }, id ) and notification == BN_CLICKED ) {
-        const int cell_index = id - cell_1_id;
+    static constexpr auto button_ids = Range{ button_1_id, button_9_id };
+
+    if( is_in( button_ids, id ) and notification == BN_CLICKED ) {
+        const int cell_index = id - button_1_id;
         on_user_move( window, cell_index );
     }
-    (void) control;
 }
 
 auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )

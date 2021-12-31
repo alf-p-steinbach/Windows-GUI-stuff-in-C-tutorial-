@@ -798,3 +798,60 @@ Anyway, by default the access keys in buttons are underlined, like this:
 
 ![The version 5  window with access keys underlined](part-03/images/sshot-6.access-keys-underlined.png)
 
+When a button is logically pressed, either by clicking it with the mouse, or by using the `Space` key when it has focus, or by using its access key (if it has), the parent window receives a `WM_COMMAND` message. This message is also produced by menu items and by “accelerator keys”, so it’s a general way to deal with **user commands**. In addition to `WM_COMMAND` the dialog proc now also handles `WM_LBUTTONDOWN`, a mouse left click, as a way for the user to proceed from game-over-information-state to a new game:
+
+~~~cpp
+auto CALLBACK message_handler(
+    const HWND      window,
+    const UINT      msg_id,
+    const WPARAM    w_param,
+    const LPARAM    ell_param
+    ) -> INT_PTR
+{
+    optional<INT_PTR> result;
+
+    #define HANDLE_WM( name, handler_func ) \
+        HANDLE_WM_##name( window, w_param, ell_param, handler_func )
+    switch( msg_id ) {
+        case WM_COMMAND:        result = HANDLE_WM( COMMAND, on_wm_command ); break;
+        case WM_CLOSE:          result = HANDLE_WM( CLOSE, on_wm_close ); break;
+        case WM_INITDIALOG:     result = HANDLE_WM( INITDIALOG, on_wm_initdialog ); break;
+        case WM_LBUTTONDOWN:    result = HANDLE_WM( LBUTTONDOWN, on_wm_lbuttondown ); break;
+    }
+    #undef HANDLE_WM
+
+    // `false` => Didn't process the message, want default processing.
+    return (result? SetDlgMsgResult( window, msg_id, result.value() ) : false);
+}
+~~~
+
+The mouse left click handling is almost trivial but instructive, so here it is:
+
+~~~cpp
+void on_wm_lbuttondown(
+    const HWND          window,
+    const bool          ,   // is_double_click
+    const int           ,   // x
+    const int           ,   // y
+    const unsigned          // key_flags
+    )
+{
+    if( the_game.is_over() ) {
+        make_a_new_game( window );
+    }
+}
+~~~
+
+Here `the_game` is a **global variable**. It’s the simplest way to associate a program state with a window. Ideally the variable’s scope should have been limited by having it in a namespace, or perhaps in a `struct` instantiated at top level in the program, but for simplicity I just declared it as `static`.
+
+There are plenty of potential problems with using global variables for window-associated state, in particular that they’re initialized before the window exists, and that they can’t easily serve more than one window of the same kind. But for a simple program with just one window, like this one, they’re fine. Or, they’re fine for our C style coding.
+
+There is one other program state variable, namely one that remembers the original text of the dialog’s status line, so that that text can be reinstated for a new round of the game:
+
+~~~cpp
+static Game     the_game;
+static string   the_original_status_text;       // Initialized by `on_wm_initdialog`.
+~~~
+
+
+
