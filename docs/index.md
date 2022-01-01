@@ -1,6 +1,8 @@
 # Windows GUI-stuff in C++: a tutorial.
 
-More is added on a weekly or bi-weekly basis, roughly. It’s an ongoing tutorial.
+Desktop Windows programming starting from the ground up in C++17.
+
+I haven’t decided how far to take this. I’ll add more as I have free time to fill, maybe once a week or two weeks. Free time include those times when I get too bored with other stuff.
 
 *Contents:*
 
@@ -25,4 +27,4 @@ More is added on a weekly or bi-weekly basis, roughly. It’s an ongoing tutoria
     - [3.4. Fix gross imperfections: standard font; window just on top; modern appearance.](#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance)
     - [3.5. Add the game logic and user interaction.](#35-add-the-game-logic-and-user-interaction)
 
-Hopefully more to come.
+Perhaps a useful link: [The tutorial’s Github project.](https://github.com/alf-p-steinbach/Windows-GUI-stuff-in-C-tutorial-)
