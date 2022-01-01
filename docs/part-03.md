@@ -897,7 +897,7 @@ void on_wm_command(
 }
 ~~~
 
-… where `Range` is a little utility class that represents a range of integers.
+… where `Range` is a little `struct` class that represents a range of integers.
 
 The GUI side of handling an attempted user move is simple: if the attempted move is invalid then indicate that, otherwise do that move in the game state and show it, plus if the game is now not over, make a counter-move for the computer, and in any case, if the game is then over, indicate that and enter a state where all the user can do is start a new one.
 
