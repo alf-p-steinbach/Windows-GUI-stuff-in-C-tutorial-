@@ -131,7 +131,7 @@ The online documentation is moved around a lot, but googling e.g. “Microsoft M
 | DLL | User32.dll |
 | API set | ext-ms-win-ntuser-dialogbox-l1-1-0 (introduced in Windows 8) |
 
-The documentation needs to be read with the understanding that it's often imperfect. For example, Windows 2000 is mentioned but Microsoft’s current tools do not support building for anything earlier than Windows Vista, and in the other direction the `MessageBox` function has been in Windows from the very start. Anyway, the **DLL** row says that `MessageBox` is provided by `User32.dll`, which for Visual C++ means specifying `user32.lib`, and for g++ means (if necessary, e.g. for a console subsystem build) specifying `-luser32`.
+The documentation needs to be read with the understanding that it's often imperfect. For example, Windows 2000 is mentioned but Microsoft’s current tools do not support building for anything earlier than Windows Vista, and in the other direction the `MessageBox` function has been in Windows from the very start. Anyway, the **DLL** row says that `MessageBox` is provided by `User32.dll`, which for Visual C++ means specifying `user32.lib`, and for g++ means specifying `-luser32`, except that this particular library is one of those (advapi32, shell32, user32 and kernel32) added by default for g++.
 
 ---
 ### 1.6. Run the program via commands and via mouse clicking.
