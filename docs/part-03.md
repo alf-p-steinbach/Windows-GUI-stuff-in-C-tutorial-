@@ -1,6 +1,6 @@
 # Windows GUI-stuff in C++: a tutorial.
 
-## Part 3 – A Tic-Tac-Toe game in a general window.
+## Part 3 – A Tic-Tac-Toe game in a dialog window.
 
 In the previous part we saw that an application’s icon is provided via data embedded in the executable, called a resource. Now we’ll additionally use a resource called a **dialog template**, that describes the contents of a simple window. As a concrete example we’ll use that for a simple Tic-Tac-Toe (tree in a row) game in a general window.
 
@@ -19,6 +19,7 @@ The game logic is just a little detail at the end, though. Mainly the [five (!) 
 - [3.2. Add a window icon and the too longish text by sending window messages.](#32-add-a-window-icon-and-the-too-longish-text-by-sending-window-messages)
 - [3.3. Factor out: `<windows.h>` inclusion; support machinery; window message cracking.](#33-factor-out-windowsh-inclusion-support-machinery-window-message-cracking)
 - [3.4. Fix gross imperfections: standard font; window just on top; modern appearance.](#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance)
+- [3.5. Add the game logic and user interaction.](#35-add-the-game-logic-and-user-interaction)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -898,4 +899,4 @@ void on_wm_command(
 
 … where `Range` is a little utility class that represents a range of integers.
 
-asdasd
+***(under construction)***
