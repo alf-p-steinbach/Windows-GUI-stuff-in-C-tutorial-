@@ -8,9 +8,9 @@ There is an original resource handling scheme that deals with binary resources s
 
 In this part we’ll only use the original “Windows API” resource scheme, namely to add a custom icon to the “Hello, world!” message box.
 
-The actual result in itself is just very marginal progress: a message box with a custom icon, plus the same icon for the executable. The important aspect is *how* that’s accomplished, namely by using resources, which later (in part 3) will enable us to tackle general windows with contents & layout defined by a resource. In an even later part it will also enable us to tackle the problems of modern look ’n feel, providing version information, and using UTF-8 Unicode text.
+The actual result in itself is just very marginal progress: a message box with a custom icon, plus the same icon for the executable. The important aspect is *how* that’s accomplished, namely by using resources, which later (in part 3) will enable us to tackle general windows with contents & layout defined by a resource. In even later parts it will also enable us to tackle e.g. the problems of providing version information via Windows Explorer, and using UTF-8 Unicode text.
 
-However, that perfection right now would be yet another very marginal advance of the actual result. Hence we’ll postpone these perfections and do just the icon resource thing now. We’ll use window contents specification, called a “dialog template” — more directly visible progress yay! — in part 3.
+However, for now we’ll do just the icon resource thing, a message box with a custom icon.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
