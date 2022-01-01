@@ -194,3 +194,7 @@ hello.cpp
 In any case, result:
 
 ![Message box with custom icon](part-02/images/sshot.part-2-message-box.png)
+
+| ← previous |  up ↑ | next → |
+|:----|:----:|---:|
+| [1. A Windows GUI “Hello, world!”.](part-01.md)  | [Contents](index.md)   |  [3. A Tic-Tac-Toe game in a dialog window.](part-03.md)  |

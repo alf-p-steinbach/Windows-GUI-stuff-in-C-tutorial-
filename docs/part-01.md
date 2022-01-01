@@ -188,3 +188,7 @@ So, if you run a GUI program in Windows 11 or later and it doesn’t appear:
 * look in the task bar to check if the program is running, and perhaps
 * use [Alt]+[Tab] to check if the window is just obscured, before
 * checking in the Task Manager whether the executable is running without a window.
+
+| ← previous |  up ↑ | next → |
+|:----|:----:|---:|
+| ✕ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | [Contents](index.md)   |  [2. Use resources to provide an icon.](part-02.md) |
