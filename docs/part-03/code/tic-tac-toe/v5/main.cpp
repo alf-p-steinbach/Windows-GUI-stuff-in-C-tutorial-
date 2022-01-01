@@ -16,7 +16,6 @@
 
 namespace wu    = winapi_util;
 namespace cu    = cpp_util;
-using namespace ttt::cell_state;        // empty, cross, circle
 
 using   cu::Range, cu::is_in;
 using   std::optional, std::string, std::to_string;
@@ -51,13 +50,15 @@ void make_a_new_game( const HWND window )
     set_status_text( window, the_original_status_text );
 }
 
-void indicate_game_over( const HWND window )
+void enter_game_over_state( const HWND window )
 {
+    assert( the_game.is_over() );
     for( int id = button_1_id; id <= button_9_id; ++id ) {
         wu::disable( GetDlgItem( window, id ) );
     }
     wu::disable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
     if( the_game.win_line ) {
+        using ttt::cell_state::cross;
         const bool user_won = (the_game.board.cells[the_game.win_line->start] == cross);
         if( user_won ) {
             set_status_text( window, "You won! Yay! Click anywhere for a new game." );
@@ -75,11 +76,11 @@ void indicate_game_over( const HWND window )
 
 void on_user_move( const HWND window, const int user_move )
 {
+    using ttt::cell_state::empty;
     if( the_game.board.cells[user_move] != empty or the_game.is_over() ) {
         FlashWindow( window, true );    // Documentation per late 2021 is misleading/wrong.
         return;
     }
-
     the_game.make_move( user_move );
     SetWindowText( button_for_cell_index( user_move, window ), "X" );
     if( not the_game.is_over() ) {
@@ -87,7 +88,7 @@ void on_user_move( const HWND window, const int user_move )
         the_game.make_move( computer_move );
         SetWindowText( button_for_cell_index( computer_move, window ), "O" );
     }
-    if( the_game.is_over() ) { indicate_game_over( window ); }
+    if( the_game.is_over() ) { enter_game_over_state( window ); }
 }
 
 void set_app_icon( const HWND window )
