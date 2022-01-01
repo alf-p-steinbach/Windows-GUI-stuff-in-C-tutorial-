@@ -922,13 +922,11 @@ void on_user_move( const HWND window, const int user_move )
 }
 ~~~
 
-So far 2D board coordinates have not been needed. And as you’ll see a bit later they’re not even needed in the internal game logic; simple one-dimensional array indexing suffices. However, thinking about how a 2D board maps into (onto?) a one-dimensional array is necessary for calculating the “magic” strides used in the game logic, and ditto for the strides one could use to navigate between between buttons with the arrow keys (functionality that is not provided here).
+So far 2D board coordinates have not been needed. And as you’ll see a bit later they’re not even needed in the internal game logic; simple one-dimensional array indexing suffices. However, thinking about how a 2D board maps into (onto?) a one-dimensional array is necessary for calculating the “magic” strides used in the game logic, and ditto for the strides one could use to navigate in 2D with the arrow keys between the between buttons (functionality that is not provided here).
 
-The `FlashWindow` call flashes the window title once to indicate invalid move. Popping up a message would be just as simple to code but far less user friendly. Displaying a temporary notice about invalid move would be more complex to code up but also more user friendly, in the sense that it would not needlessly force the user’s attention. So there is a range of design level options, including more than the three I mentioned now. I opted for simplest possible code for a tutorial, and then window title flashing was the more user-friendly choice, compared to a message box.
+The `FlashWindow` call flashes the window title once to indicate invalid move. Popping up a message would be just as simple to code but far less user friendly. Displaying a temporary notice about invalid move would be more complex to code up but also more user friendly, in the sense that it would not needlessly force the user’s attention. So there is a range of design level options, including more than the three I mentioned now. I opted for simplest possible code for a tutorial, and then window title flashing was the more user-friendly choice compared to a message box.
 
-Showing the move by calling `SetWindowText` directly in this code, is good enough for  this little game. But in general there can be two or more **views** of the same program state, for example, for numerical data there can be a numerical view and two different graph views. In such situations a common design solution is to use callbacks, where any state change communicates this to each view by calling a function that the view has registered with the state. Of old the state was called a **model**, and this design was a “model-view” design. In the original Smalltalk-80 GUI framework one also centralised the control, the orchestration of views and model, in a **controller**, and with that the design is called [**MVC**, *model-view-controller*](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller).
-
-Getting back to the nitty-gritty of *this* code, the `button_for_cell_index` function is just a [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) centralization of details:
+The `button_for_cell_index` function is just a [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) centralization of details:
 
 ~~~cpp
 auto button_for_cell_index( const int i, const HWND window )
@@ -968,7 +966,7 @@ void enter_game_over_state( const HWND window )
 }
 ~~~
 
-… where `wu::disable` is a more appropriately named simple wrapper over Windows’ `EnableWindow`.
+… where `wu::disable(w)` just calls Windows’ `EnableWindow(w, false)`, but with a more self-describing, readable and a less misleading function name than Microsoft chose.
 
 
 asdasd
@@ -982,3 +980,6 @@ asdasd
 | ← previous |  up ↑ | next → |
 |:----|:----:|---:|
 | [2. Use resources to provide an icon.](part-02.md) | [Contents](index.md)   | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ? |
+
+Showing the move by calling `SetWindowText` directly in this code, is good enough for  this little game. But in general there can be two or more **views** of the same program state, for example, for numerical data there can be a numerical view and two different graph views. In such situations a common design solution is to use callbacks, where any state change communicates this to each view by calling a function that the view has registered with the state. Of old the state was called a **model**, and this design was a “model-view” design. In the original Smalltalk-80 GUI framework one also centralised the control, the orchestration of views and model, in a **controller**, and with that the design is called [**MVC**, *model-view-controller*](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller).
+
