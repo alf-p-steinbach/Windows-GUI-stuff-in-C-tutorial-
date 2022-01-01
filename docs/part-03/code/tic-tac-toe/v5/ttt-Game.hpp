@@ -57,6 +57,17 @@ namespace ttt {
         
         auto is_over() const -> bool { return n_moves == Board::n_cells or win_line; }
         
+        void make_move( const int cell_index )
+        {
+            assert( not is_over() );
+            assert( board.cells[cell_index] == cell_state::empty );
+
+            const auto new_state = (n_moves % 2 == 0? cell_state::cross : cell_state::circle);
+            board.cells[cell_index] = new_state;
+            store_any_win_line_with( new_state );
+            ++n_moves;
+        }
+
         auto find_computer_move() const
             -> int
         {
