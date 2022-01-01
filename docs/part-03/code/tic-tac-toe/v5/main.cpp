@@ -29,8 +29,7 @@ static string   the_original_status_text;       // Initialized by `on_wm_initdia
 
 void set_status_text( const HWND window, const string& text )
 {
-    const HWND status_display = GetDlgItem( window, IDC_STATUS_DISPLAY );
-    SetWindowText( status_display, text.c_str() );
+    SetDlgItemText( window, IDC_STATUS_DISPLAY, text.c_str() );
 }
 
 auto button_for_cell_index( const int i, const HWND window )

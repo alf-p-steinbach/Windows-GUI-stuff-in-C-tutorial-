@@ -968,18 +968,183 @@ void enter_game_over_state( const HWND window )
 
 … where `wu::disable(w)` just calls Windows’ `EnableWindow(w, false)`, but with a more self-describing, readable and a less misleading function name than Microsoft chose.
 
+At the end this code has to deal with a character **encoding issue**, namely that the encoding that the controls expect (e.g. Windows ANSI Western) is not necessarily the same as the one used for C++ literals (e.g. UTF-8). A non-ASCII character such as the round single right quote «’» *in literal text* meant for a control, can therefore be displayed as gobbledygook or one or more rectangles, whatever. Also it can be displayed as the intended «’», but that’s very much less than guaranteed. So the above code uses a single `char` with the Windows ANSI Western single byte character code for «’». This should also work when the process’ ANSI codepage is a compatible encoding such as the Cyrillic variant.
 
-asdasd
+Workarounds like that are a code smell, signaling strongly that Something Isn’t Right&trade;. But to put that right we’d have to use UTF-8 throughout, including as the process ANSI codepage, and that’s a bit involved.
 
- exemplifies a text encoding issue that I’ve so far just glossed over and ignored
+After the game over state has been set the user can start a new game by clicking anywhere in the window, which just resets everything:
 
-asdasd
+~~~cpp
+void make_a_new_game( const HWND window )
+{
+    the_game = {};
+    for( int i = 1; i <= 9; ++i ) {
+        const HWND control = button_for_cell_index( i - 1, window );
+        SetWindowText( control, ("&" + to_string( i )).c_str() );
+        wu::enable( control );
+    }
+    wu::enable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
+    SetFocus( GetDlgItem( window, BOARD_BUTTON_BASE + 7 ) );
+    set_status_text( window, the_original_status_text );
+}
+~~~
 
-***(under construction)***
+And that’s essentially all of the GUI side. To see this code in context, with a few more details, check out the complete version 5 [main program source](part-03/code/tic-tac-toe/v5/main.cpp).
+
+For completeness, the game state logic:
+
+[*part-03/code/tic-tac-toe/v5/ttt-Game.hpp*](part-03/code/tic-tac-toe/v5/ttt-Game.hpp)
+~~~cpp
+#pragma once
+#include "cpp_util.hpp"
+
+#include <array>
+#include <initializer_list>
+#include <optional>
+
+namespace ttt {
+    namespace cu = cpp_util;
+    using   std::array, std::optional;
+
+    namespace cell_state {
+        enum Enum{ empty, cross, circle };
+    }  // namespace cell_state
+
+    struct Board
+    {
+        enum{ size = 3, n_cells = cu::squared( size ), max_index = n_cells - 1 };
+
+        // x is left to right, y is bottom to top, zero-based, i = 3*y + x.
+        struct Line{ int start; int stride; };  // `start` in left col or bottom row.
+        static constexpr Line lines[] =
+        {
+            {0, 1}, {3, 1}, {6, 1}, {0, 3}, {1, 3}, {2, 3}, {0, 4}, {2, 2}
+        };
+
+        array<cell_state::Enum, n_cells>    cells   = {};
+        
+        auto win_line_with( const cell_state::Enum state ) const
+            -> optional<Line>
+        {
+            for( const Line& line: lines ) {
+                int count = 0;
+                for( int offset = 0; offset < size*line.stride; offset += line.stride ) {
+                    count += (cells[line.start + offset] == state);
+                }
+                if( count == size ) { return line; }
+            }
+            return {};
+        }
+    };
+
+    struct Game
+    {
+        using Opt_line = optional<Board::Line>;
+
+        Board       board       = {};
+        int         n_moves     = 0;
+        Opt_line    win_line    = {};
+
+        void store_any_win_line_with( const cell_state::Enum state )
+        {
+            if( const Opt_line new_win_line = board.win_line_with( state ) ) {
+                win_line = new_win_line;
+            }
+        }
+        
+        auto is_over() const -> bool { return n_moves == Board::n_cells or win_line; }
+        
+        void make_move( const int cell_index )
+        {
+            assert( not is_over() );
+            assert( board.cells[cell_index] == cell_state::empty );
+
+            const auto new_state = (n_moves % 2 == 0? cell_state::cross : cell_state::circle);
+            board.cells[cell_index] = new_state;
+            store_any_win_line_with( new_state );
+            ++n_moves;
+        }
+
+        auto find_computer_move() const
+            -> int
+        {
+            assert( not is_over() );
+            for( const auto state_to_check: {cell_state::circle, cell_state::cross} ) {
+                // If state is cell_state::circle: Choose a direct computer win if possible.
+                // Else state is cell_state::cross:  Block the user’s win if any.
+                for( int i = 0; i < Board::n_cells; ++i ) {
+                    if( board.cells[i] == cell_state::empty ) {
+                        Board a_copy = board;
+                        a_copy.cells[i] = state_to_check;
+                        if( a_copy.win_line_with( state_to_check ) ) {
+                            return i;
+                        }
+                    }
+                }
+            }
+            
+            // Else choose a move at random.
+            const int n_possibles = Board::n_cells - n_moves;
+            const int which_free_cell = cu::random_in( {1, n_possibles} );
+            int count = 0;
+            for( int i = 0; i < Board::n_cells; ++i ) {
+                if( board.cells[i] == cell_state::empty ) {
+                    ++count;
+                    if( count == which_free_cell ) {
+                        return i;
+                    }
+                }
+            }
+            for( ;; );  // Should never get here.
+        }
+    };
+}  // namespace ttt
+~~~
+
+Also for completeness, the C++ utility definitions used in the above (note: the `random_up_to` function isn’t used in this program, it’s also there just for completeness):
+
+[*part-03/code/tic-tac-toe/v5/cpp-util.hpp*](part-03/code/tic-tac-toe/v5/cpp-util.hpp)
+~~~cpp
+#pragma once
+
+#include <assert.h>
+#include <random>
+
+namespace cpp_util {
+    using   std::random_device, std::mt19937, std::uniform_int_distribution;
+    
+    constexpr auto squared( const int v ) -> int { return v*v; }
+
+    struct Range
+    {
+        int     first;
+        int     last;
+    };
+    
+    inline auto is_in( const Range& range, const int v )
+        -> bool
+    { return range.first <= v and v <= range.last; }
+
+
+    inline auto random_in( const Range& range )
+        -> int
+    {
+        static random_device    entropy;
+        static mt19937          bits( entropy() );
+        return uniform_int_distribution<>( range.first, range.last )( bits );
+    }
+
+    inline auto random_up_to( const int beyond )
+        -> int
+    { return random_in({ 0, beyond - 1 }); }
+
+}  // namespace cpp_util
+~~~
+
+And that’s it.
+
+I guess in the next installment we’ll look at some unfinised business for this program, like (1) using UTF-8 encoding throughout; (2) equipping the window with a menu line with an exit choice an “about” choice; and (3) having a standard version resource so that Windows Explorer’s property dialog will display relevant information about the program. But possibly the next installment will not cover all that, just some. Or maybe it’ll be about something else entirely. :)
 
 | ← previous |  up ↑ | next → |
 |:----|:----:|---:|
 | [2. Use resources to provide an icon.](part-02.md) | [Contents](index.md)   | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ? |
-
-Showing the move by calling `SetWindowText` directly in this code, is good enough for  this little game. But in general there can be two or more **views** of the same program state, for example, for numerical data there can be a numerical view and two different graph views. In such situations a common design solution is to use callbacks, where any state change communicates this to each view by calling a function that the view has registered with the state. Of old the state was called a **model**, and this design was a “model-view” design. In the original Smalltalk-80 GUI framework one also centralised the control, the orchestration of views and model, in a **controller**, and with that the design is called [**MVC**, *model-view-controller*](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller).
-
