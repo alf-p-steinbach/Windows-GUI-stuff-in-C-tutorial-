@@ -872,7 +872,7 @@ auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*e
 }
 ~~~
 
-… where `wu::text_of` is a simple wrapper over Windows’ `GetWindowText` function.
+… where `wu::text_of` is a simple utility function using Windows’ `GetWindowTextLength` and `GetWindowText` functions.
 
 A `WM_COMMAND` message could be caused by many things, e.g. in a future version it could come from a menu item to display an “About”-box. And so, to show the general workings, `on_wm_command` first of all checks whether the message comes from a button press of one of the game board buttons. If so it calculates the corresponding internal board cell index and just calls a function `on_user_move` to handle that move:
 
