@@ -843,7 +843,7 @@ void on_wm_lbuttondown(
 }
 ~~~
 
-Here `the_game` is a (module-) **global variable**. It’s the simplest way to associate a program state with a window. Ideally the variable’s scope should have been limited by having it in a namespace, or perhaps in a `struct` instantiated at top level in the program, but for simplicity I just declared it as `static`.
+Here `the_game` is a (module-) **global variable** in the main program. It’s the simplest way to associate a program state with a window. Ideally the variable’s scope should have been limited by having it in a namespace, or perhaps in a `struct` instantiated at top level in the program, but for simplicity I just declared it as `static`.
 
 There are plenty of potential problems with using global variables for window-associated state, in particular that they’re initialized before the window exists, and that they can’t easily serve more than one window of the same kind. But for a simple program with just one window, like this one, they’re fine. Or, they’re fine for our C style coding.
 
@@ -854,7 +854,7 @@ static Game     the_game;
 static string   the_original_status_text;       // Initialized by `on_wm_initdialog`.
 ~~~
 
-Since `the_game` is initialized via its C++ default constructor, `on_wm_initdialog` only needs to deal with `the_original_status_text`, in addition to its version 4 responsibilities:
+Since `the_game` is initialized via its C++ default constructor, `on_wm_initdialog` only needs to deal with `the_original_status_text`, in addition to its version 4 GUI responsibilities:
 
 ~~~cpp
 auto on_wm_initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
@@ -934,7 +934,44 @@ auto button_for_cell_index( const int i, const HWND window )
 { return GetDlgItem( window, BOARD_BUTTON_BASE + i + 1 ); }
 ~~~
 
+`enter_game_over_state()` disables all the other controls and sets the status text to reflect the outcome: user win, computer win, or a tie. Disabling a control generally renders it in subdued gray, which gives a very visual indication that no further play is possible. Leaving the status text field control enabled then gives it relative emphasis:
 
+![The version 5  window after user won](part-03/images/sshot-7.user-won-state.png)
+
+The code that accomplishes this:
+
+~~~cpp
+void enter_game_over_state( const HWND window )
+{
+    assert( the_game.is_over() );
+    for( int id = button_1_id; id <= button_9_id; ++id ) {
+        wu::disable( GetDlgItem( window, id ) );
+    }
+    wu::disable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
+    if( the_game.win_line ) {
+        using ttt::cell_state::cross;
+        const bool user_won = (the_game.board.cells[the_game.win_line->start] == cross);
+        if( user_won ) {
+            set_status_text( window, "You won! Yay! Click anywhere for a new game." );
+        } else {
+            set_status_text( window, "I won. Better luck next time. Just click anywhere." );
+        }
+    } else {
+        const char rsquo = '\x92';      // In Windows ANSI Western encoding, codepage 1252.
+        set_status_text(                // Could be better handled using a string resource.
+            window,
+            string() + "It" + rsquo + "s a tie. Click anywhere for a new game."
+            );
+    }
+}
+~~~
+
+… where `wu::disable` is a more appropriately named simple wrapper over Windows’ `EnableWindow`.
+
+
+asdasd
+
+ exemplifies a text encoding issue that I’ve so far just glossed over and ignored
 
 asdasd
 
