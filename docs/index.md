@@ -28,3 +28,4 @@ I haven’t decided how far to take this. I’ll add more as I have free time to
     - [3.5. Add the game logic and user interaction.](part-03.md#35-add-the-game-logic-and-user-interaction)
 
 Perhaps a useful link: [The tutorial’s Github project.](https://github.com/alf-p-steinbach/Windows-GUI-stuff-in-C-tutorial-)
+Also, if you want to report a problem or possible improvement, check out the [issues page](https://github.com/alf-p-steinbach/Windows-GUI-stuff-in-C-tutorial-/issues).
