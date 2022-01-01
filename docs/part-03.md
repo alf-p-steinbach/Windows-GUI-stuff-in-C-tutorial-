@@ -968,9 +968,9 @@ void enter_game_over_state( const HWND window )
 
 … where `wu::disable(w)` just calls Windows’ `EnableWindow(w, false)`, but with a more self-describing, readable and a less misleading function name than Microsoft chose.
 
-At the end this code has to deal with a character **encoding issue**, namely that the encoding that the controls expect (e.g. Windows ANSI Western) is not necessarily the same as the one used for C++ literals (e.g. UTF-8). A non-ASCII character such as the round single right quote «’» *in literal text* meant for a control, can therefore be displayed as gobbledygook or one or more rectangles, whatever. Also it can be displayed as the intended «’», but that’s very much less than guaranteed. So the above code uses a single `char` with the Windows ANSI Western single byte character code for «’». This should also work when the process’ ANSI codepage is a compatible encoding such as the Cyrillic variant.
+At the end this code has to deal with a text **encoding issue**, namely that the text encoding that the controls expect (e.g. Windows ANSI Western) is not necessarily the same as the one used for C++ literals (e.g. UTF-8). A non-ASCII character such as the round single right quote «’» *in literal text* meant for a control, can therefore be displayed as gobbledygook or one or more rectangles, whatever. Also it can be displayed as the intended «’», but that’s very much less than guaranteed. So the above code uses a single `char` with the Windows ANSI Western single byte character code for «’». This should also work when the process’ ANSI codepage is a compatible encoding such as the Cyrillic variant.
 
-Workarounds like that are a code smell, signaling strongly that Something Isn’t Right&trade;. But to put that right we’d have to use UTF-8 throughout, including as the process ANSI codepage, and that’s a bit involved.
+Workarounds like that are a code smell, signaling strongly that Something Isn’t Right&trade;. But to put that right we’d have to use UTF-8 throughout, including as the process ANSI codepage, and that’s a bit involved. So for now, the workaround.
 
 After the game over state has been set the user can start a new game by clicking anywhere in the window, which just resets everything:
 
@@ -1103,7 +1103,7 @@ namespace ttt {
 
 Also for completeness, the C++ utility definitions used in the above (note: the `random_up_to` function isn’t used in this program, it’s also there just for completeness):
 
-[*part-03/code/tic-tac-toe/v5/cpp-util.hpp*](part-03/code/tic-tac-toe/v5/cpp-util.hpp)
+[*part-03/code/tic-tac-toe/v5/cpp-util.hpp*](part-03/code/tic-tac-toe/v5/cpp_util.hpp)
 ~~~cpp
 #pragma once
 
