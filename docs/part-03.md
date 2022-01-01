@@ -156,8 +156,8 @@ EXSTYLE WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST
 CAPTION "Tic-Tac-Toe (mostly random)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    LTEXT           "Click a place on the board,  or type its digit 1 through 9.", 0,
-                    7, 7, 313, 11, SS_NOPREFIX
+    LTEXT           "Click a place on the board, or type its digit 1 through 9.",
+                    0, 7, 7, 313, 11, SS_NOPREFIX
     PUSHBUTTON      "7", BOARD_BUTTON_BASE + 7, 5, 24, 36, 32, BS_FLAT
     PUSHBUTTON      "8", BOARD_BUTTON_BASE + 8, 43, 24, 36, 32, BS_FLAT
     PUSHBUTTON      "9", BOARD_BUTTON_BASE + 9, 81, 24, 36, 32, BS_FLAT
@@ -167,8 +167,8 @@ BEGIN
     PUSHBUTTON      "1", BOARD_BUTTON_BASE + 1, 5, 93, 36, 32, BS_FLAT
     PUSHBUTTON      "2", BOARD_BUTTON_BASE + 2, 43, 93, 36, 32, BS_FLAT
     PUSHBUTTON      "3", BOARD_BUTTON_BASE + 3, 81, 93, 36, 32, BS_FLAT
-    LTEXT           "<The rules should be displayed here>", IDC_RULES_DISPLAY,
-                    123, 25, 217, 96, SS_NOPREFIX
+    LTEXT           "<The rules should be displayed here>",
+                    IDC_RULES_DISPLAY, 123, 25, 217, 96, SS_NOPREFIX
 END
 
 STRINGTABLE
@@ -763,7 +763,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 IDD_MAIN_WINDOW DIALOGEX 0, 0, 340, 132
 STYLE DS_SETFONT | DS_CENTER | WS_CAPTION | WS_SYSMENU
 EXSTYLE WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST
-CAPTION "Tic-tac-toe (mostly random)"
+CAPTION "Tic-Tac-Toe (mostly random)"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Click a place on the board, or type its digit 1 through 9.",
