@@ -324,14 +324,14 @@ First, to exclude some of the irrelevant and sabotage-like stuff from `<windows.
 
 So, version 2’s
 
-~~~cpp
+~~~ cpp
 #include <windows.h>
 #undef small    // MSVC <windows.h> includes <rpcndr.h> which defines `small` as macro. :(
 ~~~
 
 … is now replaced with use of a **header wrapper** that defines the above two mentioned macros, and more,
 
-~~~cpp
+~~~ cpp
 #include "wrapped-windows-h.hpp"    // Safer and faster. Safe = e.g. no `small` macro.    
 ~~~
 
