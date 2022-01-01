@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "ProjectMap": {
+    "bda2bab5-5186-4b57-a9d8-0be2f2212a53": {
+      "ProjectGuid": "bda2bab5-5186-4b57-a9d8-0be2f2212a53",
+      "DisplayName": "vs-resource-editing",
+      "ColorIndex": 0
+    }
+  },
+  "NextColorIndex": 1
+}

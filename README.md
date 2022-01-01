@@ -2,7 +2,7 @@
 
 Desktop Windows programming starting from the ground up, in C++17.
 
-The first part, ❝A Windows GUI “Hello, world!”❞, is [here](tutorial/part-01.md).
+The first part, ❝A Windows GUI “Hello, world!”❞, is [here](docs/part-01.md).
 <!---
  and the contents listing is [here](tutorial/contents.md).
  --->
