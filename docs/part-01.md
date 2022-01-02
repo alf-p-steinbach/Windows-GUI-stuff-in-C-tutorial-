@@ -83,32 +83,32 @@ How you specify the GUI subsystem depends on the compiler, but in general it use
 For example, here’s how to build with GUI subsystem with the MinGW g++ compiler, using option **`-mwindows`**:
 
 ~~~txt
-[T:\tutorial\part-01\code]
+[T:\part-01\code]
 > g++ --version | find "++"
 g++ (GCC) 9.2.0
 
-[T:\tutorial\part-01\code]
+[T:\part-01\code]
 > g++ -mwindows hello.cpp
 
-[T:\tutorial\part-01\code]
+[T:\part-01\code]
 > a.exe_
 ~~~
 
 The corresponding option for Visual C++, **`/subsystem:windows`**, must be provided as a linker option, i.e. in a simple “let the compiler invoke the linker” build command it must come after option `/link`. And unfortunately, when the GUI subsystem is requested the Microsoft linker defaults to looking for a non-standard startup function called `WinMain`, instead of standard C++ `main`. In order to get standard `main` you can use linker option **`/entry:mainCRTStartup`**, which perhaps is best provided via the **`LINK`** environment variable:
 
 ~~~txt
-[T:\tutorial\part-01\code]
+[T:\part-01\code]
 > cl /? 2>&1 | find "++"
 Microsoft (R) C/C++ Optimizing Compiler Version 19.30.30705 for x64
 
-[T:\tutorial\part-01\code]
+[T:\part-01\code]
 > set LINK=/entry:mainCRTStartup
 
-[T:\tutorial\part-01\code]
+[T:\part-01\code]
 > cl /nologo hello.cpp /link /subsystem:windows user32.lib
 hello.cpp
 
-[T:\tutorial\part-01\code]
+[T:\part-01\code]
 > hello.exe_
 ~~~
 
@@ -169,7 +169,7 @@ When I run the program via double clicking in Windows Explorer the focus is miss
 
 And when I run the program via a command (e.g. `hello` or `a`) in a command interpreter that itself was started via the Run dialog, then the message box is not on top and can be partially or fully obscured by the command interpreter window, and/or by some other window:
 
-![Obscured](part-01/images/sshot.behavior.obscured.annotated.png)
+![Obscured](part-01/images/sshot.behavior.obscured.shadow.annotated.png)
 
 The case of fully obscured is especially problematic and insidious.
 
@@ -186,7 +186,7 @@ The **`MB_SETFOREGROUND`** foreground flag in the `MessageBox` call,
 So, if you run a GUI program in Windows 11 or later and it doesn’t appear:
 
 * look in the task bar to check if the program is running, and perhaps
-* use [Alt]+[Tab] to check if the window is just obscured, before
+* use `Alt`+`Tab` to check if the window is just obscured, before
 * checking in the Task Manager whether the executable is running without a window.
 
 | ← previous |  up ↑ | next → |
