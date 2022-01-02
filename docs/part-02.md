@@ -89,30 +89,30 @@ For our current task that’s all, really.
 With the MinGW g++ tools the resource compiler is called **windres**:
 
 ~~~txt
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > windres resources.rc -o resources.o
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > dir /a-d /b res*
 resources.o
 resources.rc
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > _
 ~~~
 
 With the Visual C++ tools it's called **rc**, short for “resource compiler”:
 
 ~~~txt
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > rc /nologo resources.rc
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > dir /a-d /b res*
 resources.rc
 resources.res
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > _
 ~~~
 
@@ -164,30 +164,30 @@ For completeness I now include also the earlier shown commands for generating th
 With the MingW g++ toolchain:
 
 ~~~txt
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > windres resources.rc -o resources.o
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > g++ hello.cpp resources.o -mwindows
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > a.exe_
 ~~~
 
 With the Visual C++ toolchain:
 
 ~~~txt
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > rc /nologo resources.rc
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > set LINK=/entry:mainCRTStartup
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > cl hello.cpp resources.res user32.lib /link /subsystem:windows
 hello.cpp
 
-[T:\tutorial\part-02\code\messagebox-with-icon]
+[T:\part-02\code\messagebox-with-icon]
 > hello.exe_
 ~~~
 
