@@ -195,7 +195,7 @@ There’s a lot more to say about idiosyncrasies and limitations and how e.g. th
 > rc /nologo /fo resources.res ..\resources.rc
 
 [T:\part-03\code\tic-tac-toe\v1\.build]
-> cl ..\main.cpp resources.res user32.lib /Fo"ttt"
+> cl ..\main.cpp resources.res user32.lib /Fe"ttt"
 main.cpp
 
 [T:\part-03\code\tic-tac-toe\v1\.build]
