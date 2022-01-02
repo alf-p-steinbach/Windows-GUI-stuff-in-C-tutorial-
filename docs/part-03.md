@@ -191,26 +191,26 @@ There’s a lot more to say about idiosyncrasies and limitations and how e.g. th
 
 *Using the Microsoft toolchain (Visual C++):*
 ~~~
-[T:\tutorial\part-03\code\tic-tac-toe\v1\.build]
+[T:\part-03\code\tic-tac-toe\v1\.build]
 > rc /nologo /fo resources.res ..\resources.rc
 
-[T:\tutorial\part-03\code\tic-tac-toe\v1\.build]
+[T:\part-03\code\tic-tac-toe\v1\.build]
 > cl ..\main.cpp resources.res user32.lib /Fo"ttt"
 main.cpp
 
-[T:\tutorial\part-03\code\tic-tac-toe\v1\.build]
+[T:\part-03\code\tic-tac-toe\v1\.build]
 > ttt_
 ~~~
 
 *Using the GNU toolchain (MinGW g++):*
 ~~~
-[T:\tutorial\part-03\code\tic-tac-toe\v1\.build]
+[T:\part-03\code\tic-tac-toe\v1\.build]
 > windres ..\resources.rc -o resources.o
 
-[T:\tutorial\part-03\code\tic-tac-toe\v1\.build]
+[T:\part-03\code\tic-tac-toe\v1\.build]
 > g++ ..\main.cpp resources.o -o ttt
 
-[T:\tutorial\part-03\code\tic-tac-toe\v1\.build]
+[T:\part-03\code\tic-tac-toe\v1\.build]
 > ttt_
 ~~~
 
@@ -676,21 +676,21 @@ Note: both macro symbols above are effectively defined as the pointer values fro
 The font fix uses functionality from Windows’ “gdi32.dll” (the Graphics Device Interface), and the appearance fix uses functionality from the “comctl32.dll” (the Common Controls). For Visual C++ that means adding `gdi32.lib` and `comctl32.lib` to the build command. Here I’m building for the console subsystem:
 
 ~~~txt
-[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+[T:\part-03\code\tic-tac-toe\v4\.build]
 > rc /nologo /fo r.res ..\resources.rc
 
-[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+[T:\part-03\code\tic-tac-toe\v4\.build]
 > cl /nologo ..\main.cpp r.res user32.lib gdi32.lib comctl32.lib /Fe"ttt"
 main.cpp
 
-[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+[T:\part-03\code\tic-tac-toe\v4\.build]
 > ttt_
 ~~~
 
 With the MinGW g++ compiler the default libraries depend on the specified subsystem:
 
 ~~~txt
-[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+[T:\part-03\code\tic-tac-toe\v4\.build]
 > g++ -dumpspecs 2>&1 | find "user32"
 %{pg:-lgmon} %{!no-pthread:-lpthread} %{pthread: } %{mwindows:-lgdi32 -lcomdlg32} %{fvtable-verify=preinit:-lvtv -lpsapi;         fvtable-verify=std:-lvtv -lpsapi} -ladvapi32 -lshell32 -luser32 -lkernel32
 ~~~
@@ -700,13 +700,13 @@ This means that in any case you get `‑ladvapi32`, `‑lshell32`, `‑luser32` 
 Again building for the console subsystem:
 
 ~~~txt
-[T:\tutorial\part‑03\code\tic-tac-toe\v4\.build]
+[T:\part‑03\code\tic-tac-toe\v4\.build]
 > windres ..\resources.rc -o r.o
 
-[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+[T:\part-03\code\tic-tac-toe\v4\.build]
 > g++ -std=c++17 ..\main.cpp r.o -lgdi32 -lcomctl32 -o ttt
 
-[T:\tutorial\part-03\code\tic-tac-toe\v4\.build]
+[T:\part-03\code\tic-tac-toe\v4\.build]
 > ttt
 ~~~
 
