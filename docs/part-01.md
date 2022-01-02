@@ -6,7 +6,7 @@ The main purpose of this first part is to get you up and running wrt.
 
 * basic *concepts*, *tools* usage, basic *starter code*, and *documentation*,
 
-so that you can explore further.
+… so that you can explore further.
 
 Some things that can seem mysterious are therefore explained in later parts of the tutorial, and not here.
 
