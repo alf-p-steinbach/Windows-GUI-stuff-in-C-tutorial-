@@ -310,7 +310,7 @@ auto CALLBACK message_handler(
 
 To place this in context you may want to look at [the full code](part-03/code/tic-tac-toe/v2/main.cpp) for this version 2. One important little part not shown above — there was no really natural place to discuss this — is that the macro `small` that `<windows.h>` introduces by default, that would otherwise wreak havoc with the `icon_sizes::Enum` definition, is rendered harmless by an `#undef` directive. In later versions we’ll instead just use a subset of `<windows.h>` that is less over the top inconsiderate…
 
-Result:
+Result, the icon and rules text in place now:
 
 ![The v2 main window](part-03/images/sshot-4.main-window-v2.png)
 
