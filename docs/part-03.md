@@ -1143,7 +1143,7 @@ namespace cpp_util {
 
 And that’s it.
 
-I guess in the next installment we’ll look at some unfinised business for this program, like (1) using UTF-8 encoding throughout; (2) equipping the window with a menu line with an exit choice and an “about” choice; and (3) having a standard version resource so that Windows Explorer’s property dialog will display relevant information about the program. But possibly the next installment will not cover all that, just some. Or maybe it’ll be about something else entirely. :)
+I guess in the next installment we’ll look at some unfinished business for this program, like (1) using UTF-8 encoding throughout; (2) equipping the window with a menu line with an exit choice and an “about” choice; and (3) having a standard version resource so that Windows Explorer’s property dialog will display relevant information about the program. But possibly the next installment will not cover all that, just some. Or maybe it’ll be about something else entirely. :)
 
 | ← previous |  up ↑ | next → |
 |:----|:----:|---:|
