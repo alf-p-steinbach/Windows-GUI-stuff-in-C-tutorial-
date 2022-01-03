@@ -1,12 +1,11 @@
 ﻿#pragma once
-#include "wrapped-windows-h.hpp"    // Safer and faster. Safe = e.g. no `small` macro.    
-#include <windowsx.h>               // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
-#include <commctrl.h>               // InitCommonControlsEx
+#include <wrapped-winapi/windowsx-h.hpp>    // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
+#include <wrapped-winapi/commctrl-h.hpp>    // InitCommonControlsEx
 
 #include <initializer_list>         // For using range-based `for` over initializer list.
 #include <string>
 
-namespace winapi_util {
+namespace winapi::util {
     using std::string;
 
     // Invokes various <windowsx.h> “message cracker” macros like `HANDLE_WM_CLOSE`. Each such
@@ -108,4 +107,4 @@ namespace winapi_util {
         }
         return result;
     }
-}  // namespace winapi_util
+}  // namespace winapi::util

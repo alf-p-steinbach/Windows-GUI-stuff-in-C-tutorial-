@@ -2,10 +2,26 @@
 
 #include <assert.h>
 #include <random>
+#include <stdexcept>
+#include <string>
 
-namespace cpp_util {
-    using   std::random_device, std::mt19937, std::uniform_int_distribution;
-    
+#define CPPUTIL_FAIL( s ) ::cpp::util::fail( std::string( __func__ ) + " - " + (s) )
+
+namespace cpp::util {
+    using   std::random_device, std::mt19937, std::uniform_int_distribution,
+            std::exception, std::runtime_error,
+            std::string;
+
+    inline auto hopefully( const bool condition ) -> bool { return condition; }
+    inline auto fail( const string& message ) -> bool { throw runtime_error( message ); }
+
+    struct No_copying
+    {
+        No_copying( const No_copying& ) = delete;
+        auto operator=( const No_copying& ) -> No_copying& = delete;
+        No_copying() {}
+    };
+
     constexpr auto squared( const int v ) -> int { return v*v; }
 
     struct Range
@@ -31,4 +47,4 @@ namespace cpp_util {
         -> int
     { return random_in({ 0, beyond - 1 }); }
 
-}  // namespace cpp_util
+}  // namespace cpp::util
