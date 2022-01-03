@@ -558,6 +558,8 @@ struct Standard_gui_font
 inline const auto   std_gui_font    = Standard_gui_font();
 ~~~
 
+Here `DeleteFont` is a `<windowsx.h>` macro that casts the argument to a more general handle type and calls the `DeleteObject` function.
+
 Every window keeps track of a default font, with no CSS-like inheritance, so the program has to replace the default font in both the main window and every control. Happily Windows provides a function **`EnumChildWindows`** that calls a specified function for each child window (control). Also, the `<windowsx.h>` header provides the wrapper macro `SetWindowFont` that sends a `WM_SETFONT` message to the specified window, simplifying that:
 
 ~~~cpp
@@ -573,8 +575,6 @@ inline void set_standard_gui_font( const HWND window )
     EnumChildWindows( window, callback, 0 );
 }
 ~~~
-
-Ideally, pedantically, the `std_gui_font` object should have been destroyed at the end of the program via a call to `DeleteObject`, and technically not doing that constitutes a **resource leak**, but Windows cleans up also GUI resources when the process exits.
 
 Fixing the problem with this window keeping itself on top of all other windows, including other topmost mode windows such as (on my system) an on-screen clock, likewise involves a general window management function, namely using `SetWindowPos` to just remove topmost mode:
 
