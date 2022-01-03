@@ -4,7 +4,7 @@
 // v1 - Roughly minimum code to display a window based on a dialog template resource.
 
 #include "winapi_util.hpp"          // winapi_util::*, <windowsx.h>
-#include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
+#include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW, ...
 
 #include <optional>
 

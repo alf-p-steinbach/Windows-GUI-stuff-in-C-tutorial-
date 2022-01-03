@@ -4,7 +4,7 @@
 #include <windows.h>
 #undef small    // MSVC <windows.h> includes <rpcndr.h> which defines `small` as macro. :(
 
-#include "resources.h"      // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW, IDI_APP
+#include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW, ...
 
 using C_str = const char*;
 
