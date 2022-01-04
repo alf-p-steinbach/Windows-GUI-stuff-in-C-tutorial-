@@ -25,7 +25,7 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 
 TLDR: by using UTF-8 we are at the leading edge of Windows desktop software development where not all the wrinkles have been ironed out yet, and we only support Windows versions since June 2019.
 
-<div style="text-align: center">* * *</div>
+<p align="center">* * *</p>
 
 The [**Unicode** character set](https://home.unicode.org/basic-info/faq/) is the basis of a number of possible text encodings, where the most popular in Windows are `char`-based UTF-8 and `wchar_t`-based UTF-16.
 
