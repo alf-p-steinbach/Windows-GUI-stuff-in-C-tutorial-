@@ -1,4 +1,5 @@
-﻿// v5 - Basic interaction (working game play, notification of win/lose/tie, restart).
+﻿// v6 - UTF-8 version. "π" should be a lowercase Greek pi.
+// v5 - Basic interaction (working game play, notification of win/lose/tie, restart).
 // v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode;
 //      modern look ’n feel via application manifest resource and initcontrolsex.
 // v3 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
@@ -8,7 +9,6 @@
 
 #include "ttt-Game.hpp"             // ttt::Game
 #include <winapi/util.hpp>          // HANDLER_OF_WM, winapi_util::*
-#include <winapi/gdi_plusplus.hpp>  // winapi::gdi_plusplus
 #include <cpp/util.hpp>
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
 
@@ -18,7 +18,6 @@
 #include <string>
 
 namespace cu    = cpp::util;
-namespace gpp   = winapi::gdi_plusplus;
 namespace wu    = winapi::util;
 
 using   cu::Range, cu::is_in;
@@ -64,16 +63,12 @@ void enter_game_over_state( const HWND window )
         using ttt::cell_state::cross;
         const bool user_won = (the_game.board.cells[the_game.win_line->start] == cross);
         if( user_won ) {
-            set_status_text( window, "You won! Yay! Click anywhere for a new game." );
+            set_status_text( window, "You won! Yay! \U0001F603 Click anywhere for a new game…" );
         } else {
             set_status_text( window, "I won. Better luck next time. Just click anywhere." );
         }
     } else {
-        const char rsquo = '\x92';      // In Windows ANSI Western encoding, codepage 1252.
-        set_status_text(                // Could be better handled using a string resource.
-            window,
-            string() + "It" + rsquo + "s a tie. Click anywhere for a new game."
-            );
+        set_status_text( window, "It’s a tie. Click anywhere for a new game." );
     }
 }
 
@@ -85,11 +80,11 @@ void on_user_move( const HWND window, const int user_move )
         return;
     }
     the_game.make_move( user_move );
-    SetWindowText( button_for_cell_index( user_move, window ), "X" );
+    SetWindowText( button_for_cell_index( user_move, window ), "\u2573" );
     if( not the_game.is_over() ) {
         const int computer_move = the_game.find_computer_move();
         the_game.make_move( computer_move );
-        SetWindowText( button_for_cell_index( computer_move, window ), "O" );
+        SetWindowText( button_for_cell_index( computer_move, window ), "\u25EF" );
     }
     if( the_game.is_over() ) { enter_game_over_state( window ); }
 }
@@ -177,7 +172,6 @@ auto CALLBACK message_handler(
 
 void cpp_main()
 {
-    const gpp::Library gdiplus_usage;
     wu::init_common_controls();
     DialogBox(
         wu::this_exe, wu::Resource_id{ IDD_MAIN_WINDOW }.as_ptr(),
