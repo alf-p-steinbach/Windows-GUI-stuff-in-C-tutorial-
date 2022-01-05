@@ -175,7 +175,7 @@ A compiler may have options to specify each separately, and it may offer an opti
 | **Visual C++:** | `/source-charset:utf-8` | `/execution-charset:utf-8` | `/utf-8` |
 | **g++:** | `-finput-charset=utf-8` | `-fexec-charset=utf-8` | (default) |
 
-However, in practice, when you adopt UTF-8 BOM for your Windows programming there’s no further action need to get the compiler’s assumed source encoding correct.
+However, in practice, when you adopt UTF-8 BOM for your Windows programming there’s no further action needed to get the compiler’s assumed source encoding correct.
 
 You still need to set the execution character set for Visual C++. A good way to do that is to use the **`/utf-8`** option that sets both encodings. Because that also works for source code files without BOM, e.g. from Unix.
 
