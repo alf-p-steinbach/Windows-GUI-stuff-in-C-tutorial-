@@ -22,7 +22,7 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 ---
 ### 4.1. Some background info.
 
-TLDR: by using UTF-8 we are at the leading edge of Windows desktop software development where not all the wrinkles have been ironed out yet, and we only support Windows versions since June 2019.
+TLDR: by using UTF-8 we are at the leading edge of Windows desktop software development where not all Windows’ wrinkles have been ironed out yet, and we only support Windows versions since June 2019.
 
 <p align="center">* * *</p>
 
