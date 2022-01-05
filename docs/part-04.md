@@ -110,6 +110,8 @@ Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code
 </assembly>
 ~~~
 
+Compared to a hypothetical `SetACP(65001)` call the above is exceedingly complex and over-engineered, not to mention brittle (get a space wrong and it doesn’t work). It’s… Well, it’s Microsoft.
+
 ---
 ### 4.3. Specify UTF-8 as the “.rc” resource script codepage.
 
