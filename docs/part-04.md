@@ -112,6 +112,8 @@ Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code
 
 Compared to a hypothetical `SetACP(65001)` call the above is exceedingly complex and over-engineered, not to mention brittle (get a space wrong and it doesn’t work). It’s… Well, it’s Microsoft.
 
+Instead of the simple hypothetical `SetACP` call one must have something like the above monstrosity, *plus* a call like `assert(GetACP()==65001)`, or alternatively using the symbolic name for that codepage value, `CP_UTF8`.
+
 ---
 ### 4.3. Specify UTF-8 as the “.rc” resource script codepage.
 
