@@ -170,7 +170,7 @@ poh
 
 A compiler may have options to specify each separately, and it may offer an option to specify both as the same encoding:
 
-| Compiler: | Source charset: | Literals (execution charset): | Both: |
+| Compiler: | Source charset: | Literals (execution charset): | Both charsets: |
 |---|---|---|--|
 | **Visual C++:** | `/source-charset:utf-8` | `/execution-charset:utf-8` | `/utf-8` |
 | **g++:** | `-finput-charset=utf-8` | `-fexec-charset=utf-8` | (default) |
