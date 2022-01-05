@@ -117,7 +117,25 @@ Instead of the simple hypothetical `SetACP` call one must have something like th
 ---
 ### 4.3. Specify UTF-8 as the “.rc” resource script codepage.
 
-jkølk
+Converting the existing Windows ANSI-encoded “resources.rc” resource script to UTF-8 can be done via your editor. With some editors, such as the one in Visual Studio, the encoding choice appears (directly or indirectly) in the “Save as…” dialog. And with some editors, such as Notepad++, it’s a separate place in the menus:
+
+![Encoding conversion in Notepad++](part-04/images/sshot-2.encoding-conversion-in-notepad++.png)
+
+Alternatively you can use commands to convert, e.g. [`Set-Content` in Windows Powershell](https://superuser.com/questions/1163753/converting-text-file-to-utf-8-on-windows-command-prompt).
+
+But how to communicate the “.rc” file’s encoding to the resource compiler, so that it won’s mess up e.g. round quote characters?
+
+Well, there are three mechanisms:
+
+* An [UTF-8 **BOM**](https://en.wikipedia.org/wiki/Byte_order_mark#UTF-8), a special Unicode character at the start of the file, tells Windows editors that the file is UTF-8 encoded. It may and should also tell a resource compiler that. But with e.g. Microsoft’s `rc` it doesn’t.
+* A `#pragma code_page(65001)` at the top of the file tells or should tell a resource compiler to please, assume UTF-8 encoding for the rest.
+* A command option, such as with Microsoft’s `rc` option `/c 65001`, can force the resource compiler to assume the specified encoding.
+
+Just a decade ago (or so) Unix tools did in general not understand the UTF-8 BOM and could choke on it, while Windows tools required it. It was a dilemma. Visual C++ required it in order to understand that source code was UTF-8 encoded, while GNU’s g++ compiler choked on it.
+
+And in an ironic reversal of roles, now Microsoft’s `rc` *chokes on the BOM* unless one uses the `/c 65001` option, while the MinGW toolchain’s `windres` is happy with it. Again, Microsoft. Or something.
+
+
 
 ---
 
