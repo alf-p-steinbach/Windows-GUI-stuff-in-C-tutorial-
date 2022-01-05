@@ -135,6 +135,19 @@ Just a decade ago (or so) Unix tools did in general not understand the UTF-8 BOM
 
 And in an ironic reversal of roles, now Microsoft’s `rc` *chokes on the BOM* unless one uses the `/c 65001` option, while the MinGW toolchain’s `windres` is happy with it. Again, Microsoft. Or something.
 
+Creating the binary linker-friendly resource file (here called “r.res”) with Microsoft’s toolchain:
+
+~~~txt
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> rc /c 65001 /nologo /fo r.res ..\resources.rc
+~~~
+
+Creating it (here called “res.o”) with the MinGW toolchain:
+
+~~~txt
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> windres ..\resources.rc -o res.o
+~~~
 
 
 ---
