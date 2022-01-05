@@ -24,7 +24,8 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 ---
 ### 4.1. Some background on Unicode in Windows programming.
 
-<img align="right" width="250" src="part-04/images/modern-times.2.jpeg"/>
+<img align="right" width="250" src="part-04/images/modern-times.2.jpeg"
+alt="Charlie Chaplin in “Modern Times”" title="Charlie Chaplin in “Modern Times”"/>
 
 TLDR: ***Using UTF-8 we are at the leading edge of Windows desktop software development where not all Windows’ wrinkles have been ironed out yet, and our programs only work with Windows versions since June 2019, but it’s worth it.***
 
