@@ -16,7 +16,7 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 
 - [4.1. Some background on Unicode in Windows programming.](#41-some-background-on-unicode-in-windows-programming)
 - [4.2. Specify UTF-8 as the process’ ANSI codepage.](#42-specify-utf-8-as-the-process-ansi-codepage)
-- [4.3. Specify UTF-8 as the “.rc” resource script codepage.](#43-specify-utf-8-as-the-rc-resource-script-codepage)
+- [4.3. Specify UTF-8 as the “.rc” resource script code page.](#43-specify-utf-8-as-the-rc-resource-script-code-page)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -115,7 +115,7 @@ Compared to a hypothetical `SetACP(65001)` call the above is exceedingly complex
 Instead of the simple hypothetical `SetACP` call one must have something like the above monstrosity, *plus* a call like `assert(GetACP()==65001)`, or alternatively using the symbolic name for that codepage value, `CP_UTF8`.
 
 ---
-### 4.3. Specify UTF-8 as the “.rc” resource script codepage.
+### 4.3. Specify UTF-8 as the “.rc” resource script code page.
 
 Converting the existing Windows ANSI-encoded “resources.rc” resource script to UTF-8 can be done via your editor. With some editors, such as the one in Visual Studio, the encoding choice appears (directly or indirectly) in the “Save as…” dialog. And with some editors, such as Notepad++, it’s a separate place in the menus:
 
