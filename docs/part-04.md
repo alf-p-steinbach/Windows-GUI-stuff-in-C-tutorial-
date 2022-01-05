@@ -32,7 +32,7 @@ TLDR: ***Using UTF-8 we are at the leading edge of Windows desktop software deve
 
 Full text:
 
-The [**Unicode** character set](https://home.unicode.org/basic-info/faq/) with currently (early 2022) 144 697 characters, is the basis of a number of possible text encodings, where the most popular in Windows are `char`-based UTF-8 and `wchar_t`-based UTF-16.
+The [**Unicode** character set](https://home.unicode.org/basic-info/faq/) with <span title="As of early 2022">currently</span> 144 697 characters is the basis of a number of possible text encodings, where the most popular in Windows are `char`-based UTF-8 and `wchar_t`-based UTF-16.
 
 UTF-16 encoded text is a sequence of 16-bit encoding values which in Windows C and C++ programming are of type **`wchar_t`**. The “`w`” in `wchar_t` stands for **wide text**, text represented with “`wide`” encoding values. In C and C++ you can express wide text literals with prefix **`L`**, e.g. `L"Hello!"`.
 
