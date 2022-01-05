@@ -20,7 +20,6 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 
 
 ---
-
 ### 4.1. Some background info.
 
 TLDR: by using UTF-8 we are at the leading edge of Windows desktop software development where not all the wrinkles have been ironed out yet, and we only support Windows versions since June 2019.
@@ -61,7 +60,30 @@ With this the `char` based wrapper layer, the “A” suffix functions like `Mes
 
 Anyway, as of early 2022 the UTF-8 support is far from complete.
 
-However, together with earlier introduced UTF-8 support in the Visual C++ compiler and other Microsoft tools the June 2019 support in Windows *enables* use of UTF-8 throughout. This avoids text encoding problems such as for the right single quote in the previous version of our Tic-Tac-Toe game. And it enables use of special Unicode characters provided that the font one uses, supports them.
+But together with earlier introduced UTF-8 support in the Visual C++ compiler and other Microsoft tools the June 2019 support in Windows *enables* use of UTF-8 throughout. This avoids text encoding problems such as for the right single quote in the previous version of our Tic-Tac-Toe game. And it enables use of special Unicode characters provided that the font one uses, supports them.
+
+
+---
+### 4.2. Specify UTF-8 as the process’ ANSI codepage.
+
+Text fields and other controls assume that text is encoded with the process’ ANSI text encoding, the **code page** specified by the `GetACP` — short for “get ANSI code page” — function.
+
+[“Code page”](https://en.wikipedia.org/wiki/Code_page) is an old alternative term for “text encoding”, originally referring to a practice of displaying a complete old times’ text encoding table such as ASCII on a single page of paper. Each code page has an identifying number (note: other vendors do not necessarily use the Microsoft code page numbers). For example, for Windows ANSI Western `GetACP` returns **1252**, and for UTF-8 it returns **65001**.
+
+Codepage numbers are used for Windows’ global text encoding assumptions, e.g. in the registry value “HKLM\SYSTEM\CurrentControlSet\Control\Nls\CodePage@ACP” that more or less undocumented specifies the default for `GetACP`. I’ve found experimentally that it generally works to set that to 65001, with a reboot of Windows, and then there’s no need to set particular processes’ ANSI codepage. But I don’t know if that’s supported or whether it’s at all a good idea, and hence I don’t use it.
+
+Codepage numbers are also used for the [API functions](https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp) and commands ([chcp](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/chcp), [mode](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/mode#select-code-page)) to set a console window’s **active code page**, the text encoding that it should assume, to a specific code page number. 
+
+Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code page. I.e. there’s no “setter” counterpart to `GetACP`, there’s no `SetACP`. Instead it has to be done via the XML application manifest resource, like this:
+
+
+UTF-8
+
+
+asd
+
+---
+
 
 
 | ← previous |  up ↑ | next → |
