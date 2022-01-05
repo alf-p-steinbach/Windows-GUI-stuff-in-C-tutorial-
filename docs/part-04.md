@@ -24,11 +24,15 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 ---
 ### 4.1. Some background on Unicode in Windows programming.
 
-TLDR: by using UTF-8 we are at the leading edge of Windows desktop software development where not all Windows’ wrinkles have been ironed out yet, and we only support Windows versions since June 2019.
+<img align="right" width="250" src="part-04/images/modern-times.2.jpeg"/>
+
+TLDR: ***Using UTF-8 we are at the leading edge of Windows desktop software development where not all Windows’ wrinkles have been ironed out yet, and our programs only work with Windows versions since June 2019, but it’s worth it.***
 
 <p align="center">* * *</p>
 
-The [**Unicode** character set](https://home.unicode.org/basic-info/faq/) is the basis of a number of possible text encodings, where the most popular in Windows are `char`-based UTF-8 and `wchar_t`-based UTF-16.
+Full text:
+
+The [**Unicode** character set](https://home.unicode.org/basic-info/faq/) with currently (early 2022) 144 697 characters, is the basis of a number of possible text encodings, where the most popular in Windows are `char`-based UTF-8 and `wchar_t`-based UTF-16.
 
 UTF-16 encoded text is a sequence of 16-bit encoding values which in Windows C and C++ programming are of type **`wchar_t`**. The “`w`” in `wchar_t` stands for **wide text**, text represented with “`wide`” encoding values. In C and C++ you can express wide text literals with prefix **`L`**, e.g. `L"Hello!"`.
 
@@ -40,7 +44,7 @@ When we used `MessageBox` like
 MessageBox( 0, "Some text in the box", "A title", MB_SETFOREGROUND );
 ~~~
 
-… we actually used a `<windows.h>` macro that was defined as `MessageBoxA`, the message box function that takes `char` based string arguments:
+… we actually used a `<windows.h>` macro `MessageBox` that was defined as `MessageBoxA`, the message box function that takes `char` based string arguments:
 
 ~~~cpp
 MessageBoxA( 0, "Some text in the box", "A title", MB_SETFOREGROUND );
@@ -60,9 +64,7 @@ However, from June 2019 Windows supports using UTF-8 as a process’ `char`-base
 
 With this the `char` based wrapper layer, the “A” suffix functions like `MessageBoxA`, has been *re-purposed to support the future* instead of supporting the past, just now with the “A” very much a misleading misnomer. This is  much like how C++ `auto` was re-purposed to support the future instead of supporting the past, just now with the “auto” very much a misleading misnomer… Well, I guess there must be an example also in the human body, maybe.
 
-Anyway, as of early 2022 the UTF-8 support is far from complete.
-
-But together with earlier introduced UTF-8 support in the Visual C++ compiler and other Microsoft tools the June 2019 support in Windows *enables* use of UTF-8 throughout. This avoids text encoding problems such as for the right single quote in the previous version of our Tic-Tac-Toe game. And it enables use of special Unicode characters provided that the font one uses, supports them.
+As of early 2022 the UTF-8 support is far from complete, but together with earlier introduced UTF-8 support in the Visual C++ compiler and other Microsoft tools the June 2019 support in Windows *enables* use of UTF-8 throughout. This avoids text encoding problems such as for the right single quote in the previous version of our Tic-Tac-Toe game. And it enables use of special Unicode characters provided that the font one uses, supports them.
 
 
 ---
