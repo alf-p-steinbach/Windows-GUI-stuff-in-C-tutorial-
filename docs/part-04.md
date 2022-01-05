@@ -79,7 +79,7 @@ Codepage numbers are used for Windows’ global text encoding assumptions, e.g. 
 
 Codepage numbers are also used for the [API functions](https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp) and commands ([chcp](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/chcp), [mode](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/mode#select-code-page)) to set a console window’s **active code page**, the text encoding that it should assume, to a specific code page number. 
 
-Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code page. I.e. there’s no “setter” counterpart to `GetACP`, there’s no `SetACP`. Instead it has to be done [via the XML application manifest resource](https://docs.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page#set-a-process-code-page-to-utf-8), like this:
+Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code page. I.e. there’s no “setter” counterpart to `GetACP`, there’s no `SetACP`. Instead it has to be done [via the XML application manifest resource](https://docs.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page#set-a-process-code-page-to-utf-8), in the *assembly*▸*application*▸*windowsSettings*▸*activeCodePage* element:
 
 [*part-04/code/tic-tac-toe/v6/resources/app-manifest.xml*](part-04/code/tic-tac-toe/v6/resources/app-manifest.xml)
 ~~~c
