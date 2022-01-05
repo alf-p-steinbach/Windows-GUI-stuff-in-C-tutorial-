@@ -50,7 +50,7 @@ This function just translates the text to `wchar_t` based UTF-16 and calls `Mess
 MessageBoxW( 0, L"Some text in the box", L"A title", MB_SETFOREGROUND );
 ~~~
 
-That is, the Windows core functionality is based on UTF-16 encoding, but `<windows.h>` defaults to offering wrapper functions that convert `char` based text to `wchar_t` based UTF-16, and vice versa. This wrapper layer originated as a compatibility layer for old `char` based applications. The intent was, in the early and mid 1990’s, that new Windows programs should use wide text, e.g. `MessageBoxW`.
+That is, the Windows core functionality is based on UTF-16 encoding, but `<windows.h>` defaults to offering wrapper functions that convert `char` based text to `wchar_t` based UTF-16, and vice versa. This wrapper layer originated as a compatibility layer for old non-Unicode `char` based applications. The intent was, in the early and mid 1990’s, that new Windows programs should use wide text, e.g. `MessageBoxW`.
 
 And up [until June 2019](https://docs.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page#set-a-process-code-page-to-utf-8) one had to use UTF-16 encoded wide text in that way in any serious Windows desktop programming, because that was the only Unicode encoding supported by the API functions. One then defined the macro symbol **`UNICODE`** before including `<windows.h>`, so that `<windows.h>` would define the function-name macros to map to the “W” functions. For example, with `UNICODE` defined before `<windows.h>` is included, it defines `MessageBox` as `MessageBoxW`.
 
