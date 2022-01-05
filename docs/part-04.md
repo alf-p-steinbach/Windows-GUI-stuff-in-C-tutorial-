@@ -14,13 +14,15 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [4.1. Some background info.](#41-some-background-info)
+- [4.1. Some background on Unicode in Windows programming.](#41-some-background-on-unicode-in-windows-programming)
+- [4.2. Specify UTF-8 as the process’ ANSI codepage.](#42-specify-utf-8-as-the-process-ansi-codepage)
+- [4.3. Specify UTF-8 as the “.rc” resource script codepage.](#43-specify-utf-8-as-the-rc-resource-script-codepage)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
 ---
-### 4.1. Some background info.
+### 4.1. Some background on Unicode in Windows programming.
 
 TLDR: by using UTF-8 we are at the leading edge of Windows desktop software development where not all Windows’ wrinkles have been ironed out yet, and we only support Windows versions since June 2019.
 
@@ -74,13 +76,44 @@ Codepage numbers are used for Windows’ global text encoding assumptions, e.g. 
 
 Codepage numbers are also used for the [API functions](https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp) and commands ([chcp](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/chcp), [mode](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/mode#select-code-page)) to set a console window’s **active code page**, the text encoding that it should assume, to a specific code page number. 
 
-Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code page. I.e. there’s no “setter” counterpart to `GetACP`, there’s no `SetACP`. Instead it has to be done via the XML application manifest resource, like this:
+Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code page. I.e. there’s no “setter” counterpart to `GetACP`, there’s no `SetACP`. Instead it has to be done [via the XML application manifest resource](https://docs.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page#set-a-process-code-page-to-utf-8), like this:
 
+[*part-04/code/tic-tac-toe/v6/resources/app-manifest.xml*](part-04/code/tic-tac-toe/v6/resources/app-manifest.xml)
+~~~c
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+    <assemblyIdentity
+        version="0.6.0.0"
+        processorArchitecture="*"
+        name="Alfs.CppInPractice.TicTacToe"
+        type="win32"
+    />
+    <description>A basic tic-tac-toe game with intentionally limited smarts.</description>
+    <application>
+        <windowsSettings>
+            <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings"
+                >UTF-8</activeCodePage>
+        </windowsSettings>
+    </application>
+    <dependency>
+        <dependentAssembly>
+            <assemblyIdentity
+                type="win32"
+                name="Microsoft.Windows.Common-Controls"
+                version="6.0.0.0"
+                processorArchitecture="*"
+                publicKeyToken="6595b64144ccf1df"
+                language="*"
+            />
+        </dependentAssembly>
+    </dependency>
+</assembly>
+~~~
 
-UTF-8
+---
+### 4.3. Specify UTF-8 as the “.rc” resource script codepage.
 
-
-asd
+jkølk
 
 ---
 
