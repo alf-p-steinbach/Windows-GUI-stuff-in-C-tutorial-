@@ -166,6 +166,9 @@ For the C++ source code the UTF-8 encoding is applied at two levels (the termino
 
 poh
 
+<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+
+
 ---
 
 A compiler may have options to specify each separately, and it may offer an option to specify both as the same encoding:
