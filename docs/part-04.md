@@ -185,7 +185,7 @@ Still one may inadvertently end up with one or more source files encoded as Wind
 * I always use UTF-8 **with BOM**, converting a file if necessary.  
   This is the basic measure that makes the Windows tools do The Right Thing™. It’s *the right and conventional thing to do in Windows*, and it can be argued that it’s also the technically right (though unconventional) thing to do for multi-platform code. However, in an UTF-8 based Unix environment the advantages are marginal to zero while the social cost of being non-conforming be high, so for Unix specific as opposed to portable or pure Windows code I don’t recommend this measure.
 * I add an **encoding comment** as the first line of each file.  
-  This is a preventive measure. And so that comment doesn’t just assert that the source is UTF-8, but it includes at least one non-ASCII character, e.g. “π”, with an explanation of what it *should* be. When or if that character appears as something else (e.g. an editor that incorrectly applies Windows ANSI might translate it to “p”) one can know that something’s wrong.
+  This is a preventive measure. And so that comment doesn’t just say that the source is UTF-8, but it includes at least one non-ASCII character, e.g. “π”, with an explanation of what it *should* be. When or if that character appears as something else (e.g. an editor that incorrectly applies Windows ANSI might translate it to “p”) one can know that something’s wrong.
 
 
 
