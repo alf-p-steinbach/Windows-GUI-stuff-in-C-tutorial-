@@ -27,9 +27,10 @@ static_assert(
     "The execution character set must be UTF-8 (e.g. MSVC option \"/utf-8\")."
     );
 
-using   cu::Range, cu::is_in;
-using   std::optional, std::string, std::to_string;
+using   cu::hopefully, cu::Range, cu::is_in;
+using   std::exception, std::optional, std::string, std::to_string;
 using   ttt::Board, ttt::Game;
+#define FAIL CPPUTIL_FAIL
 
 constexpr int button_1_id = BOARD_BUTTON_BASE + 1;
 constexpr int button_9_id = BOARD_BUTTON_BASE + 9;
@@ -189,9 +190,9 @@ void cpp_main()
 
 auto main() -> int
 {
-    using   std::exception;
-
     try {
+        hopefully( GetACP() == CP_UTF8 and false )
+            or FAIL( "The process ANSI codepage isn't UTF-8." );
         cpp_main();
         return EXIT_SUCCESS;
     } catch( const exception& x ) {
@@ -200,7 +201,7 @@ auto main() -> int
             "\n"
             "Technical reason (exception message):\n"
             + x.what();
-        MessageBox( 0, text.c_str(), "Tic-Tac-Toe - OOPS!", MB_TASKMODAL | MB_ICONERROR );
+        MessageBox( 0, text.c_str(), "Tic-Tac-Toe - OOPS!", MB_ICONERROR | MB_SETFOREGROUND );
     }
     return EXIT_FAILURE;
 }

@@ -244,6 +244,65 @@ static_assert(
 
 This guarantees UTF-8 execution character set, and also that the source character set, that is, the source code encoding, is the one that the compiler expects.
 
+<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+
+Until now there’s been no way that the program could *fail* at run time. Well, except for allocation failures, which are so rare and so difficult to handle that we’ve just pretended that there is no issue, just like most professionals. But now, because the Microsoft-ish baroque mechanism for setting the GUI encoding to UTF-8 is so brittle, so easy to get wrong, we need to ensure that the program doesn’t get very much farther than the start of `main` is this encoding is wrong.
+
+So, the version 5 `main`
+
+~~~cpp
+auto main() -> int
+{
+    wu::init_common_controls();
+    DialogBox(
+        wu::this_exe, wu::Resource_id{ IDD_MAIN_WINDOW }.as_ptr(),
+        HWND(),             // Parent window, a zero handle is "no parent".
+        message_handler
+        );
+}
+~~~
+
+… is now replaced with
+
+*(in) [part-04/code/tic-tac-toe/v6/main.cpp](part-04/code/tic-tac-toe/v6/main.cpp)*
+~~~cpp
+void cpp_main()
+{
+    wu::init_common_controls();
+    DialogBox(
+        wu::this_exe, wu::Resource_id{ IDD_MAIN_WINDOW }.as_ptr(),
+        HWND(),             // Parent window, a zero handle is "no parent".
+        message_handler
+        );
+}
+
+auto main() -> int
+{
+    try {
+        hopefully( GetACP() == CP_UTF8 and false )
+            or FAIL( "The process ANSI codepage isn't UTF-8." );
+        cpp_main();
+        return EXIT_SUCCESS;
+    } catch( const exception& x ) {
+        const string text = string() +
+            "Sorry, there was an unexpected failure.\n"
+            "\n"
+            "Technical reason (exception message):\n"
+            + x.what();
+        MessageBox( 0, text.c_str(), "Tic-Tac-Toe - OOPS!", MB_ICONERROR | MB_SETFOREGROUND );
+    }
+    return EXIT_FAILURE;
+}
+~~~
+
+The error box, if against exectation it pops up, looks like this:
+
+![The error box](part-04/images/sshot-4.error-box.png)
+
+
+<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+
+asd
 
 ---
 ### 4.5. asd.
@@ -261,7 +320,7 @@ You still need to set the execution character set for Visual C++. A good way to 
 
  But as of Visual Studio 2022 there’s still no way to just choose UTF-8 in a C++ project’s options. For a VS project the `/utf-8` option must therefore be specified by typing it in the “advanced” command line options:
 
-![UTF-8 option in VS2022 project options](part-04/images/sshot-2.vs2022-command-line-options.annotated.png)
+![UTF-8 option in VS2022 project options](part-04/images/sshot-3.vs2022-command-line-options.annotated.png)
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
