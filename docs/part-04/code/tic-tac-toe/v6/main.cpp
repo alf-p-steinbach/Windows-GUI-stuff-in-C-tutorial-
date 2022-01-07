@@ -1,4 +1,6 @@
-﻿// v6 - UTF-8 version. "π" should be a lowercase Greek pi.
+﻿#// Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+
+// v6 - UTF-8 version. "π" should be a lowercase Greek pi.
 // v5 - Basic interaction (working game play, notification of win/lose/tie, restart).
 // v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode;
 //      modern look ’n feel via application manifest resource and initcontrolsex.

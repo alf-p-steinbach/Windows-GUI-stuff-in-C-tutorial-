@@ -176,21 +176,47 @@ Let’s first consider the “source character set” (or really, encoding).
 
 As it happens the C++ source code is already valid UTF-8, because: it only uses ASCII characters, and UTF-8 is an extension of ASCII so that all pure ASCII text is also valid UTF-8. The version 5 source code only uses ASCII because we dealt with the non-ASCII right single quote «’» by using its Windows ANSI code. However, if you edit this source code and introduce some non-ASCII characters, such as a string literal with the right single quote directly in it, then a Windows editor is likely to *assume* and *use* Windows ANSI encoding, with ungood consequences!, because there’s nothing to tell it that this is intended as UTF-8.
 
-There is a standard [Python directive to indicate the source code encoding](https://www.python.org/dev/peps/pep-0263/#defining-the-encoding) in the first line, like “`#encoding: utf-8`”. This is much like a Windows resource script’s “`#pragma code_page(65001)`” directive. But unfortunately C++ — even Windows-specific C++ — doesn’t have such a directive, and more critically Windows editors generally don’t recognize and honor such a directive.
+There is a standard [Python directive to indicate the source code encoding](https://www.python.org/dev/peps/pep-0263/#defining-the-encoding) in the first line, like
+
+~~~python
+#encoding: utf-8
+~~~
+
+This is much like a Windows resource script’s
+
+~~~c
+#pragma code_page(65001)
+~~~
+
+… directive. But unfortunately C++ — even Windows-specific C++ — doesn’t have such a directive, and more critically Windows editors generally don’t recognize and honor such a directive.
 
 Something like that is needed in Windows because Windows’ default encoding is Windows ANSI. In Windows the UTF-8 BOM serves as an encoding directive. The UTF-8 BOM is understood as indicating UTF-8 by a host of Windows tools, including the old Windows Notepad editor, most/all programmers’ editors, C++ compilers (in particular Visual C++), etc.
 
 Still one may inadvertently end up with one or more source files encoded as Windows ANSI, so I use a two-tiered approach to ensuring UTF-8 as source character set:
 
 * I always use UTF-8 **with BOM**, converting a file if necessary.  
-  This is the basic measure that makes the Windows tools do The Right Thing™. It’s *the right and conventional thing to do in Windows*, and it can be argued that it’s also the technically right (though unconventional) thing to do for multi-platform code. However, in an UTF-8 based Unix environment the advantages are marginal to zero while the social cost of being non-conforming be high, so for Unix specific as opposed to portable or pure Windows code I don’t recommend this measure.
+  This is the basic measure that makes the Windows tools do The Right Thing™. It’s *the right and conventional thing to do in Windows*, and it can be argued that it’s also the technically right (though unconventional) thing to do for multi-platform code. However, in an UTF-8 based Unix environment the advantages are marginal to zero while the social cost of being non-conforming can be high, so for Unix specific as opposed to portable or pure Windows code I don’t recommend this measure.
 * I add an **encoding comment** as the first line of each file.  
   This is a preventive measure. And so that comment doesn’t just say that the source is UTF-8, but it includes at least one non-ASCII character, e.g. “π”, with an explanation of what it *should* be. When or if that character appears as something else (e.g. an editor that incorrectly applies Windows ANSI might translate it to “p”) one can know that something’s wrong.
 
+So, summing up what to do, (1) convert the source code to UTF-8 with BOM, e.g. via your editor, and (2) add as the first line an encoding comment like the Python PEP 263 compatible
 
+(at the start of) [*part-04/code/tic-tac-toe/v6/main.cpp*](part-04/code/tic-tac-toe/v6/main.cpp)
+~~~cpp
+#// Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+~~~
 
+This is essentially the solution used in Python, because also Python’s PEP 263 honors the UTF-8 BOM:
+
+> ❞ To aid with platforms such as Windows, which add Unicode BOM marks to the beginning of Unicode files, the UTF-8 signature \xef\xbb\xbf will be interpreted as 'utf-8' encoding as well (even if no magic encoding comment is given).
+
+<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+
+asdasd
 
 ---
+
+asdlkj
 
 A compiler may have options to specify each separately, and it may offer an option to specify both as the same encoding:
 
