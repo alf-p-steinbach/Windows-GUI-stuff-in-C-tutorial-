@@ -17,6 +17,8 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 - [4.1. Some background on Unicode in Windows programming.](#41-some-background-on-unicode-in-windows-programming)
 - [4.2. Specify UTF-8 as the process’ ANSI codepage.](#42-specify-utf-8-as-the-process-ansi-codepage)
 - [4.3. Specify UTF-8 as the “.rc” resource script code page.](#43-specify-utf-8-as-the-rc-resource-script-code-page)
+- [4.4. Adapt the C++ source code to UTF-8.](#44-adapt-the-c-source-code-to-utf-8)
+- [4.5. Building with UTF-8 encoding throughout.](#45-building-with-utf-8-encoding-throughout)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
