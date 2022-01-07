@@ -210,7 +210,7 @@ This two-tiered approach is essentially the solution used in Python, because als
 
 > ❞ To aid with platforms such as Windows, which add Unicode BOM marks to the beginning of Unicode files, the UTF-8 signature \xef\xbb\xbf will be interpreted as 'utf-8' encoding as well (even if no magic encoding comment is given).
 
-The difference for C++ is that for C++ a `//` comment start is required, and that since the directive is not recognized as such by the tools there is a non-ASCII character like “π”, that can be recognized by humans.
+The difference for C++ is that for C++ a `//` comment start is required, and that since the directive is not recognized as such by the tools there is a non-ASCII character like “π”, that can be recognized by humans. The `#` at the start is not necessary for the C++ compiler, and I used to omit it. But it can help tools such as editors that (perhaps with customization) support the PEP 263 convention.
 
 PEP 263 states that characters between the leading `#` and the word `encoding` are ignored, so in the C++ header files we now add
 
@@ -246,7 +246,7 @@ This guarantees UTF-8 execution character set, and also that the source characte
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-Until now there’s been no way that the program could *fail* at run time. Well, except for allocation failures, which are so rare and so difficult to handle that we’ve just pretended that there is no issue, just like most professionals. But now, because the Microsoft-ish baroque mechanism for setting the GUI encoding to UTF-8 is so brittle, so easy to get wrong, we need to ensure that the program doesn’t get very much farther than the start of `main` is this encoding is wrong.
+Until now there’s been no way that the program could *fail* at run time. Well, except for allocation failures, which are so rare and so difficult to handle that we’ve just pretended that there is no issue, the same way as in most professional work. But now, because the Microsoft-ish baroque mechanism for setting the GUI encoding to UTF-8 is so brittle, so easy to get wrong, we need to ensure that the program execution doesn’t get very much farther than the start of `main` is this encoding is wrong.
 
 So, the version 5 `main`
 
@@ -295,17 +295,68 @@ auto main() -> int
 }
 ~~~
 
-The error box, if against exectation it pops up, looks like this:
+If against expectation the error box pops up, it looks like this:
 
 ![The error box](part-04/images/sshot-4.error-box.png)
 
-
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-asd
+With both the execution character set and the GUI encoding guaranteed to be UTF-8 the workaround for right single quote can be removed, one can just use «’» directly in a string literal. Also, the code can now take advantage of other special Unicode characters, such as &#x2573; and &#x25EF; for the crosses and circles in the game. Not to mention &#x1F603; for a smiley (I picked this particular one because as opposed to the ordinary smiley it displays OK with the Windows 11 GUI font — the font support for symbols does matter!).
+
+However, in a source code editor these characters may not be displayed in a very recognizable way if they're just used directly in the text. So, depending on the symbol it may be a good idea to specify it via its Unicode code point value, its **character code**. And in C++ most Unicode symbols except emojis can be specified by using a 4-digit hex [**universal character name**](https://en.cppreference.com/w/cpp/language/escape), or in informal-speech a short **unicode escape**, which starts with lowercase “`\u`”:
+
+*(in) [part-04/code/tic-tac-toe/v6/main.cpp](part-04/code/tic-tac-toe/v6/main.cpp)*
+~~~cpp
+void on_user_move( const HWND window, const int user_move )
+{
+    using ttt::cell_state::empty;
+    if( the_game.board.cells[user_move] != empty or the_game.is_over() ) {
+        FlashWindow( window, true );    // Documentation per late 2021 is misleading/wrong.
+        return;
+    }
+    the_game.make_move( user_move );
+    SetWindowText( button_for_cell_index( user_move, window ), "\u2573" );          // cross
+    if( not the_game.is_over() ) {
+        const int computer_move = the_game.find_computer_move();
+        the_game.make_move( computer_move );
+        SetWindowText( button_for_cell_index( computer_move, window ), "\u25EF" );  // circle
+    }
+    if( the_game.is_over() ) { enter_game_over_state( window ); }
+}
+~~~
+
+However, some symbols (in particular emojis) require 8 digits, a long Unicode escape, and then uses uppercase “`\U`”:
+
+*(in) [part-04/code/tic-tac-toe/v6/main.cpp](part-04/code/tic-tac-toe/v6/main.cpp)*
+~~~cpp
+void enter_game_over_state( const HWND window )
+{
+    assert( the_game.is_over() );
+    for( int id = button_1_id; id <= button_9_id; ++id ) {
+        wu::disable( GetDlgItem( window, id ) );
+    }
+    wu::disable( GetDlgItem( window, IDC_RULES_DISPLAY ) );
+    if( the_game.win_line ) {
+        using ttt::cell_state::cross;
+        const bool user_won = (the_game.board.cells[the_game.win_line->start] == cross);
+        if( user_won ) {
+            set_status_text( window, "You won! Yay! \U0001F603 Click anywhere for a new game…" );
+        } else {
+            set_status_text( window, "I won. Better luck next time. Just click anywhere." );
+        }
+    } else {
+        set_status_text( window, "It’s a tie. Click anywhere for a new game." );
+    }
+}
+~~~
+
+All these symbols were present in the screenshot at the start, and I repeat that figure so that you can see the symbols in context with the code now:
+
+![Unicode symbols in the main window.](part-04/images/sshot-1.unicode-symbols-in-ttt.png)
+
 
 ---
-### 4.5. asd.
+### 4.5. Building with UTF-8 encoding throughout.
 
 A compiler may have options to specify each separately, and it may offer an option to specify both as the same encoding:
 
@@ -327,12 +378,6 @@ You still need to set the execution character set for Visual C++. A good way to 
 asdasd
 
 
----
-### 4.4. Use UTF-8 both for the C++ source code and as encoding for strings.
-
-
-
-asd
 
 ---
 

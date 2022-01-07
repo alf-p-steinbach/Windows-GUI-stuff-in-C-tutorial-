@@ -88,11 +88,11 @@ void on_user_move( const HWND window, const int user_move )
         return;
     }
     the_game.make_move( user_move );
-    SetWindowText( button_for_cell_index( user_move, window ), "\u2573" );
+    SetWindowText( button_for_cell_index( user_move, window ), "\u2573" );          // cross
     if( not the_game.is_over() ) {
         const int computer_move = the_game.find_computer_move();
         the_game.make_move( computer_move );
-        SetWindowText( button_for_cell_index( computer_move, window ), "\u25EF" );
+        SetWindowText( button_for_cell_index( computer_move, window ), "\u25EF" );  // circle
     }
     if( the_game.is_over() ) { enter_game_over_state( window ); }
 }
