@@ -18,7 +18,7 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 - [4.2. Specify UTF-8 as the process’ ANSI codepage.](#42-specify-utf-8-as-the-process-ansi-codepage)
 - [4.3. Specify UTF-8 as the “.rc” resource script code page.](#43-specify-utf-8-as-the-rc-resource-script-code-page)
 - [4.4. Adapt the C++ source code to UTF-8.](#44-adapt-the-c-source-code-to-utf-8)
-- [4.5. Building with UTF-8 encoding throughout.](#45-building-with-utf-8-encoding-throughout)
+- [4.5. Build with UTF-8 encoding throughout.](#45-build-with-utf-8-encoding-throughout)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -358,7 +358,7 @@ All these symbols were present in the screenshot at the start, and I repeat that
 
 
 ---
-### 4.5. Building with UTF-8 encoding throughout.
+### 4.5. Build with UTF-8 encoding throughout.
 
 A compiler may have options to specify source character set and execution character set separately, and it may offer an option to specify both as the same encoding:
 
