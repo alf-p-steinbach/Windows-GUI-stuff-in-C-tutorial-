@@ -218,15 +218,31 @@ PEP 263 states that characters between the leading `#` and the word `encoding` a
 #pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 ~~~
 
-
-
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-asdasd
+The execution character set cannot be communicated to the C++ compiler via the source code. But one can ensure that compilation fails if it isn’t UTF-8. A checker function can go like this:
 
----
+*(in) [part-04/code/tic-tac-toe/v6/cpp/util.hpp](part-04/code/tic-tac-toe/v6/cpp/util.hpp)*
+~~~cpp
+constexpr inline auto utf8_is_the_execution_character_set()
+    -> bool
+{
+    constexpr auto& slashed_o = "ø";
+    return (sizeof( slashed_o ) == 3 and slashed_o[0] == '\xC3' and slashed_o[1] == '\xB8');
+}
+~~~
 
-asdlkj
+In the main program one can then add a `static_assert` like
+
+*(in) [part-04/code/tic-tac-toe/v6/main.cpp](part-04/code/tic-tac-toe/v6/main.cpp)*
+~~~cpp
+static_assert(
+    cu::utf8_is_the_execution_character_set(),
+    "The execution character set must be UTF-8 (e.g. MSVC option \"/utf-8\")."
+    );
+~~~
+
+This guarantees UTF-8 execution character set, and also that the source character set (the source code encoding) is the one that the compiler expects.
 
 A compiler may have options to specify each separately, and it may offer an option to specify both as the same encoding:
 
@@ -243,7 +259,9 @@ You still need to set the execution character set for Visual C++. A good way to 
 
 ![UTF-8 option in VS2022 project options](part-04/images/sshot-2.vs2022-command-line-options.annotated.png)
 
+<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
+asdasd
 
 
 ---

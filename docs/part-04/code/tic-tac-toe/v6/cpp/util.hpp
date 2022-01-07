@@ -12,6 +12,13 @@ namespace cpp::util {
             std::exception, std::runtime_error,
             std::string;
 
+    constexpr inline auto utf8_is_the_execution_character_set()
+        -> bool
+    {
+        constexpr auto& slashed_o = "ø";
+        return (sizeof( slashed_o ) == 3 and slashed_o[0] == '\xC3' and slashed_o[1] == '\xB8');
+    }
+
     inline auto hopefully( const bool condition ) -> bool { return condition; }
     inline auto fail( const string& message ) -> bool { throw runtime_error( message ); }
 

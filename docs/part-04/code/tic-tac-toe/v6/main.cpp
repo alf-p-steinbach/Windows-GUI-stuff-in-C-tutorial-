@@ -22,6 +22,11 @@
 namespace cu    = cpp::util;
 namespace wu    = winapi::util;
 
+static_assert(
+    cu::utf8_is_the_execution_character_set(),
+    "The execution character set must be UTF-8 (e.g. MSVC option \"/utf-8\")."
+    );
+
 using   cu::Range, cu::is_in;
 using   std::optional, std::string, std::to_string;
 using   ttt::Board, ttt::Game;
