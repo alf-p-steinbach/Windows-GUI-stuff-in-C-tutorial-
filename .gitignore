@@ -5,3 +5,4 @@
 *.aps
 docs/part-03/code/tic-tac-toe/vs-resource-editing/.vs/*
 docs/part-03/code/tic-tac-toe/vs-resource-editing/x64/*
+docs/part-04/code/tic-tac-toe/v6/.build/*
