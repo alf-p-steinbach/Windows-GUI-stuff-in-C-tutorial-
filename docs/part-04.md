@@ -212,7 +212,7 @@ This two-tiered approach is essentially the solution used in Python, because als
 
 The difference for C++ is that for C++ a `//` comment start is required, and that since the directive is not recognized as such by the tools there is a non-ASCII character like “π”, that can be recognized by humans.
 
-PEP 263 states that characters between the leading `#` and the word `encoding` are ignored, so for C and C++ header files one can do
+PEP 263 states that characters between the leading `#` and the word `encoding` are ignored, so in the C++ header files we now add
 
 ~~~c
 #pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
@@ -220,7 +220,7 @@ PEP 263 states that characters between the leading `#` and the word `encoding` a
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-The execution character set cannot be communicated to the C++ compiler via the source code. But one can ensure that compilation fails if it isn’t UTF-8. A checker function can go like this:
+The execution character set cannot be communicated to the C++ compiler via the source code. But one can ensure that compilation or running the program fails if it isn’t UTF-8. A checker function can go like this:
 
 *(in) [part-04/code/tic-tac-toe/v6/cpp/util.hpp](part-04/code/tic-tac-toe/v6/cpp/util.hpp)*
 ~~~cpp
@@ -232,7 +232,7 @@ constexpr inline auto utf8_is_the_execution_character_set()
 }
 ~~~
 
-In the main program one can then add a `static_assert` like
+A good way to use it is via a `static_assert` (compilation failure), as now in the main program:
 
 *(in) [part-04/code/tic-tac-toe/v6/main.cpp](part-04/code/tic-tac-toe/v6/main.cpp)*
 ~~~cpp
@@ -242,7 +242,11 @@ static_assert(
     );
 ~~~
 
-This guarantees UTF-8 execution character set, and also that the source character set (the source code encoding) is the one that the compiler expects.
+This guarantees UTF-8 execution character set, and also that the source character set, that is, the source code encoding, is the one that the compiler expects.
+
+
+---
+### 4.5. asd.
 
 A compiler may have options to specify each separately, and it may offer an option to specify both as the same encoding:
 
