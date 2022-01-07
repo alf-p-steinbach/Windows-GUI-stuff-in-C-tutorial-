@@ -325,7 +325,7 @@ void on_user_move( const HWND window, const int user_move )
 }
 ~~~
 
-However, some symbols (in particular emojis) require 8 digits, a long Unicode escape, and then uses uppercase “`\U`”:
+However, some symbols (in particular emojis) require 8 digits, a long Unicode escape, and one then uses uppercase “`\U`”:
 
 *(in) [part-04/code/tic-tac-toe/v6/main.cpp](part-04/code/tic-tac-toe/v6/main.cpp)*
 ~~~cpp
