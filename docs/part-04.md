@@ -206,9 +206,11 @@ So, summing up what to do, (1) convert the source code to UTF-8 with BOM, e.g. v
 #// Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 ~~~
 
-This is essentially the solution used in Python, because also Python’s PEP 263 honors the UTF-8 BOM:
+This two-tiered approach is essentially the solution used in Python, because also Python’s PEP 263 honors the UTF-8 BOM:
 
 > ❞ To aid with platforms such as Windows, which add Unicode BOM marks to the beginning of Unicode files, the UTF-8 signature \xef\xbb\xbf will be interpreted as 'utf-8' encoding as well (even if no magic encoding comment is given).
+
+The difference for C++ is that for C++ a `//` comment start is required, and that since the directive is not recognized as such by the tools there is a non-ASCII character like π, that can be recognized by humans.
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
