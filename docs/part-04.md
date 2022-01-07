@@ -212,6 +212,14 @@ This two-tiered approach is essentially the solution used in Python, because als
 
 The difference for C++ is that for C++ a `//` comment start is required, and that since the directive is not recognized as such by the tools there is a non-ASCII character like “π”, that can be recognized by humans.
 
+PEP 263 states that characters between the leading `#` and the word `encoding` are ignored, so for C and C++ header files one can do
+
+~~~c
+#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+~~~
+
+
+
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
 asdasd

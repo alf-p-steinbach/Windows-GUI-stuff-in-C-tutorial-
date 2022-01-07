@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+
 #include <wrapped-winapi/windowsx-h.hpp>    // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
 #include <wrapped-winapi/commctrl-h.hpp>    // InitCommonControlsEx
 
