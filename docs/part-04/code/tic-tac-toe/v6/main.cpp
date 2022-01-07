@@ -191,7 +191,8 @@ void cpp_main()
 auto main() -> int
 {
     try {
-        hopefully( GetACP() == CP_UTF8 and false )
+        static_assert( CP_UTF8 == 65001 );
+        hopefully( GetACP() == CP_UTF8 )
             or FAIL( "The process ANSI codepage isn't UTF-8." );
         cpp_main();
         return EXIT_SUCCESS;

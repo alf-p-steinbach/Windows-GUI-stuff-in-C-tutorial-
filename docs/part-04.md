@@ -360,25 +360,45 @@ All these symbols were present in the screenshot at the start, and I repeat that
 ---
 ### 4.5. Building with UTF-8 encoding throughout.
 
-A compiler may have options to specify each separately, and it may offer an option to specify both as the same encoding:
+A compiler may have options to specify source character set and execution character set separately, and it may offer an option to specify both as the same encoding:
 
 | Compiler: | Source charset: | Literals (execution charset): | Both charsets: |
 |---|---|---|--|
 | **Visual C++:** | `/source-charset:utf-8` | `/execution-charset:utf-8` | `/utf-8` |
 | **g++:** | `-finput-charset=utf-8` | `-fexec-charset=utf-8` | (default) |
 
-However, in practice, when you adopt UTF-8 BOM for your Windows programming there’s no further action needed to get the compiler’s assumed source encoding correct.
+For Visual C++ I recommend using the **`/utf-8`** option that sets both encodings.
 
-You still need to set the execution character set for Visual C++. A good way to do that is to use the **`/utf-8`** option that sets both encodings. Because that also works for source code files without BOM, e.g. from Unix.
-
- But as of Visual Studio 2022 there’s still no way to just choose UTF-8 in a C++ project’s options. For a VS project the `/utf-8` option must therefore be specified by typing it in the “advanced” command line options:
+But as of Visual Studio 2022 `/utf-8` is not the default in project. And there’s still no way to just choose UTF-8 in a VS C++ project’s options. For a VS C++ project the `/utf-8` option must therefore be specified by typing it in the “advanced” command line options:
 
 ![UTF-8 option in VS2022 project options](part-04/images/sshot-3.vs2022-command-line-options.annotated.png)
 
-<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+Anyway, here’s building with UTF-8 throughout with the Microsoft tool chain, Visual C++:
 
-asdasd
+~~~
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> rc /c 65001 /nologo /fo r.res ..\resources.rc
 
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> cl /I .. ..\main.cpp r.res user32.lib gdi32.lib comctl32.lib /Fe"ttt"
+main.cpp
+
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> ttt_
+~~~
+
+And ditto building with the MinGW tool chain, g++:
+
+~~~
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> windres ..\resources.rc -o res.o
+
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> g++ -I .. -std=c++17 ..\main.cpp res.o -lgdi32 -lcomctl32 -o ttt
+
+[T:\part-04\code\tic-tac-toe\v6\.build]
+> ttt_
+~~~
 
 
 ---
