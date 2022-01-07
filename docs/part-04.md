@@ -157,7 +157,7 @@ Creating it (here called “res.o”) with the MinGW toolchain:
 ---
 ### 4.4. Adapt the C++ source code to UTF-8.
 
-For the C++ source code the UTF-8 encoding is applied at two levels (the terminology is a bit of frozen history, today we’d say “encoding”):
+For the C++ source code the UTF-8 encoding is applied at two levels (these standard terms are a bit of frozen history, today we’d say “encoding”):
 
 * As the C++ **source character set**.  
   This is about what characters the compiler believes that the source code bytes stand for. I.e. this affects how the compiler *interprets* the source code bytes.
@@ -169,7 +169,6 @@ Also, as a third and final level where the encoding is applied, the `char` based
 &nbsp;
 <img alt="Text endcoding char" width="600" src="part-04/images/encoding-chain.png">
 &nbsp;
-
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
