@@ -190,7 +190,7 @@ This is much like a Windows resource script’s
 
 … directive. But unfortunately C++ — even Windows-specific C++ — doesn’t have such a directive, and more critically Windows editors generally don’t recognize and honor such a directive.
 
-Something like that is needed in Windows because Windows’ default encoding is Windows ANSI. In Windows the UTF-8 BOM serves as an encoding directive. The UTF-8 BOM is understood as indicating UTF-8 by a host of Windows tools, including the old Windows Notepad editor, most/all programmers’ editors, C++ compilers (in particular Visual C++), etc.
+Something like that is needed in Windows because Windows’ default encoding is Windows ANSI. So in Windows the UTF-8 BOM serves as an encoding directive. The UTF-8 BOM is understood as indicating UTF-8 by a host of Windows tools, including the old Windows Notepad editor, most/all programmers’ editors, C++ compilers (in particular Visual C++), etc.
 
 Still one may inadvertently end up with one or more source files encoded as Windows ANSI, so I use a two-tiered approach to ensuring UTF-8 as source character set:
 
