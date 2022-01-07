@@ -201,7 +201,7 @@ Still one may inadvertently end up with one or more source files encoded as Wind
 
 So, summing up what to do, (1) convert the source code to UTF-8 with BOM, e.g. via your editor, and (2) add as the first line an encoding comment like the Python PEP 263 compatible
 
-(at the start of) [*part-04/code/tic-tac-toe/v6/main.cpp*](part-04/code/tic-tac-toe/v6/main.cpp)
+*(at the start of) [part-04/code/tic-tac-toe/v6/main.cpp](part-04/code/tic-tac-toe/v6/main.cpp)*
 ~~~cpp
 #// Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 ~~~
