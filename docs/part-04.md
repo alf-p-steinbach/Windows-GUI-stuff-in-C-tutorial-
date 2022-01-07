@@ -170,8 +170,15 @@ Also, as a third and final level where the encoding is applied, the `char` based
 <img alt="Text endcoding char" width="600" src="part-04/images/encoding-chain.png">
 &nbsp;
 
+Let’s first consider the “source character set” (or really, encoding).
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+
+As it happens the C++ source code is already valid UTF-8, because: it only uses ASCII characters, and UTF-8 is an extension of ASCII so that all pure ASCII text is also valid UTF-8. The version 5 source code only uses ASCII because we dealt with the non-ASCII right single quote «’» by using its Windows ANSI code. However, if you edit this source code and introduce some non-ASCII characters, such as a string literal with the right single quote directly in it, then a Windows editor is likely to *assume* and *use* Windows ANSI encoding, with ungood consequences!, because there’s nothing to tell it that this is intended as UTF-8.
+
+There is a standard [Python directive to indicate the source code encoding](https://www.python.org/dev/peps/pep-0263/#defining-the-encoding) in the first line, like “`#encoding: utf-8`”. This is much like a Windows resource script’s “`#pragma code_page(65001)`” directive. But unfortunately C++ — even Windows-specific C++ — doesn’t have such a directive, and more critically, Windows editors generally don’t recognize and honor such a directive.
+
+
 
 
 ---
