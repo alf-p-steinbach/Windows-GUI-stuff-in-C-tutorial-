@@ -1,4 +1,4 @@
-﻿#pragma once
+﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 
 #include <assert.h>
 #include <random>
@@ -12,7 +12,14 @@ namespace cpp::util {
             std::exception, std::runtime_error,
             std::string;
 
-    inline auto hopefully( const bool condition ) -> bool { return condition; }
+    constexpr auto utf8_is_the_execution_character_set()
+        -> bool
+    {
+        constexpr auto& slashed_o = "ø";
+        return (sizeof( slashed_o ) == 3 and slashed_o[0] == '\xC3' and slashed_o[1] == '\xB8');
+    }
+
+    constexpr auto hopefully( const bool condition ) -> bool { return condition; }
     inline auto fail( const string& message ) -> bool { throw runtime_error( message ); }
 
     struct No_copying

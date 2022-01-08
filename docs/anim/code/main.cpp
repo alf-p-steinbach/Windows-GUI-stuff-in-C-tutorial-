@@ -1,15 +1,5 @@
 ﻿#// Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 
-// v6 - UTF-8 version. "π" should be a lowercase Greek pi.
-// v5 - Basic interaction (working game play, notification of win/lose/tie, restart).
-// v4 - Gross imperfections fixed: Windows standard GUI font; turned off topmost mode;
-//      modern look ’n feel via application manifest resource and initcontrolsex.
-// v3 - Refactoring: <windows.h> wrapped; using <windowsx.h> macros; resource-id class.
-//      <winapi_util.hpp> introduced as place for simple Windows API utility stuff.
-// v2 - Missing window parts added programmatically: the rules text; the window icon.
-// v1 - Roughly minimum code to display a window based on a dialog template resource.
-
-#include "ttt-Game.hpp"             // ttt::Game
 #include <winapi/util.hpp>          // winapi_util::*
 #include <cpp/util.hpp>
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW
@@ -191,6 +181,7 @@ void cpp_main()
 auto main() -> int
 {
     try {
+        static_assert( CP_UTF8 == 65001 );
         hopefully( GetACP() == CP_UTF8 )
             or FAIL( "The process ANSI codepage isn't UTF-8." );
         cpp_main();
