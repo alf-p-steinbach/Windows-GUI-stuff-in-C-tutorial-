@@ -31,7 +31,7 @@ alt="Charlie Chaplin in “Modern Times”" title="Charlie Chaplin in “Modern 
 
 TLDR: ***Using UTF-8 we are at the leading edge of Windows desktop software development where not all Windows’ wrinkles have been ironed out yet, and our programs only work with Windows versions since June 2019, but it’s worth it.***
 
-<p align="center">* * *</p>
+<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
 Full text:
 
