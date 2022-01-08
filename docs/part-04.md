@@ -400,7 +400,6 @@ And ditto building with the MinGW tool chain, g++:
 > ttt_
 ~~~
 
-
 The `/I..` and `-I..` options specify a base path for `<`*relative-path*`>` includes, because in this part I started moving the header files to sub-folders with a view towards possible later reuse, before I got a more firm idea of what this should mainly be about (namely UTF-8, not code structure).
 
 
