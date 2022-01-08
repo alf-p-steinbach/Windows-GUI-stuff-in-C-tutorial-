@@ -380,7 +380,7 @@ Anyway, here’s building with UTF-8 throughout with the Microsoft tool chain, V
 > rc /c 65001 /nologo /fo r.res ..\resources.rc
 
 [T:\part-04\code\tic-tac-toe\v6\.build]
-> cl /I .. ..\main.cpp r.res user32.lib gdi32.lib comctl32.lib /Fe"ttt"
+> cl /I .. /utf-8 ..\main.cpp r.res user32.lib gdi32.lib comctl32.lib /Fe"ttt"
 main.cpp
 
 [T:\part-04\code\tic-tac-toe\v6\.build]
