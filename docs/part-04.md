@@ -369,7 +369,7 @@ A compiler may have options to specify source character set and execution charac
 
 For Visual C++ I recommend using the **`/utf-8`** option that sets both encodings.
 
-But as of Visual Studio 2022 `/utf-8` is not the default in project. And there’s still no way to just choose UTF-8 in a VS C++ project’s options. For a VS C++ project the `/utf-8` option must therefore be specified by typing it in the “advanced” command line options:
+But as of Visual Studio 2022 `/utf-8` is not the default in a new project. And there’s still no way to just choose UTF-8 in a VS C++ project’s options. For a VS C++ project the `/utf-8` option must therefore be specified by typing it in the “advanced” command line options:
 
 ![UTF-8 option in VS2022 project options](part-04/images/sshot-3.vs2022-command-line-options.annotated.png)
 
