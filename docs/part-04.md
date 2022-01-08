@@ -15,7 +15,7 @@ So, in this part we’ll change everything to UTF-8 encoding. Which involves tel
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
 - [4.1. Some background on Unicode in Windows programming.](#41-some-background-on-unicode-in-windows-programming)
-- [4.2. Specify UTF-8 as the process’ ANSI codepage.](#42-specify-utf-8-as-the-process-ansi-codepage)
+- [4.2. Specify UTF-8 as the process’ ANSI code page.](#42-specify-utf-8-as-the-process-ansi-code-page)
 - [4.3. Specify UTF-8 as the “.rc” resource script code page.](#43-specify-utf-8-as-the-rc-resource-script-code-page)
 - [4.4. Adapt the C++ source code to UTF-8.](#44-adapt-the-c-source-code-to-utf-8)
 - [4.5. Build with UTF-8 encoding throughout.](#45-build-with-utf-8-encoding-throughout)
@@ -71,17 +71,17 @@ As of early 2022 the UTF-8 support is far from complete, but together with earli
 
 
 ---
-### 4.2. Specify UTF-8 as the process’ ANSI codepage.
+### 4.2. Specify UTF-8 as the process’ ANSI code page.
 
 Text fields and other controls assume that text is encoded with the process’ ANSI text encoding, the **code page** specified by the `GetACP` — short for “get ANSI code page” — function.
 
 [“Code page”](https://en.wikipedia.org/wiki/Code_page) is an old alternative term for “text encoding”, originally referring to a practice of displaying a complete old times’ text encoding table such as ASCII on a single page of paper. Each code page has an identifying number (note: other vendors do not necessarily use the Microsoft code page numbers). For example, for Windows ANSI Western `GetACP` returns **1252**, and for UTF-8 it returns **65001**.
 
-Codepage numbers are used for Windows’ global text encoding assumptions, e.g. in the registry value “HKLM\SYSTEM\CurrentControlSet\Control\Nls\CodePage@ACP” that more or less undocumented specifies the default for `GetACP`. I’ve found experimentally that it generally works to set that to 65001, with a reboot of Windows, and then there’s no need to set particular processes’ ANSI codepage. But I don’t know if that’s supported or whether it’s at all a good idea, and hence I don’t use it.
+code page numbers are used for Windows’ global text encoding assumptions, e.g. in the registry value “HKLM\SYSTEM\CurrentControlSet\Control\Nls\code page@ACP” that more or less undocumented specifies the default for `GetACP`. I’ve found experimentally that it generally works to set that to 65001, with a reboot of Windows, and then there’s no need to set particular processes’ ANSI code page. But I don’t know if that’s supported or whether it’s at all a good idea, and hence I don’t use it.
 
-Codepage numbers are also used for the [API functions](https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp) and commands ([chcp](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/chcp), [mode](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/mode#select-code-page)) to set a console window’s **active code page**, the text encoding that it should assume, to a specific code page number. 
+code page numbers are also used for the [API functions](https://docs.microsoft.com/en-us/windows/console/setconsoleoutputcp) and commands ([chcp](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/chcp), [mode](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/mode#select-code-page)) to set a console window’s **active code page**, the text encoding that it should assume, to a specific code page number. 
 
-Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code page. I.e. there’s no “setter” counterpart to `GetACP`, there’s no `SetACP`. Instead it has to be done [via the XML application manifest resource](https://docs.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page#set-a-process-code-page-to-utf-8), in the *assembly*▸*application*▸*windowsSettings*▸*activeCodePage* element:
+Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code page. I.e. there’s no “setter” counterpart to `GetACP`, there’s no `SetACP`. Instead it has to be done [via the XML application manifest resource](https://docs.microsoft.com/en-us/windows/apps/design/globalizing/use-utf8-code-page#set-a-process-code-page-to-utf-8), in the *assembly*▸*application*▸*windowsSettings*▸*activecode page* element:
 
 [*part-04/code/tic-tac-toe/v6/resources/app-manifest.xml*](part-04/code/tic-tac-toe/v6/resources/app-manifest.xml)
 ~~~c
@@ -96,8 +96,8 @@ Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code
     <description>A basic tic-tac-toe game with intentionally limited smarts.</description>
     <application>
         <windowsSettings>
-            <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings"
-                >UTF-8</activeCodePage>
+            <activecode page xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings"
+                >UTF-8</activecode page>
         </windowsSettings>
     </application>
     <dependency>
@@ -117,7 +117,7 @@ Unfortunately Microsoft doesn’t offer a function to set a process’ ANSI code
 
 Compared to a hypothetical `SetACP(65001)` call the above is exceedingly complex and over-engineered, not to mention brittle (get a space wrong and it doesn’t work). It’s… Well, it’s Microsoft.
 
-Instead of the simple hypothetical `SetACP` call one must have something like the above monstrosity, *plus* a call like `assert(GetACP()==65001)`, or alternatively using the symbolic name for that codepage value, `CP_UTF8`.
+Instead of the simple hypothetical `SetACP` call one must have something like the above monstrosity, *plus* a call like `assert(GetACP()==65001)`, or alternatively using the symbolic name for that code page value, `CP_UTF8`.
 
 
 ---
@@ -282,7 +282,7 @@ auto main() -> int
 {
     try {
         hopefully( GetACP() == CP_UTF8 )
-            or FAIL( "The process ANSI codepage isn't UTF-8." );
+            or FAIL( "The process ANSI code page isn't UTF-8." );
         cpp_main();
         return EXIT_SUCCESS;
     } catch( const exception& x ) {
