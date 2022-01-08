@@ -4,7 +4,13 @@ Desktop Windows programming starting from the ground up in C++17.
 
 I haven’t decided how far to take this. I’ll add more as I have free time to fill, maybe once a week or two weeks. Free time include those times when I get too bored with other stuff.
 
-*Contents:*
+*TLDR short contents:*
+- [1. A Windows GUI “Hello, world!”.](part-01.md)
+- [2. Use resources to provide an icon.](part-02.md)
+- [3. A Tic-Tac-Toe game in a dialog window.](part-03.md)
+- [4. UTF-8 as the one and only text encoding.](part-04.md)
+
+*Full contents:*
 
 - [1. A Windows GUI “Hello, world!”.](part-01.md)
     - [1.1. Message boxes.](part-01.md#11-message-boxes)
@@ -26,6 +32,12 @@ I haven’t decided how far to take this. I’ll add more as I have free time to
     - [3.3. Factor out: `<windows.h>` inclusion; support machinery; window message cracking.](part-03.md#33-factor-out-windowsh-inclusion-support-machinery-window-message-cracking)
     - [3.4. Fix gross imperfections: standard font; window just on top; modern appearance.](part-03.md#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance)
     - [3.5. Add the game logic and user interaction.](part-03.md#35-add-the-game-logic-and-user-interaction)
+- [4. UTF-8 as the one and only text encoding.](part-04.md)
+    - [4.1. Some background on Unicode in Windows programming.](#41-some-background-on-unicode-in-windows-programming)
+    - [4.2. Specify UTF-8 as the process’ ANSI codepage.](#42-specify-utf-8-as-the-process-ansi-codepage)
+    - [4.3. Specify UTF-8 as the “.rc” resource script code page.](#43-specify-utf-8-as-the-rc-resource-script-code-page)
+    - [4.4. Adapt the C++ source code to UTF-8.](#44-adapt-the-c-source-code-to-utf-8)
+    - [4.5. Build with UTF-8 encoding throughout.](#45-build-with-utf-8-encoding-throughout)
 
 Perhaps a useful link: [The tutorial’s Github project.](https://github.com/alf-p-steinbach/Windows-GUI-stuff-in-C-tutorial-)
 
