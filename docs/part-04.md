@@ -226,7 +226,7 @@ The execution character set cannot be communicated to the C++ compiler via the s
 
 *(in) [part-04/code/tic-tac-toe/v6/cpp/util.hpp](part-04/code/tic-tac-toe/v6/cpp/util.hpp)*
 ~~~cpp
-constexpr inline auto utf8_is_the_execution_character_set()
+constexpr auto utf8_is_the_execution_character_set()
     -> bool
 {
     constexpr auto& slashed_o = "ø";

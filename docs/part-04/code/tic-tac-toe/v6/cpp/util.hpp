@@ -12,7 +12,7 @@ namespace cpp::util {
             std::exception, std::runtime_error,
             std::string;
 
-    constexpr inline auto utf8_is_the_execution_character_set()
+    constexpr auto utf8_is_the_execution_character_set()
         -> bool
     {
         constexpr auto& slashed_o = "ø";
