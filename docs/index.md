@@ -33,11 +33,11 @@ I haven’t decided how far to take this. I’ll add more as I have free time to
     - [3.4. Fix gross imperfections: standard font; window just on top; modern appearance.](part-03.md#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance)
     - [3.5. Add the game logic and user interaction.](part-03.md#35-add-the-game-logic-and-user-interaction)
 - [4. UTF-8 as the one and only text encoding.](part-04.md)
-    - [4.1. Some background on Unicode in Windows programming.](#41-some-background-on-unicode-in-windows-programming)
-    - [4.2. Specify UTF-8 as the process’ ANSI codepage.](#42-specify-utf-8-as-the-process-ansi-codepage)
-    - [4.3. Specify UTF-8 as the “.rc” resource script code page.](#43-specify-utf-8-as-the-rc-resource-script-code-page)
-    - [4.4. Adapt the C++ source code to UTF-8.](#44-adapt-the-c-source-code-to-utf-8)
-    - [4.5. Build with UTF-8 encoding throughout.](#45-build-with-utf-8-encoding-throughout)
+    - [4.1. Some background on Unicode in Windows programming.](part-04.md#41-some-background-on-unicode-in-windows-programming)
+    - [4.2. Specify UTF-8 as the process’ ANSI codepage.](part-04.md#42-specify-utf-8-as-the-process-ansi-codepage)
+    - [4.3. Specify UTF-8 as the “.rc” resource script code page.](part-04.md#43-specify-utf-8-as-the-rc-resource-script-code-page)
+    - [4.4. Adapt the C++ source code to UTF-8.](part-04.md#44-adapt-the-c-source-code-to-utf-8)
+    - [4.5. Build with UTF-8 encoding throughout.](part-04.md#45-build-with-utf-8-encoding-throughout)
 
 Perhaps a useful link: [The tutorial’s Github project.](https://github.com/alf-p-steinbach/Windows-GUI-stuff-in-C-tutorial-)
 
