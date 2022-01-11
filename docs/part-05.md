@@ -15,11 +15,7 @@ Unfortunately Windows doesn’t yet support custom UTF-8 based text presentation
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [4.1. Some background on Unicode in Windows programming.](#41-some-background-on-unicode-in-windows-programming)
-- [4.2. Specify UTF-8 as the process’ ANSI code page.](#42-specify-utf-8-as-the-process-ansi-code-page)
-- [4.3. Specify UTF-8 as the “.rc” resource script code page.](#43-specify-utf-8-as-the-rc-resource-script-code-page)
-- [4.4. Adapt the C++ source code to UTF-8.](#44-adapt-the-c-source-code-to-utf-8)
-- [4.5. Build with UTF-8 encoding throughout.](#45-build-with-utf-8-encoding-throughout)
+- [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
