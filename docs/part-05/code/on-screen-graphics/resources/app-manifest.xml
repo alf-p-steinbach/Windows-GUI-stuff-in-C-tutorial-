@@ -3,10 +3,10 @@
     <assemblyIdentity
         version="0.6.0.0"
         processorArchitecture="*"
-        name="Alfs.CppInPractice.TicTacToe"
+        name="Alfs.CppInPractice.On-screen-graphics"
         type="win32"
     />
-    <description>A basic tic-tac-toe game with intentionally limited smarts.</description>
+    <description>Demonstrates using old GDI to draw directly on the screen.</description>
     <application>
         <windowsSettings>
             <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings"
