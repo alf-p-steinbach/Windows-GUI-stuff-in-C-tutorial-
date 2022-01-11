@@ -60,6 +60,33 @@ The nested blocks are just for clarity of presentation, showing that each tool c
 
 Originally the effect was probably to actually draw directly on the screen, bypassing all the window management, and messing up the screen Real Good&trade;. But in Windows 11 there are layers of indirection and management interposed between the drawing calls and the screen output, in particular the [Desktop Window Manager](https://docs.microsoft.com/en-us/windows/win32/dwm/dwm-overview). However, presumably for backward compatibility Windows still supports such old draw-directly-on-the-screen code. There are some weird effects such as the graphics partially intruding in console windows, but such code still “works” and supports explorative programming.
 
-![A filled ellips drawn directly on the screen](part-05/images/sshot-1.graphics-on-screen.cropped.png)
+![A filled ellips drawn directly on the screen](part-05/images/sshot-1.graphics-on-screen.png)
 
+The effect is not entirely consistent between runs. Sometimes I get the black background around the red disk, sometimes (but rarely) only the red disk, then with essentially transparent background. This is much like the rest of Windows 11’s functionality, i.e. it’s pretty shaky, not very reliable, depending on the phase of the moon, but it doesn’t really matter here.
 
+For completeness, here’s how to build and run with the Microsoft toolchain, Visual C++ (needs linking with “**gdi32**.lib”):
+
+~~~txt
+[T:\part-05\code\on-screen-graphics\v1\.build]
+> set common-code=t:\part-05\code\.include
+
+[T:\part-05\code\on-screen-graphics\v1\.build]
+> cl /I %common% ..\main.cpp user32.lib gdi32.lib /Feb
+main.cpp
+
+[T:\part-05\code\on-screen-graphics\v1\.build]
+> b_
+~~~
+
+Ditto, building and running with the MinGW toolchain, g++:
+
+~~~txt
+[T:\part-05\code\on-screen-graphics\v1\.build]
+> set common-code=t:\part-05\code\.include
+
+[T:\part-05\code\on-screen-graphics\v1\.build]
+> g++ -I %common-code% ..\main.cpp -lgdi32
+
+[T:\part-05\code\on-screen-graphics\v1\.build]
+> a_
+~~~
