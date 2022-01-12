@@ -62,7 +62,7 @@ Originally the effect was probably to actually draw directly on the screen, bypa
 
 ![A filled ellips drawn directly on the screen](part-05/images/sshot-1.graphics-on-screen.png)
 
-The effect is not entirely consistent between runs. Sometimes I get the black background around the red disk, sometimes (but rarely) only the red disk, then with essentially transparent background. This is much like the rest of Windows 11’s functionality, i.e. it’s pretty shaky, not very reliable, depending on the phase of the moon, but it doesn’t really matter here.
+The effect is not entirely consistent between runs. Sometimes I get the black background around the red disk, sometimes (but rarely) only the red disk, then with essentially transparent background. This is much like the rest of Windows 11’s functionality, i.e. it’s pretty shaky, not very reliable, depending on the phase of the moon, but that doesn’t really matter here.
 
 For completeness, here’s how to build and run with the Microsoft toolchain, Visual C++ (needs linking with “**gdi32**.lib”):
 
