@@ -113,7 +113,12 @@ const HDC canvas = GetDC( no_window );
 ReleaseDC( no_window, canvas );
 ~~~
 
-Here `GetDC` creates an object and `ReleaseDC` destroys it; `CreateSolidBrush` creates an object and `DeleteObject` destroys it; `SelectObject` selects and `SelectObject` also unselects, which one can regard as respectively a creation of a selection state and a destruction of the selection state.
+| What: | Create: | Destroy: |
+|-------|----------|-----------|
+| Window device context: | `GetDC` | `ReleaseDC` |
+| Color brush: | `CreateSolidBrush` | `DeleteObject` |
+| Selection state: | `SelectObject` | `SelectObject` |
+
 
 These pairwise nested *create* + *destroy* call pairs are as made for applying the C++ [**RAII** technique](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization), the idea of using a C++ constructor to create something, and to automate the something’s eventual destruction via the corresponding C++ destructor. The nice thing about RAII is that it ensures destruction even when an exception occurs in the code using the something. But in this case there is a snag, for the [documentation of the `DeleteObject` function](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject) warns that
 
