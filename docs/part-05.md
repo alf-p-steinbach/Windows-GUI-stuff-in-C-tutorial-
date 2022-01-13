@@ -268,7 +268,7 @@ With a MinGW g++ console subsystem build this works fine; in that the assertion 
 Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include/winapi/gdi.hpp, line 22
 ~~~
 
-With a MinGW g++ GUI subsystem build it also works fine, 
+With a MinGW g++ GUI subsystem build it also works fine, producing an assertion failure box:
 
 ~~~txt
 [T:\part-05\code\on-screen-graphics\v2\.build]
