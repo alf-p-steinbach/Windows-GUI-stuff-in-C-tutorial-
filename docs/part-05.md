@@ -219,7 +219,52 @@ auto main() -> int
 }
 ~~~
 
-The C++ RAII classes reduce the client code compared to direct use of the GDI API, but the main point is guaranteed *correctness* via guaranteed cleanup. This is however paid for by incurring some ideally needless *inefficiency*, namely that *n* selection effect calls of `SelectObject` are paired with *n* corresponding guaranteed unselection calls, when just 1 final unselection call would suffice… The GDI API provides the `SaveDC` and `RestoreDC` functions to address that efficiency concern.
+This can be further streamlined by defining a `WITH` macro, e.g.
 
-However, from a C++ RAII automation point of view `SaveDC`+`RestoreDC` are slightly problematic because the unselection in `RestoreDC` should ideally be done before any possibly selected pen or brush is destroyed, which requires overlapping lifetimes for the RAII objects, which doesn’t match C++ scopes.
+~~~cpp
+#define WITH( initializer )  if( const auto& _ = initializer; ((void) _, true) )
+~~~
+
+… so that one can write, for example,
+
+~~~cpp
+WITH( gdi::Selection( canvas, red_brush ) ) {
+    Ellipse( canvas, 10, 10, 10 + 400, 10 + 400 );
+}
+~~~
+
+… but I’ve found that I don’t actually use a `WITH` macro after definining it in some project (this has happened a number of times), so while it looks elegant it’s perhaps a waste of time.
+
+Anyway the C++ RAII classes reduce the client code compared to direct use of the GDI API, but that’s just a nice bonus: they exist to provide *correctness* via guaranteed cleanup. This is however paid for by incurring some needless *inefficiency*, namely that *n* selection effect calls of `SelectObject` are paired with *n* corresponding guaranteed unselection calls, when just 1 final unselection call would suffice… The GDI API provides the `SaveDC` and `RestoreDC` functions to address that efficiency concern, where `SaveDC` saves the current selections, somewhere, and `RestoreDC` restores the last saved state.
+
+However, from a C++ RAII automation point of view `SaveDC`+`RestoreDC` are slightly problematic because the unselection in `RestoreDC` should ideally be done before any possibly selected pen or brush is destroyed, which practically requires overlapping lifetimes for the RAII objects, and overlapping lifetimes don’t match C++ scopes very well.
+
+
+---
+### 5.3. In passing: support `assert` in a GUI program built with Visual C++.
+
+To be sure that the `assert` statements really do their job you can intentionally trigger an assert, make it “fire”, e.g. by changing
+
+~~~cpp
+    assert( m_dc != 0 );
+~~~
+
+… to
+
+~~~cpp
+    assert( m_dc != 0 and false );
+~~~
+
+With a MinGW g++ console subsystem build this works fine; in that the assertion text is reported in the console:
+
+~~~txt
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> g++ -std=c++17 -I %common-code% ..\main.cpp -lgdi32
+
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> a
+Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include/winapi/gdi.hpp, line 22
+~~~
+
+With a MinGW g++ GUI subsystem build it also works fine, 
 

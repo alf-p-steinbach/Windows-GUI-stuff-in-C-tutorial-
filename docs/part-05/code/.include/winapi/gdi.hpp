@@ -19,7 +19,7 @@ namespace winapi::gdi {
             m_window( window ),
             m_dc( ::GetDC( window ) )
         {
-            assert( m_dc != 0 );
+            assert( m_dc != 0 and false );
         }
         
         auto handle() const -> HDC { return m_dc; }
