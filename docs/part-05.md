@@ -292,7 +292,7 @@ main.cpp
 Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include\winapi/gdi.hpp, line 22
 ~~~
 
-But with a Visual C++ GUI subsystem build the assertion message is not reported in any way. Indeed there’s nothing to tell you that an assertion fired. All you can see is that the program, mysteriously, fails to have any effect:
+But with a Visual C++ GUI subsystem build the assertion message is not reported in any way. Indeed there’s ***nothing to tell you that an assertion fired***. All you can see is that the program, mysteriously, fails to have any effect:
 
 ~~~txt
 [T:\part-05\code\on-screen-graphics\v2\.build]
