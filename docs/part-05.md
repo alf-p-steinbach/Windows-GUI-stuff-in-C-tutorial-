@@ -270,3 +270,45 @@ Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include/winapi/gdi.
 
 With a MinGW g++ GUI subsystem build it also works fine, 
 
+~~~txt
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> g++ -std=c++17 -I %common-code% ..\main.cpp -lgdi32 -mwindows
+
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> a
+~~~
+
+![The assertion box](part-05/images/sshot-2.assertion-box.png)
+
+And, it works fine with a Visual C++ console program build:
+
+~~~txt
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> cl /I %common-code% ..\main.cpp user32.lib gdi32.lib /Feb
+main.cpp
+
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> b
+Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include\winapi/gdi.hpp, line 22
+~~~
+
+But with a Visual C++ GUI subsystem build the assertion message is not reported in any way. Indeed there’s nothing to tell you that an assertion fired. All you can see is that the program, mysteriously, fails to have any effect:
+
+~~~txt
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> set LINK=/entry:mainCRTStartup
+
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> cl /I %common-code% ..\main.cpp user32.lib gdi32.lib /Feb /link /subsystem:windows
+main.cpp
+
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> b
+
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> echo %errorlevel%
+0
+~~~
+
+
+
