@@ -4,8 +4,7 @@
 #include    <assert.h>
 
 namespace winapi::gdi {
-    class Window_dc:
-        private cpp::util::No_copying
+    class Window_dc: private cpp::util::No_copying
     {
         HWND    m_window;
         HDC     m_dc;
@@ -28,16 +27,15 @@ namespace winapi::gdi {
     };
 
     template< class Handle >
-    class Object_:
-        private cpp::util::No_copying
+    class Object_: private cpp::util::No_copying
     {
         Handle      m_object;
         
     public:
         ~Object_()
         {
-            const bool delete_object_succeeded = !!::DeleteObject( m_object );
-            assert( delete_object_succeeded );  (void) delete_object_succeeded;
+            const bool ok = !!::DeleteObject( m_object );
+            assert(( "DeleteObject", ok ));  (void) ok;
         }
         
         Object_( const Handle object ): m_object( object ) {}
@@ -46,8 +44,7 @@ namespace winapi::gdi {
         operator Handle() const { return handle(); }
     };
 
-    class Selection:
-        private cpp::util::No_copying
+    class Selection: private cpp::util::No_copying
     {
         HDC         m_dc;
         HGDIOBJ     m_original_object;

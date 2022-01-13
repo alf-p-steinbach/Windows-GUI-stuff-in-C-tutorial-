@@ -124,28 +124,102 @@ These pairwise nested *create* + *destroy* call pairs are as made for applying t
 
 > ❞ Do not delete a drawing object (pen or brush) while it is still selected into a DC.
 
-This means that `DeleteObject` probably can fail, and therefore that the destructor used for RAII can fail, and if one chooses to let it report failure via an exception then it’s not unlikely that this will result in an exception in the stack unwinding of some other exception, resulting in a call of `std::terminate`… Which is seriously undesireable. Alternatives include:
+This means that `DeleteObject` probably can fail, even though some simple experimentation with not unselecting didn’t provoke such destruction failure, and therefore that the destructor used for RAII can fail, and if one chooses to let it report failure via an exception then it’s not unlikely that this will result in an exception in the stack unwinding of some other exception, resulting in a call of `std::terminate`… Which is seriously undesireable. Alternatives include:
 
 * Ignore cleanup failures. This is likely to result in an ongoing GDI **resource leak**. A possible consequence is that instead of graphics the program ends up displaying white (or possibly black) areas, say.
 * Ensure that the particular failure mode, `DeleteObject` of a pen or brush that’s still selected in a device context, cannot happen. Doing this in a reliable, robust way involves defining a full abstraction layer where client code doesn’t have access to the GDI object handles, so that it can’t mess up things. That can be a lot of work.
 * Make it very likely that the problem, if any, is detected by testing, e.g. via `assert` statements.
 
-The code below uses the “support discovery of the problem” approach, last bullet point:
+The code below uses the last bullet point’s approach, the “just support discovery of the problem” approach:
 
+[*part-05/code/.include/winapi/gdi.hpp*](part-05/code/.include/winapi/gdi.hpp)
+~~~cpp
+#include <wrapped-winapi/windows-h.hpp>
+#include <cpp/util.hpp>
 
+#include    <assert.h>
 
-l,k
-
-    class Dc_usage:
-        private cu::No_copying
+namespace winapi::gdi {
+    class Window_dc: private cpp::util::No_copying
     {
-        HDC     m_handle;
+        HWND    m_window;
+        HDC     m_dc;
         
     public:
-        ~Dc_usage() { ::RestoreDC( m_handle, -1 ); }
+        ~Window_dc()
+        {
+            ::ReleaseDC( m_window, m_dc );
+        }
         
-        Dc_usage( const HDC handle ):
-            m_handle( handle )
-        { ::SaveDC( handle ); }
-            
+        explicit Window_dc( const HWND window ):
+            m_window( window ),
+            m_dc( ::GetDC( window ) )
+        {
+            assert( m_dc != 0 );
+        }
+        
+        auto handle() const -> HDC { return m_dc; }
+        operator HDC() const { return handle(); }
     };
+
+    template< class Handle >
+    class Object_: private cpp::util::No_copying
+    {
+        Handle      m_object;
+        
+    public:
+        ~Object_()
+        {
+            const bool ok = !!::DeleteObject( m_object );
+            assert(( "DeleteObject", ok ));  (void) ok;
+        }
+        
+        Object_( const Handle object ): m_object( object ) {}
+        
+        auto handle() const -> Handle { return m_object; }
+        operator Handle() const { return handle(); }
+    };
+
+    class Selection: private cpp::util::No_copying
+    {
+        HDC         m_dc;
+        HGDIOBJ     m_original_object;
+        
+    public:
+        ~Selection() { ::SelectObject( m_dc, m_original_object ); }
+        
+        Selection( const HDC dc, const HGDIOBJ object ):
+            m_dc( dc ),
+            m_original_object( ::SelectObject( dc, object ) )
+        {}
+    };
+}  // namespace winapi::gdi
+~~~
+
+In the v2 main program below this machinery is used to do exactly the same as in v1:
+
+[*part-05/code/on-screen-graphics/v2/main.cpp*](part-05/code/on-screen-graphics/v2/main.cpp)
+~~~cpp
+#include <wrapped-winapi/windows-h.hpp>
+#include <winapi/gdi.hpp>
+namespace gdi = winapi::gdi;
+
+auto main() -> int
+{
+    constexpr auto  red         = COLORREF( RGB( 0xFF, 0, 0 ) );
+    constexpr auto  no_window   = HWND( 0 );
+    
+    const auto canvas       = gdi::Window_dc( no_window );
+    const auto red_brush    = gdi::Object_( CreateSolidBrush( red ) );
+
+    { // Using the red brush.
+        const auto _ = gdi::Selection( canvas, red_brush );
+        Ellipse( canvas, 10, 10, 10 + 400, 10 + 400 );
+    }
+}
+~~~
+
+The C++ RAII classes reduce the client code compared to direct use of the GDI API, but the main point is guaranteed *correctness*, via guaranteed cleanup. This is however paid for by incurring some ideally needless *inefficiency*, namely that *n* selection effect calls of `SelectObject` are paired with *n* corresponding unselection calls, when just 1 final unselection call would suffice… The GDI API provides the `SaveDC` and `RestoreDC` functions to address that efficiency concern.
+
+From a C++ RAII automation point of view `SaveDC`+`RestoreDC` are slightly problematic because the unselection in `RestoreDC` should ideally be done before any possibly selected pen or brush is destroyed, which leads to overlapping lifetimes, which doesn’t match C++ scopes.
+
