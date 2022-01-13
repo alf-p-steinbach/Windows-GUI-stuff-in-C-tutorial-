@@ -16,6 +16,8 @@ Unfortunately Windows doesn’t yet support UTF-8 based text for *drawing* text 
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
 - [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
+- [5.2. Use C++ RAII to automate GDI object destruction.](#52-use-c-raii-to-automate-gdi-object-destruction)
+- [5.3. In passing: support `assert` messages in a GUI program built with Visual C++.](#53-in-passing-support-assert-messages-in-a-gui-program-built-with-visual-c)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -241,7 +243,7 @@ However, from a C++ RAII automation point of view `SaveDC`+`RestoreDC` are sligh
 
 
 ---
-### 5.3. In passing: support `assert` in a GUI program built with Visual C++.
+### 5.3. In passing: support `assert` messages in a GUI program built with Visual C++.
 
 To be sure that the `assert` statements really do their job you can intentionally trigger an assert, make it “fire”, e.g. by changing
 
