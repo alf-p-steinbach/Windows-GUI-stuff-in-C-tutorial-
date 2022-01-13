@@ -196,7 +196,7 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ~~~
 
-In the v2 main program below this machinery is used to do exactly the same as in v1:
+In the v2 main program below this machinery is used to do exactly the same as the v1 program did:
 
 [*part-05/code/on-screen-graphics/v2/main.cpp*](part-05/code/on-screen-graphics/v2/main.cpp)
 ~~~cpp
@@ -219,7 +219,7 @@ auto main() -> int
 }
 ~~~
 
-The C++ RAII classes reduce the client code compared to direct use of the GDI API, but the main point is guaranteed *correctness*, via guaranteed cleanup. This is however paid for by incurring some ideally needless *inefficiency*, namely that *n* selection effect calls of `SelectObject` are paired with *n* corresponding unselection calls, when just 1 final unselection call would suffice… The GDI API provides the `SaveDC` and `RestoreDC` functions to address that efficiency concern.
+The C++ RAII classes reduce the client code compared to direct use of the GDI API, but the main point is guaranteed *correctness* via guaranteed cleanup. This is however paid for by incurring some ideally needless *inefficiency*, namely that *n* selection effect calls of `SelectObject` are paired with *n* corresponding guaranteed unselection calls, when just 1 final unselection call would suffice… The GDI API provides the `SaveDC` and `RestoreDC` functions to address that efficiency concern.
 
-From a C++ RAII automation point of view `SaveDC`+`RestoreDC` are slightly problematic because the unselection in `RestoreDC` should ideally be done before any possibly selected pen or brush is destroyed, which leads to overlapping lifetimes, which doesn’t match C++ scopes.
+However, from a C++ RAII automation point of view `SaveDC`+`RestoreDC` are slightly problematic because the unselection in `RestoreDC` should ideally be done before any possibly selected pen or brush is destroyed, which requires overlapping lifetimes for the RAII objects, which doesn’t match C++ scopes.
 
