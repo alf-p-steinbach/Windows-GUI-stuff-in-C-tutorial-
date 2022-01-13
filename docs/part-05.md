@@ -4,9 +4,9 @@
 
 With last part’s discussion of how to use UTF-8 as the `char` based text encoding in both resource definitions and GUI code, we have a limited but useful framework for exploratory C++ Windows desktop programming.
 
-We’ll use that to now explore the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, which supports basic graphics and text. GDI is simple and C-oriented, which is nice. On the other hand it’s slow and produces low quality graphics, in particular without anti-aliasing, which is a strong reason to later move on to the successor technologies [GDI+](https://en.wikipedia.org/wiki/Graphics_Device_Interface#Windows_XP) and [Direct 2D](https://en.wikipedia.org/wiki/Direct2D).
+We’ll use that to now explore some of the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, which supports basic graphics and text. GDI is simple and C-oriented, which is nice. On the other hand it’s slow and produces low quality graphics, in particular without anti-aliasing, which is a strong reason to later move on to the successor technologies [GDI+](https://en.wikipedia.org/wiki/Graphics_Device_Interface#Windows_XP) and [Direct 2D](https://en.wikipedia.org/wiki/Direct2D).
 
-Unfortunately Windows doesn’t yet support custom UTF-8 based text presentation, i.e. for *drawing* text as graphics, as opposed to using controls to present text, as we did in part 4. We’ll work around that limitation by writing our own wrappers over Windows’ wide text functions. Happily Windows does support conversion between UTF-8 (as well as a large number of other encodings) and UTF-16 via API functions such as [`MultiByteToWideChar`](https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar), in addition to, since Windows 10, providing the feature-rich C API of the main Unicode library [**ICU**](https://docs.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-).
+Unfortunately Windows doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4. We’ll work around that by writing our own wrappers over Windows’ wide text drawing functions. Happily Windows does support conversion between UTF-8 and UTF-16 via API functions such as [`MultiByteToWideChar`](https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar), in addition to, since Windows 10, providing the feature rich C API of the main Unicode library [**ICU**](https://docs.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-).
 
 
 [some figure]
@@ -54,7 +54,7 @@ auto main() -> int
 }
 ~~~
 
-Here the `COLORREF` type is a 32-bit [RGB](https://en.wikipedia.org/wiki/RGB_color_model) **color** specification (in modern Windows it can be [RGBA](https://en.wikipedia.org/wiki/RGBA_color_model)).
+Here the `COLORREF` type is a 32-bit [RGB](https://en.wikipedia.org/wiki/RGB_color_model) **color** specification.
 
 The nested blocks are just for clarity of presentation, showing that each tool creation and destruction is in a limited scope, and that these usually and ideally are strictly nested scopes.
 
@@ -90,3 +90,57 @@ Ditto, building and running with the MinGW toolchain, g++:
 [T:\part-05\code\on-screen-graphics\v1\.build]
 > a_
 ~~~
+
+
+---
+### 5.2. Use C++ RAII to automate GDI object destruction.
+
+The preceding section’s code exemplified how GDI usage, and for that matter many other areas of Windows programming, involves establishing and tearing down local state, with these pairs of calls at least logically in nested scopes:
+
+~~~cpp
+const HDC canvas = GetDC( no_window );
+{
+    const HBRUSH red_brush = CreateSolidBrush( red );
+    {
+        const HGDIOBJ original_brush = SelectObject( canvas, red_brush );
+        {
+            Ellipse( canvas, 10, 10, 10 + 400, 10 + 400 );
+        }
+        SelectObject( canvas, original_brush );
+    }
+    DeleteObject( red_brush );
+}
+ReleaseDC( no_window, canvas );
+~~~
+
+Here `GetDC` creates an object and `ReleaseDC` destroys it; `CreateSolidBrush` creates an object and `DeleteObject` destroys it; `SelectObject` selects and `SelectObject` also unselects, which one can regard as respectively a creation of a selection state and a destruction of the selection state.
+
+These pairwise nested *create* + *destroy* call pairs are as made for applying the C++ [**RAII** technique](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization), the idea of using a C++ constructor to create something, and to automate the something’s eventual destruction via the corresponding C++ destructor. The nice thing about RAII is that it ensures destruction even when an exception occurs in the code using the something. But in this case there is a snag, for the [documentation of the `DeleteObject` function](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject) warns that
+
+> ❞ Do not delete a drawing object (pen or brush) while it is still selected into a DC.
+
+This means that `DeleteObject` probably can fail, and therefore that the destructor used for RAII can fail, and if one chooses to let it report failure via an exception then it’s not unlikely that this will result in an exception in the stack unwinding of some other exception, resulting in a call of `std::terminate`… Which is seriously undesireable. Alternatives include:
+
+* Ignore cleanup failures. This is likely to result in an ongoing GDI **resource leak**. A possible consequence is that instead of graphics the program ends up displaying white (or possibly black) areas, say.
+* Ensure that the particular failure mode, `DeleteObject` of a pen or brush that’s still selected in a device context, cannot happen. Doing this in a reliable, robust way involves defining a full abstraction layer where client code doesn’t have access to the GDI object handles, so that it can’t mess up things. That can be a lot of work.
+* Make it very likely that the problem, if any, is detected by testing, e.g. via `assert` statements.
+
+The code below uses the “support discovery of the problem” approach, last bullet point:
+
+
+
+l,k
+
+    class Dc_usage:
+        private cu::No_copying
+    {
+        HDC     m_handle;
+        
+    public:
+        ~Dc_usage() { ::RestoreDC( m_handle, -1 ); }
+        
+        Dc_usage( const HDC handle ):
+            m_handle( handle )
+        { ::SaveDC( handle ); }
+            
+    };
