@@ -310,5 +310,14 @@ main.cpp
 0
 ~~~
 
+The *technical* reason is that Microsoft’s runtime library decides how to present the assertion message, as text output or in an assertion failure box, based on ***which entry point function*** one linked with:
 
+| Entry point: | Calls startup function: | Assumed subsystem: | Presentation of assertion message: |
+|-------------------|---------------|----------------|-----------------|
+| `mainCRTStartup`  | `main` | Console | Text output. |
+| `wmainCRTStartup` | Microsoft `wmain` | Console | ? |
+| `WinMainCRTStartup` | Microsoft `WinMain` | GUI | Assertion failure box. |
+| `wWinMainCRTStartup` | Microsoft `wWinMain` | GUI | Assertion failure box. |
+
+From a design level perspective, if the intent was to support the programmer, then a decision to base presentation mode on the subsystem is sub-optimal (better base it on whether the standard error stream is connected to something), and a decision to *assume* the subsystem from the entry point, instead of checking the subsystem, is a bit of lunacy. But perhaps the intent was not to support but instead to add yet another vendor lock in. Microsoft got infamous for its vendor lock in tactics when [internal mails were revealed](https://www.cnet.com/tech/services-and-software/eu-report-takes-microsoft-to-task/) in the legal dispute between Microsoft and Sun Corporation.
 
