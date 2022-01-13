@@ -321,5 +321,74 @@ The *technical* reason is that Microsoft’s runtime library decides how to pres
 
 From a design level perspective, if the intent was to support the programmer, then a decision to base the presentation mode on the executable’s subsystem is sub-optimal. For example, a GUI subsystem program may be running with its standard error stream tied to a console, so that presentation as text output is desirable. And in most cases it supports the programmer best to have both presentation modes, both text output (that can be logged) and an assertion failure box (that can be viewed when the assertion failure happens); a restriction of the presentation to a single mode very seldom has any advantage.
 
-Then, a decision to *assume* the subsystem from the entry point, instead of checking the subsystem, is a bit of lunacy. But perhaps the intent was not to support but instead to add yet another vendor lock in, and after all, this is tied to the `WinMain` monstrosity, which itself was a vendor lock in device. Microsoft got infamous for its vendor lock in business tactics when some [internal mails were revealed](https://www.cnet.com/tech/services-and-software/eu-report-takes-microsoft-to-task/) in the legal dispute between Microsoft and Sun Corporation.
+**\<rant\>** Then, a decision to *assume* the subsystem from the entry point, instead of checking the subsystem, is a bit of lunacy. But perhaps the intent was not to support but instead to add yet another vendor lock in, and after all, this is tied to the `WinMain` monstrosity, which itself was a vendor lock in device. Microsoft got infamous for its vendor lock in business tactics when some [internal mails were revealed](https://www.cnet.com/tech/services-and-software/eu-report-takes-microsoft-to-task/) in the legal dispute between Microsoft and Sun Corporation. **\</rant\>**
 
+Anyway, the assertion message wasn’t actually suppressed: it was just erroneously presented as text output on the program’s standard error stream, that wasn’t connected to anything. So a simple fix is to connect that error stream to the console. To do that in Cmd, simply redirecting the standard error stream via `2>con` doesn’t work, but fusing it into the standard output stream via `2>&1` and then piping the output to e.g. `find /v ""`, works nicely:
+
+~~~cpp
+[T:\part-05\code\on-screen-graphics\v2\.build]
+> b 2>&1 | find /v ""
+Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include\winapi/gdi.hpp, line 22
+~~~
+
+It would of course be much better if the program itself chose a more reasonable practically useful presentation mode. For example, depending on whether its standard error stream is connected to something (as it is with the above command), or not. Doing this involves ***lying*** to the Microsoft runtime about the executable’s subsystem, but happily that Just Works&trade; with as of Visual C++ 2022 no ill effects:
+
+[*part-05/code/.include/compiler/msvc/Assertion_reporting_fix.hpp*](part-05/code/.include/compiler/msvc/Assertion_reporting_fix.hpp)
+~~~cpp
+#pragma once
+#ifndef     _MSC_VER
+#   error   "This header is for the Visual C++ compiler only."
+#endif
+
+#include <wrapped-winapi/windows-h.hpp>
+
+#include <process.h>            // Microsoft - _set_app_type
+
+namespace compiler::msvc {
+    class  Assertion_reporting_fix
+    {
+        static auto is_connected( const HANDLE stream )
+            -> bool
+        {
+            DWORD dummy;
+            if( ::GetConsoleMode( stream, &dummy ) ) { return true; }
+            switch( ::GetFileType( stream ) ) {
+                case FILE_TYPE_DISK:    [[fallthrough]];
+                case FILE_TYPE_PIPE:    { return true; }
+            }
+            return false;       // E.g. stream is redirected to `nul`.
+        }
+
+        Assertion_reporting_fix()
+        {
+            // Prevent assertion text being sent to The Big Bit Bucket In The Sky™.
+            const HANDLE error_stream = ::GetStdHandle( STD_ERROR_HANDLE );
+            _set_app_type( static_cast<_crt_app_type>(
+                is_connected( error_stream )? _crt_console_app : _crt_gui_app
+                ) );
+        }
+
+    public:
+        static auto global_instantiation()
+            -> bool
+        {
+            static Assertion_reporting_fix  the_instance;
+            return true;
+        };
+    };
+}  // namespace compiler::msvc
+~~~
+
+Here [**`_set_app_type`**](https://docs.microsoft.com/en-us/cpp/c-runtime-library/set-app-type?view=msvc-170) is an internal function in Microsoft’s runtime library.
+
+The above is intended to be used like this:
+
+*In [part-05/code/on-screen-graphics/v3/main.cpp](part-05/code/on-screen-graphics/v3/main.cpp)*
+~~~cpp
+#ifdef _MSC_VER
+#   include <compiler/msvc/Assertion_reporting_fix.hpp>
+    const bool msvc_arf = compiler::msvc::Assertion_reporting_fix::global_instantiation();
+#endif
+~~~
+
+With this, if you don’t redirect standard error, then with GUI subsystem you get the assertion failure box (the very same as shown earlier for MinGW g++, because it’s the same library in both cases), but if you do connect up the standard error stream then you get the message as text output, so you can decide the reporting mode in the command to run the program.
