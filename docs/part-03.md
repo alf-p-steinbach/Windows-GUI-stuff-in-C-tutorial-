@@ -1147,4 +1147,4 @@ I guess in the next installment we’ll look at some unfinished business for thi
 
 | ← previous |  up ↑ | next → |
 |:----|:----:|---:|
-| [2. Use resources to provide an icon.](part-02.md) | [Contents](index.md)   | &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ? |
+| [2. Use resources to provide an icon.](part-02.md) | [Contents](index.md)   | [4. UTF-8 as the one and only text encoding.](part-04.md) |
