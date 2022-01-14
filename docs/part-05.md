@@ -160,7 +160,7 @@ namespace winapi::gdi {
             m_window( window ),
             m_dc( ::GetDC( window ) )
         {
-            assert( m_dc != 0 );
+            assert(( m_dc != 0 ));
         }
         
         auto handle() const -> HDC { return m_dc; }
@@ -252,13 +252,13 @@ However, from a C++ RAII automation point of view `SaveDC`+`RestoreDC` are sligh
 To be sure that the `assert` statements really do their job you can intentionally trigger an assert, make it “fire”, e.g. by changing
 
 ~~~cpp
-    assert( m_dc != 0 );
+    assert(( m_dc != 0 ));
 ~~~
 
 … to
 
 ~~~cpp
-    assert( m_dc != 0 and false );
+    assert(( m_dc != 0 and false ));
 ~~~
 
 With a MinGW g++ console subsystem build this works fine; in that the assertion text is reported in the console:
@@ -269,10 +269,10 @@ With a MinGW g++ console subsystem build this works fine; in that the assertion 
 
 [T:\part-05\code\on-screen-graphics\v2\.build]
 > a
-Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include/winapi/gdi.hpp, line 22
+Assertion failed: ( m_dc != 0 and false ), file t:\part-05\code\.include/winapi/gdi.hpp, line 23
 ~~~
 
-With a MinGW g++ GUI subsystem build it also works fine, producing an assertion failure box:
+With a MinGW g++ GUI subsystem build it also works fine, producing an **assertion failure box**:
 
 ~~~txt
 [T:\part-05\code\on-screen-graphics\v2\.build]
@@ -293,10 +293,10 @@ main.cpp
 
 [T:\part-05\code\on-screen-graphics\v2\.build]
 > b
-Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include\winapi/gdi.hpp, line 22
+Assertion failed: ( m_dc != 0 and false ), file t:\part-05\code\.include\winapi/gdi.hpp, line 23
 ~~~
 
-But with a Visual C++ GUI subsystem build the assertion message is not reported in any way. Indeed there’s ***nothing to tell you that an assertion fired***. All you can see is that the program, mysteriously, fails to have any effect:
+But with a Visual C++ GUI subsystem build the assertion message is not reported in any way. Indeed there’s ***nothing to tell you that an assertion fired***. All you can see is that the program mysteriously fails to have any effect:
 
 ~~~txt
 [T:\part-05\code\on-screen-graphics\v2\.build]
@@ -325,17 +325,17 @@ The *technical* reason is that Microsoft’s runtime library decides how to pres
 
 From a design level perspective, if the intent was to support the programmer, then a decision to base the presentation mode on the executable’s subsystem is sub-optimal. For example, a GUI subsystem program may be running with its standard error stream tied to a console, so that presentation as text output is desirable. And in most cases it supports the programmer best to have both presentation modes, both text output (that can be logged) and an assertion failure box (that can be viewed when the assertion failure happens); a restriction of the presentation to a single mode very seldom has any advantage.
 
-**\<rant\>** Then, a decision to *assume* the subsystem from the entry point, instead of checking the subsystem, is a bit of lunacy. But perhaps the intent was not to support but instead to add yet another vendor lock in, and after all, this is tied to the `WinMain` monstrosity, which itself was a vendor lock in device. Microsoft got infamous for its vendor lock in business tactics when some [internal mails were revealed](https://www.cnet.com/tech/services-and-software/eu-report-takes-microsoft-to-task/) in the legal dispute between Microsoft and Sun Corporation. **\</rant\>**
+**\<rant\>** Then, a decision to *infer* the subsystem from the entry point, instead of checking the subsystem, is a bit of lunacy. But perhaps the intent was not to support but instead to add yet another vendor lock in, and after all, this is tied to the `WinMain` monstrosity, which itself was a vendor lock in device. Microsoft got infamous for its vendor lock in business tactics when some [internal mails were revealed](https://www.cnet.com/tech/services-and-software/eu-report-takes-microsoft-to-task/) in the legal dispute between Microsoft and Sun Corporation. **\</rant\>**
 
 Anyway, the assertion message wasn’t actually suppressed: it was just erroneously presented as text output on the program’s standard error stream, that wasn’t connected to anything. So a simple fix is to connect that error stream to the console. To do that in Cmd, simply redirecting the standard error stream via `2>con` doesn’t work, but fusing it into the standard output stream via `2>&1` and then piping the output to e.g. `find /v ""`, works nicely:
 
-~~~cpp
+~~~txt
 [T:\part-05\code\on-screen-graphics\v2\.build]
 > b 2>&1 | find /v ""
-Assertion failed: m_dc != 0 and false, file t:\part-05\code\.include\winapi/gdi.hpp, line 22
+Assertion failed: ( m_dc != 0 and false ), file t:\part-05\code\.include\winapi/gdi.hpp, line 23
 ~~~
 
-It would of course be much better if the program itself chose a more reasonable practically useful presentation mode. For example, depending on whether its standard error stream is connected to something (as it is with the above command), or not. Doing this involves ***lying*** to the Microsoft runtime about the executable’s subsystem, but happily that Just Works&trade; with as of Visual C++ 2022 no ill effects:
+It would of course be much better if the program itself chose a more reasonable practically useful presentation mode. For example, depending on whether its standard error stream is connected to something, as it is with the above command, or not. Doing this involves ***lying*** to the Microsoft runtime about the executable’s subsystem (like with a sabotage-minded donkey that always goes in the opposite direction of where you indicate you want to go, so you just lie to it), but happily that Just Works&trade; with as of Visual C++ 2022 no ill effects:
 
 [*part-05/code/.include/compiler/msvc/Assertion_reporting_fix.hpp*](part-05/code/.include/compiler/msvc/Assertion_reporting_fix.hpp)
 ~~~cpp
