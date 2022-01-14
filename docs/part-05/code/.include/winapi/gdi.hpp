@@ -1,4 +1,5 @@
-﻿#include <wrapped-winapi/windows-h.hpp>
+﻿#pragma once
+#include <wrapped-winapi/windows-h.hpp>
 #include <cpp/util.hpp>
 
 #include    <assert.h>

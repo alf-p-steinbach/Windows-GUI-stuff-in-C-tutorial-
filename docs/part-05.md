@@ -136,6 +136,7 @@ The code below uses the last bullet point’s approach, the “just support disc
 
 [*part-05/code/.include/winapi/gdi.hpp*](part-05/code/.include/winapi/gdi.hpp)
 ~~~cpp
+#pragma once
 #include <wrapped-winapi/windows-h.hpp>
 #include <cpp/util.hpp>
 
