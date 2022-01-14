@@ -314,7 +314,7 @@ main.cpp
 0
 ~~~
 
-The *technical* reason is that Microsoft’s runtime library decides how to present the assertion message, as text output or in an assertion failure box, based on ***which entry point function*** one linked with:
+The technical reason is that Microsoft’s runtime library decides how to present the assertion message, as text output or in an assertion failure box, based on ***which entry point function*** one linked with:
 
 | Entry point: | Calls startup function: | Assumed subsystem: | Presentation of assertion message: |
 |-------------------|---------------|----------------|-----------------|
