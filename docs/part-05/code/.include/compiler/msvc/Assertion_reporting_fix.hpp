@@ -1,4 +1,4 @@
-﻿#pragma once
+﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #ifndef     _MSC_VER
 #   error   "This header is for the Visual C++ compiler only."
 #endif

@@ -1,4 +1,5 @@
-﻿#include <wrapped-winapi/windows-h.hpp>
+﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
 
 auto main() -> int
 {

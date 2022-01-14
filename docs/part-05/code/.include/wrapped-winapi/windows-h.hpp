@@ -1,4 +1,4 @@
-﻿#pragma once
+﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #ifdef UNICODE
 #   error "`UNICODE` should not be defined for a `char` based application."
 #   include <stop-compilation>

@@ -33,6 +33,7 @@ Next one can create and use various drawing tools such as a **pen** to draw line
 
 [*part-05/code/on-screen-graphics/v1/main.cpp*](part-05/code/on-screen-graphics/v1/main.cpp)
 ~~~cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
 
 auto main() -> int
@@ -136,7 +137,7 @@ The code below uses the last bullet point’s approach, the “just support disc
 
 [*part-05/code/.include/winapi/gdi.hpp*](part-05/code/.include/winapi/gdi.hpp)
 ~~~cpp
-#pragma once
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
 #include <cpp/util.hpp>
 
@@ -203,6 +204,7 @@ In the v2 main program below this machinery is used to do exactly the same as th
 
 [*part-05/code/on-screen-graphics/v2/main.cpp*](part-05/code/on-screen-graphics/v2/main.cpp)
 ~~~cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/gdi.hpp>
 namespace gdi = winapi::gdi;
@@ -336,7 +338,7 @@ It would of course be much better if the program itself chose a more reasonable 
 
 [*part-05/code/.include/compiler/msvc/Assertion_reporting_fix.hpp*](part-05/code/.include/compiler/msvc/Assertion_reporting_fix.hpp)
 ~~~cpp
-#pragma once
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #ifndef     _MSC_VER
 #   error   "This header is for the Visual C++ compiler only."
 #endif
