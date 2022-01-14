@@ -342,6 +342,7 @@ It would of course be much better if the program itself chose a more reasonable 
 #pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #ifndef     _MSC_VER
 #   error   "This header is for the Visual C++ compiler only."
+#   include <stop-compilation>
 #endif
 
 #include <wrapped-winapi/windows-h.hpp>
