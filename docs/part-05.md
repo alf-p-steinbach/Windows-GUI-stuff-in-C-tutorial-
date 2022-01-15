@@ -423,6 +423,6 @@ And so all that appears in v3 of the program is an include of the above file:
 
 One of my pet pedagogical ideas is that the things that are most important are the things one ends up using or needing in concrete examples. So, as a concrete example I chose a simple recursive figure called the [C curve](https://en.wikipedia.org/wiki/L%C3%A9vy_C_curve). One way to create it is to start with a single line segment **–**, replace each line segment with an angle bracket **∨**, do that again, and so on:
 
-<img src="part-05/images/c-curve-construction.png" width="340">
+<img src="part-05/images/C-curve-construction.png" width="340">
 
 (The above figure based on [an image from Wikimedia](https://en.wikipedia.org/wiki/File:Levy_C_construction.png).)
