@@ -258,7 +258,7 @@ To be sure that the `assert` statements really do their job you can intentionall
 … to
 
 ~~~cpp
-    assert(( m_dc != 0 and false ));
+    assert(( m_dc != 0, false ));
 ~~~
 
 With a MinGW g++ console subsystem build this works fine; in that the assertion text is reported in the console:
@@ -269,7 +269,7 @@ With a MinGW g++ console subsystem build this works fine; in that the assertion 
 
 [T:\part-05\code\on-screen-graphics\v2\.build]
 > a
-Assertion failed: ( m_dc != 0 and false ), file t:\part-05\code\.include/winapi/gdi.hpp, line 23
+Assertion failed: ( m_dc != 0, false ), file t:\part-05\code\.include/winapi/gdi.hpp, line 23
 ~~~
 
 With a MinGW g++ GUI subsystem build it also works fine, producing an **assertion failure box**:
@@ -293,7 +293,7 @@ main.cpp
 
 [T:\part-05\code\on-screen-graphics\v2\.build]
 > b
-Assertion failed: ( m_dc != 0 and false ), file t:\part-05\code\.include\winapi/gdi.hpp, line 23
+Assertion failed: ( m_dc != 0, false ), file t:\part-05\code\.include\winapi/gdi.hpp, line 23
 ~~~
 
 But with a Visual C++ GUI subsystem build the assertion message is not reported in any way. Indeed there’s ***nothing to tell you that an assertion fired***. All you can see is that the program mysteriously fails to have any effect:
@@ -332,7 +332,7 @@ Anyway, the assertion message wasn’t actually suppressed: it was just erroneou
 ~~~txt
 [T:\part-05\code\on-screen-graphics\v2\.build]
 > b 2>&1 | find /v ""
-Assertion failed: ( m_dc != 0 and false ), file t:\part-05\code\.include\winapi/gdi.hpp, line 23
+Assertion failed: ( m_dc != 0, false ), file t:\part-05\code\.include\winapi/gdi.hpp, line 23
 ~~~
 
 It would of course be much better if the program itself chose a more reasonable practically useful presentation mode. For example, depending on whether its standard error stream is connected to something, as it is with the above command, or not. Doing this involves ***lying*** to the Microsoft runtime about the executable’s subsystem (like with a sabotage-minded donkey that always goes in the opposite direction of where you indicate you want to go, so you just lie to it), but happily that Just Works&trade; with as of Visual C++ 2022 no ill effects:
