@@ -425,4 +425,97 @@ One of my pet pedagogical ideas is that the things that are most important are t
 
 <img src="part-05/images/C-curve-construction.png" width="340">
 
-(The above figure based on [an image from Wikimedia](https://en.wikipedia.org/wiki/File:Levy_C_construction.png).)
+The above figure is based on [an image from Wikimedia](https://en.wikipedia.org/wiki/File:Levy_C_construction.png).
+
+Using the above conceptual construction directly in code has the advantage that the starting line defines the direction and size of the result curve, but it has the problems that the generated (line start and end-) points are not necessarily at integer pixel coordinates, and that one may end up with diagonal lines that don’t look so good without anti-aliasing (GDI).
+
+An alternative is to generate the curve with essentially [turtle graphics](https://en.wikipedia.org/wiki/Turtle_graphics), just tracing the curve from start to end, recreating its logical structure  — the left and right turnings — without regard for absolute orientation or size. This yields pixel perfect line segments that are either horizontal or vertical and always start and end on integer pixel coordinates, but the curve gets larger and rotates 45° when the number of levels is increased by 1. Anyway, with this approach one doesn’t need any graphics library or geometry maths to generate the curve points, just an understanding of recursive functions:
+
+~~~cpp
+void generate( const int order )
+{
+    if( order == 0 ) {
+        current_position += step;
+        output_curve_point( current_position );
+    } else {
+        generate( order - 1 );
+        rotate_left( step );
+        generate( order - 1 );
+        rotate_right( step );
+    }
+}
+~~~
+
+That code gets a little obfuscated, sorry, by having the details filled in and being expressed as something easy to *use*, as opposed to easy to grok:
+
+*[part-05\code\c-curve\v1\c_curve.hpp](part-05\code\c-curve\v1\c_curve.hpp)*
+~~~cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <functional>       // std::function
+#include <utility>          // std::move
+#include <vector>           // std::vector
+
+namespace c_curve {
+    using std::function, std::move, std::vector;
+    
+    struct Point { int x; int y; };
+    void rotate_left( Point& pt )   { pt = {-pt.y, pt.x}; }
+    void rotate_right( Point& pt )  { pt = {pt.y, -pt.x}; }
+
+    void operator+=( Point& pt, const Point& d )
+    {
+        pt.x += d.x; pt.y += d.y;
+    }
+
+    using Callback = function<void( const Point& )>;
+
+    class Impl
+    {
+        Point       m_current_position;
+        Point       m_step;
+        Callback    m_output_curve_point;
+
+    public:
+        Impl( Callback output_curve_point, const int step ):
+            m_current_position{ 0, 0 },
+            m_step{ 0, -step },
+            m_output_curve_point( move( output_curve_point ) )
+        {
+            m_output_curve_point( m_current_position );
+        }
+        
+        void generate( const int order )
+        {
+            if( order == 0 ) {
+                m_current_position += m_step;
+                m_output_curve_point( m_current_position );
+            } else {
+                generate( order - 1 );
+                rotate_left( m_step );
+                generate( order - 1 );
+                rotate_right( m_step );
+            }
+        }
+    };
+
+    inline void generate( const int order, Callback output_curve_point, const int step = 4 )
+    {
+        Impl( move( output_curve_point ), step ).generate( order );
+    }
+    
+    template< class Point_type >
+    auto as_vector_of_( const int order, const int step = 4 )
+        -> vector<Point_type>
+    {
+        vector<Point_type> points;
+        points.reserve( 1 + (1 << order) );     // Just because this is C++ => efficiency.
+        generate(
+            order,
+            [&]( const Point& pt ){ points.push_back( Point_type{ pt.x, pt.y } ); },
+            step
+            );
+        return points;
+    }
+}  // namespace c_curve
+~~~
+

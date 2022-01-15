@@ -25,12 +25,12 @@ auto main() -> int
     const auto area = RECT{ 10, 10, 10 + 400, 10 + 400 };
     ::FillRect( canvas, &area, orange_brush );                      // Consistent background.
     
-    vector<POINT> points;
-    c_curve::generate(
-        11,     // Number of levels.
-        [&]( auto& pt ){ points.push_back( POINT{ pt.x, pt.y } ); },
-        3       // Step size = line segments length.
-        );
+    const vector<POINT> points = c_curve::as_vector_of_<POINT>( 11, 3 );
+    // c_curve::generate(
+        // 11,     // Number of levels.
+        // [&]( auto& pt ){ points.push_back( POINT{ pt.x, pt.y } ); },
+        // 3       // Step size = line segments length.
+        // );
     printf( "%d points.\n", (int) points.size() );
     {
         const auto _1 = gdi::Selection( canvas, blue_brush );
