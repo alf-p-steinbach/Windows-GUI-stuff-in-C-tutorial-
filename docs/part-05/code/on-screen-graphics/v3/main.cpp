@@ -10,6 +10,9 @@ namespace gdi = winapi::gdi;
 
 auto main() -> int
 {
+    #ifdef TEST
+        assert(( 2 + 2 == 5 ));
+    #endif
     constexpr auto  red         = COLORREF( RGB( 0xFF, 0, 0 ) );
     constexpr auto  no_window   = HWND( 0 );
     
