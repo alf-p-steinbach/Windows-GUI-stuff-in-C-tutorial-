@@ -3,7 +3,7 @@
 #include <functional>       // function
 #include <utility>          // move
 
-namespace dragon_curve {
+namespace c_curve {
     using std::function, std::move;
     
     struct Point { int x; int y; };
@@ -50,4 +50,4 @@ namespace dragon_curve {
     {
         Impl( move( add_point ), step ).generate( order );
     }
-}  // namespace dragon_curve
+}  // namespace c_curve
