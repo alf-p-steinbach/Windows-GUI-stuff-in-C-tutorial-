@@ -388,7 +388,6 @@ Here [**`_set_app_type`**](https://docs.microsoft.com/en-us/cpp/c-runtime-librar
 
 The above is intended to be used like this:
 
-*In [part-05/code/on-screen-graphics/v3/main.cpp](part-05/code/on-screen-graphics/v3/main.cpp)*
 ~~~cpp
 #ifdef _MSC_VER
 #   include <compiler/msvc/Assertion_reporting_fix.hpp>
@@ -396,4 +395,25 @@ The above is intended to be used like this:
 #endif
 ~~~
 
+The [Meyers’ singleton](https://stackoverflow.com/a/17712497) ensures that this results in a single call of `_set_app_type` even if this code appears in several translation units. I chose to exemplify this general `global_instantiation` technique even though the `_set_app_type` calls are idempotent, because it’s a good way to provide such fixes in general. A C++17 `inline` variable’s initialization could alternatively have done the job, but `inline` variables appear to still be somewhat unreliable in Visual C++.
+
 With this, if you don’t redirect standard error, then with GUI subsystem you get the assertion failure box (the very same as shown earlier for MinGW g++, because it’s the same library in both cases), but if you do connect up the standard error stream then you get the message as text output, so you can decide the reporting mode in the command to run the program.
+
+However, for more [DRY code](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) the above usage is placed in a convenience header:
+
+*[part-05/code/.include/compiler/msvc/Assertion_reporting_fix.auto.hpp](part-05/code/.include/compiler/msvc/Assertion_reporting_fix.auto.hpp)*
+~~~cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#ifdef _MSC_VER
+#   include <compiler/msvc/Assertion_reporting_fix.hpp>
+    const bool msvc_arf = compiler::msvc::Assertion_reporting_fix::global_instantiation();
+#endif
+~~~
+
+And so all that appears in v3 of the program is an include of the above file:
+
+*In [part-05/code/on-screen-graphics/v3/main.cpp](part-05/code/on-screen-graphics/v3/main.cpp)*
+~~~cpp
+#include <compiler/msvc/Assertion_reporting_fix.auto.hpp>
+~~~
+
