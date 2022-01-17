@@ -30,11 +30,13 @@ You don’t need a window to draw graphics: with GDI you can draw more or less d
 
 This involves first calling `GetDC(0)` to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is called a **canvas**, emphasizing what it’s used for, namely painting.
 
-The input side of a device context works as a canvas to draw or paint on: it executes drawing commands such as calls of the `Ellipse` function. It also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, such as in particular the fill color. And on the output side it works as an abstraction of various quite different devices: it generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics.
+The “input side” of a device context works as a canvas to draw or paint on: it executes drawing commands such as calls of the `Ellipse` function. It also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, in particular the fill color. And on the “output side” a device context works as an abstraction of various quite different devices: it generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics.
 
 <img alt="DC inputs and outputs" src="part-05/images/dc.png" width="500">
 
-Drawing directly on the screen is just a special case of drawing in a window.
+Drawing directly on the screen is just a special case of drawing in a window, the slightly paradoxical case of “no window”.
+
+
 
 asdf
 
