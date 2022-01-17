@@ -32,22 +32,22 @@ auto main() -> int
     { // Display the curve.
         const auto _1 = gdi::Selection( canvas, blue_brush );
         const auto _2 = gdi::Selection( canvas, white_pen );
-        ::Ellipse( canvas, area.left + 3, area.top + 3, area.right - 3, area.bottom - 3 );
-        ::SetViewportOrgEx( canvas, 150, 180, nullptr );    // Empirically determined offsets.
-        ::Polyline( canvas, points.data(), static_cast<int>( points.size() ) );
-        ::SetViewportOrgEx( canvas, 0, 0, nullptr );
+        Ellipse( canvas, area.left + 3, area.top + 3, area.right - 3, area.bottom - 3 );
+        SetViewportOrgEx( canvas, 150, 180, nullptr );      // Empirically determined offsets.
+        Polyline( canvas, points.data(), static_cast<int>( points.size() ) );
+        SetViewportOrgEx( canvas, 0, 0, nullptr );
     }
 
     { // Add explanatory text.
         const auto& s = "The C curve!";     // Only ASCII, because TextOut isn't UTF-8 aware.
         #ifndef DEFTEXT
-            ::SetBkMode( canvas, TRANSPARENT );
-            ::SetTextColor( canvas, yellow );
+            SetBkMode( canvas, TRANSPARENT );
+            SetTextColor( canvas, yellow );
             const auto _ = gdi::Selection( canvas, wu::std_gui_font.handle );
         #else
             (void) yellow;
         #endif
-        ::TextOut( canvas, 80, 220, s, static_cast<int>( strlen( s ) ) );
+        TextOut( canvas, 80, 220, s, static_cast<int>( strlen( s ) ) );
     }
 
     // At this point the brushes and canvas are destroyed automatically via RAII.

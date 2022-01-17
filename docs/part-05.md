@@ -28,9 +28,16 @@ Unfortunately Windows doesn’t yet support UTF-8 based text for *drawing* text 
 
 You don’t need a window to draw graphics: with GDI you can draw more or less directly on the screen.
 
-This involves first calling `GetDC(0)` to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, emphasizing its technical rôle of abstracting away the particular hardware, and so the handle type is a `HDC`, handle to device context. More generally it’s called a **canvas**, emphasizing what it’s used for, namely painting.
+This involves first calling `GetDC(0)` to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is called a **canvas**, emphasizing what it’s used for, namely painting.
 
-Next one can create and use various drawing tools such as a **pen** to draw lines or a **brush** to fill in interiors of things. This methaphor is very shallow, e.g. there’s no notion of ink, but instead pens and brushes that have inherent colors. A device context at any time contains one object of each kind and uses that object for graphics operations. One can *replace* the current object of a given kind via `SelectObject`, which returns the handle to the original object of the argument kind. Unfortunately this is a C-oriented API with no overloading, so that the code involves a mixture of the generic GDI tool handle type, `HGDIOBJ`, and more tool kind specific handles like `HBRUSH`, sometimes (but not in this example) with downcasting required:
+The input side of a device context works as a canvas to draw or paint on: it executes drawing commands such as calls of the `Ellipse` function. It also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, such as in particular the fill color. And on the output side it works as an abstraction of various quite different devices: it generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics.
+
+<img alt="DC inputs and outputs" src="part-05/images/dc.png" width="500">
+
+Drawing directly on the screen is just a special case of drawing in a window.
+
+asdf
+
 
 [*part-05/code/on-screen-graphics/v1/main.cpp*](part-05/code/on-screen-graphics/v1/main.cpp)
 ~~~cpp
@@ -94,6 +101,11 @@ Ditto, building and running with the MinGW toolchain, g++:
 [T:\part-05\code\on-screen-graphics\v1\.build]
 > a_
 ~~~
+
+
+### 5.x asd
+
+Next one can create and use various drawing tools such as a **pen** to draw lines or a **brush** to fill in interiors of things. This methaphor is very shallow, e.g. there’s no notion of ink, but instead pens and brushes that have inherent colors. A device context at any time contains one object of each kind and uses that object for graphics operations. One can *replace* the current object of a given kind via `SelectObject`, which returns the handle to the original object of the argument kind. Unfortunately this is a C-oriented API with no overloading, so that the code involves a mixture of the generic GDI tool handle type, `HGDIOBJ`, and more tool kind specific handles like `HBRUSH`, sometimes (but not in this example) with downcasting required:
 
 
 ---
