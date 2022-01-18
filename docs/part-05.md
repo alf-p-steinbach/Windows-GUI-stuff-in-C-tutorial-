@@ -28,15 +28,17 @@ Unfortunately Windows doesn’t yet support UTF-8 based text for *drawing* text 
 
 You don’t need a window to draw graphics: with GDI you can draw more or less directly on the screen.
 
-This involves first calling `GetDC(0)` to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is called a **canvas**, emphasizing what it’s used for, namely painting.
+Drawing directly on the screen is just a special case of drawing in a window, the slightly paradoxical case of “no window”.
 
-The “input side” of a device context works as a canvas to draw or paint on: it executes drawing commands such as calls of the `Ellipse` function. It also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, in particular the fill color. And on the “output side” a device context works as an abstraction of various quite different devices: it generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics.
+This involves first calling `GetDC(0)` (with `0` for “no window”) to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is often called a **canvas**, emphasizing what it’s used for, namely painting.
+
+On the “output side” — the right side in the figure below — a device context works as a common abstraction of various quite different devices. It generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics “meta-files”. So, you can use roughly the same code to generate graphics for all these devices.
+
+The side of a device context that such code relates to, the “input side”, mainly executes drawing commands such as calls of the `Ellipse` function, but it also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, in particular the fill color.
 
 <img alt="DC inputs and outputs" src="part-05/images/dc.png" width="500">
 
-Drawing directly on the screen is just a special case of drawing in a window, the slightly paradoxical case of “no window”.
-
-By default a device context typically has a black pen and a white brush. To draw a yellow circle filled with orange the code below uses the general GDI approach of (1) creating pen and brush objects, respectively yellow and red; (2) **selecting** them in the device context; (3) drawing; (4) deselecting the objects by selecting in the original objects; and finally (5) destroying the objects. This is not necessarily inefficient, but it’s quite verbose:
+By default a device context typically has a black pen and a white brush. To draw a yellow circle filled with orange the code below uses the general GDI approach of (1) creating pen and brush objects, respectively yellow and red; (2) **selecting** them in the device context; (3) drawing, which implicitly uses the selected objects; (4) deselecting the objects by selecting back in the original objects; and finally (5) destroying the objects. This is not necessarily inefficient, but it’s quite verbose:
 
 [*part-05/code/on-screen-graphics/v1/main.cpp*](part-05/code/on-screen-graphics/v1/main.cpp)
 ~~~cpp
@@ -73,7 +75,7 @@ auto main() -> int
 }
 ~~~
 
-Here the `COLORREF` type is a 32-bit [RGB](https://en.wikipedia.org/wiki/RGB_color_model) **color** specification.
+The `COLORREF` type is a 32-bit [RGB](https://en.wikipedia.org/wiki/RGB_color_model) **color** specification.
 
 Originally the effect was probably to actually draw directly on the screen, bypassing all the window management, and messing up the screen Real Good&trade;. But in Windows 11 there are layers of indirection and management interposed between the drawing calls and the screen output, in particular the [Desktop Window Manager](https://docs.microsoft.com/en-us/windows/win32/dwm/dwm-overview). There are some weird effects such as the graphics partially intruding in console windows, but such code still “works” and supports explorative programming.
 
