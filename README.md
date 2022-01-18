@@ -1,6 +1,6 @@
 # Windows GUI-stuff in C++: a tutorial.
 
-Desktop Windows API level programming starting from the ground up, in C++17.
+Desktop Windows API level programming from the ground up, in C++17.
 
 ![An "Hello, world!" message box](docs/part-02/images/sshot.part-2-message-box.png)
 
