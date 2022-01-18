@@ -11,10 +11,10 @@ If you instead read it [on Github Pages](https://alf-p-steinbach.github.io/Windo
 <p align="center">❁</p>
 
 *TLDR short contents so far, links to this repository:*
-- [1. A Windows GUI “Hello, world!”.](part-01.md)
-- [2. Use resources to provide an icon.](part-02.md)
-- [3. A Tic-Tac-Toe game in a dialog window.](part-03.md)
-- [4. UTF-8 as the one and only text encoding.](part-04.md)
+- [1. A Windows GUI “Hello, world!”.](docs/part-01.md)
+- [2. Use resources to provide an icon.](docs/part-02.md)
+- [3. A Tic-Tac-Toe game in a dialog window.](docs/part-03.md)
+- [4. UTF-8 as the one and only text encoding.](docs/part-04.md)
 
 <p align="center">❁</p>
 
