@@ -1,18 +1,25 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
-#include <winapi/gdi.hpp>
-namespace gdi = winapi::gdi;
 
 auto main() -> int
 {
-    constexpr auto  red         = COLORREF( RGB( 0xFF, 0, 0 ) );
+    constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
+    constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
+    constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
     constexpr auto  no_window   = HWND( 0 );
+    constexpr auto  area        = RECT{ 10, 10, 10 + 400, 10 + 400 };
     
-    const auto canvas       = gdi::Window_dc( no_window );
-    const auto red_brush    = gdi::Object_( CreateSolidBrush( red ) );
+    const HDC canvas = GetDC( no_window );
+    SelectObject( canvas, GetStockObject( DC_PEN ) );
+    SelectObject( canvas, GetStockObject( DC_BRUSH ) );
 
-    { // Using the red brush.
-        const auto _ = gdi::Selection( canvas, red_brush );
-        Ellipse( canvas, 10, 10, 10 + 400, 10 + 400 );
-    }
+    SetDCBrushColor( canvas, blue );
+    FillRect( canvas, &area, 0 );   // `0` works for me, but should perhaps be the DC brush.
+
+    // Draw a yellow circle filled with orange.
+    SetDCPenColor( canvas, yellow );
+    SetDCBrushColor( canvas, orange );
+    Ellipse( canvas, area.left, area.top, area.right, area.bottom );
+
+    ReleaseDC( no_window, canvas );
 }

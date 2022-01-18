@@ -117,14 +117,44 @@ Ditto, building and running with the MinGW toolchain, g++:
 
 ### 5.2 Use pseudo-mutable `DC_PEN` and `DC_BRUSH` stock objects to reduce verbosity.
 
-Instead of creating, selecting, using, unselecting and destroying pen and brush objects, as long as you don’t need fancy effects such as line patterns you can just change the device context’s **DC pen color** and **DC brush color**, via respectively `SetDCPenColor` and `SetDCBrushColor`. These colors are only *used* when the **stock objects** you get from respectively `GetStockObject(DC_PEN)` and `GetStockObject(DC_BRUSH)` are selected in the device context. My experimentation showed that in Windows 11 these are not the default objects in a DC from `GetDC(0)`, so it’s necessary to explicitly select them:
+Instead of creating, selecting, using, unselecting and destroying pen and brush objects, as long as you don’t need fancy effects such as line patterns you can just change the device context’s **DC pen color** and **DC brush color**, via respectively `SetDCPenColor` and `SetDCBrushColor`. These colors are only *used* when the **stock objects** you get from respectively `GetStockObject(DC_PEN)` and `GetStockObject(DC_BRUSH)` are selected in the device context.
 
+My experimentation showed that in Windows 11 these are not the default objects in a DC from `GetDC(0)`, so it’s necessary to explicitly select them:
 
+[*part-05/code/on-screen-graphics/v1/main.cpp*](part-05/code/on-screen-graphics/v1/main.cpp)
+~~~cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
 
-But there is a bit of make-believe where it’s as if you’re modifying the stock objects, because the functions to set these colors are named :
+auto main() -> int
+{
+    constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
+    constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
+    constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
+    constexpr auto  no_window   = HWND( 0 );
+    constexpr auto  area        = RECT{ 10, 10, 10 + 400, 10 + 400 };
+    
+    const HDC canvas = GetDC( no_window );
+    SelectObject( canvas, GetStockObject( DC_PEN ) );
+    SelectObject( canvas, GetStockObject( DC_BRUSH ) );
 
+    SetDCBrushColor( canvas, blue );
+    FillRect( canvas, &area, 0 );   // `0` works for me, but should perhaps be the DC brush.
 
+    // Draw a yellow circle filled with orange.
+    SetDCPenColor( canvas, yellow );
+    SetDCBrushColor( canvas, orange );
+    Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 
+    ReleaseDC( no_window, canvas );
+}
+~~~
+
+The [current documentation of `SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject) states that the object one selects “must have been created” by one of the functions listed in a table there, which does not include `GetStockObject`. But of course that’s just the usual documentation SNAFU. The stock objects would not be useful for anything if they couldn’t be used.
+
+However, the stock objects are special in that they don’t need to and shouldn’t be destroyed via `DeleteObject` (or any other way).
+
+Result: same as before, just with shorter & more clear code.
 
 
 ---
