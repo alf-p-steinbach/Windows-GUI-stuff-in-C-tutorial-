@@ -36,10 +36,7 @@ The “input side” of a device context works as a canvas to draw or paint on: 
 
 Drawing directly on the screen is just a special case of drawing in a window, the slightly paradoxical case of “no window”.
 
-
-
-asdf
-
+By default a device context typically has a black pen and a white brush. To draw a yellow circle filled with orange the code below uses the general GDI approach of (1) creating pen and brush objects, respectively yellow and red; (2) **selecting** them in the device context; (3) drawing; (4) deselecting the objects by selecting in the original objects; and finally (5) destroying the objects. This is not necessarily inefficient, but it’s quite verbose:
 
 [*part-05/code/on-screen-graphics/v1/main.cpp*](part-05/code/on-screen-graphics/v1/main.cpp)
 ~~~cpp
@@ -48,31 +45,39 @@ asdf
 
 auto main() -> int
 {
-    constexpr auto  red         = COLORREF( RGB( 0xFF, 0, 0 ) );
+    constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
+    constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
+    constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
     constexpr auto  no_window   = HWND( 0 );
+    constexpr auto  area        = RECT{ 10, 10, 10 + 400, 10 + 400 };
     
     const HDC canvas = GetDC( no_window );
-    {
-        const HBRUSH red_brush = CreateSolidBrush( red );
-        {
-            const HGDIOBJ original_brush = SelectObject( canvas, red_brush );
-            {
-                Ellipse( canvas, 10, 10, 10 + 400, 10 + 400 );
-            }
-            SelectObject( canvas, original_brush );
-        }
-        DeleteObject( red_brush );
-    }
+
+    // Fill the background with blue.
+    const HBRUSH blue_brush = CreateSolidBrush( blue );
+    FillRect( canvas, &area, blue_brush );
+    DeleteObject( blue_brush );
+
+    // Draw a yellow circle filled with orange.
+    const HBRUSH    orange_brush    = CreateSolidBrush( orange );
+    const HGDIOBJ   original_brush  = SelectObject( canvas, orange_brush );
+    const HPEN      yellow_pen      = CreatePen( PS_SOLID, 1, yellow );
+    const HGDIOBJ   original_pen    = SelectObject( canvas, yellow_pen );
+    Ellipse( canvas, area.left, area.top, area.right, area.bottom );
+    SelectObject( canvas, original_pen );
+    DeleteObject( yellow_pen );
+    SelectObject( canvas, original_brush );
+    DeleteObject( orange_brush );
+
     ReleaseDC( no_window, canvas );
 }
 ~~~
 
 Here the `COLORREF` type is a 32-bit [RGB](https://en.wikipedia.org/wiki/RGB_color_model) **color** specification.
 
-The nested blocks are just for clarity of presentation, showing that each tool creation and destruction is in a limited scope, and that these usually and ideally are strictly nested scopes.
+Originally the effect was probably to actually draw directly on the screen, bypassing all the window management, and messing up the screen Real Good&trade;. But in Windows 11 there are layers of indirection and management interposed between the drawing calls and the screen output, in particular the [Desktop Window Manager](https://docs.microsoft.com/en-us/windows/win32/dwm/dwm-overview). There are some weird effects such as the graphics partially intruding in console windows, but such code still “works” and supports explorative programming.
 
-Originally the effect was probably to actually draw directly on the screen, bypassing all the window management, and messing up the screen Real Good&trade;. But in Windows 11 there are layers of indirection and management interposed between the drawing calls and the screen output, in particular the [Desktop Window Manager](https://docs.microsoft.com/en-us/windows/win32/dwm/dwm-overview). However, presumably for backward compatibility Windows still supports such old draw-directly-on-the-screen code. There are some weird effects such as the graphics partially intruding in console windows, but such code still “works” and supports explorative programming.
-
+asdasd
 ![A filled ellips drawn directly on the screen](part-05/images/sshot-1.graphics-on-screen.png)
 
 The effect is not entirely consistent between runs. Sometimes I get the black background around the red disk, sometimes (but rarely) only the red disk, then with essentially transparent background, and with some other graphics I’ve seen the background from one run of one program being retained as background for the graphics from another program, which was pretty confusing, huh where did *that* come from, before I understood what was going on. This is much like the rest of Windows 11’s functionality, i.e. it’s pretty shaky, not very reliable, depending on the phase of the moon, but the unreliability doesn’t really matter here.
