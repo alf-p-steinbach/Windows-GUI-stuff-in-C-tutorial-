@@ -30,7 +30,7 @@ You don’t need a window to draw graphics: with GDI you can draw more or less d
 
 Drawing directly on the screen is just a special case of drawing in a window, the slightly paradoxical case of “no window”.
 
-This involves first calling `GetDC(0)` (with `0` for “no window”) to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is often called a **canvas**, emphasizing what it’s used for, namely painting.
+This involves first calling `GetDC(0)` (with `0` for “no window”) to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is often called a **canvas**, emphasizing that it’s used for painting.
 
 On the “output side” — the right side in the figure below — a device context works as a common abstraction of various quite different devices. It generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics “meta-files”. So, you can use roughly the same code to generate graphics for all these devices.
 
