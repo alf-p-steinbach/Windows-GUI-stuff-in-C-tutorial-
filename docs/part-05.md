@@ -150,7 +150,7 @@ auto main() -> int
 }
 ~~~
 
-The [current documentation of `SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject) states that the object one selects “must have been created” by one of the functions listed in a table there, which does not include `GetStockObject`. But of course that’s just the usual documentation SNAFU. The stock objects would not be useful for anything if they couldn’t be used.
+The [current documentation of `SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject) states that the object one selects “must have been created” by one of the functions listed in a table there, which does not include `GetStockObject`. But of course that’s just the usual Microsoft documentation SNAFU. The stock objects would not be useful for anything if they couldn’t be used.
 
 However, the stock objects are special in that they don’t need to and shouldn’t be destroyed via `DeleteObject` (or any other way).
 
