@@ -3,9 +3,11 @@
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/ole2.hpp>  // Ole_library_usage
 
+#include <shlwapi.h>        // SHCreateStreamOnFileEx
 #include <stdio.h>          // fprintf
 #include <stdlib.h>         // EXIT_...
 #include <olectl.h>         // OleCreatePictureIndirect
+#include <ocidl.h>          // IPicture
 
 #include <stdexcept>        // std::exception&
 #include <string>           // std::string
@@ -87,6 +89,20 @@ void display_graphics()
     const auto bitmap_dc = Bitmap_dc( Screen_dc().handle, 400, 400 );
     display_graphics_on( bitmap_dc.handle );
     BitBlt( Screen_dc().handle, 15, 15, 400, 400, bitmap_dc.handle, 0, 0, SRCCOPY );
+    
+    PICTDESC params = {sizeof( params )};
+    params.picType = PICTYPE_BITMAP;
+    params.bmp.hbitmap = static_cast<HBITMAP>( GetCurrentObject( bitmap_dc.handle, OBJ_BITMAP ) );
+    IPictureDisp* p_picture_disp;
+    const HRESULT hr2 = OleCreatePictureIndirect( &params, __uuidof( IPictureDisp ), false, (void**) &p_picture_disp );
+    hopefully( SUCCEEDED( hr2 ) )
+        or fail( "OleCreatePictureIndirect failed" );
+
+    const HRESULT hr4 = OleSavePictureFile( p_picture_disp, SysAllocString( L"generated_image.bmp" ) );
+    hopefully( SUCCEEDED( hr4 ) )
+        or fail( "OleSavePictureFile failed" );
+    
+    p_picture_disp->Release();
 }
 
 auto main( int, char** args ) -> int
