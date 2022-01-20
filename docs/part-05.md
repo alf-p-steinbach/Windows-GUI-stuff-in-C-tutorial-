@@ -170,7 +170,7 @@ As of early 2022 GDI’s `char` based text drawing functions unfortunately assum
 
 ![Default result of drawing UTF-8 text](part-05/images/sshot-4.mangled-utf-8.cropped.png)
 
-Not only is the text “Every 日本国 кошка loves Norwegian blåbærsyltetøy!” mangled, but it’s also drawn with an old 1980’s raster font. As I see it this double whammy of problems is due to a Microsoft business tactic of not fixing or updating what they’ve made, but just moving on to ever more fancy stuff (like GDI+ and DirectX). However, we obtained a handle to the modern GUI font [in part 3](part-03.md#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance), and all that remains is a call of `SelectObject`, so the main problem is the text mangling.
+Not only is the text “Every 日本国 кошка loves Norwegian blåbærsyltetøy!” mangled, but it’s also drawn with an old 1980’s raster font. As I see it this double whammy of problems is due to a Microsoft business tactic of not fixing or updating what they’ve made, but just moving on to ever more fancy stuff (like GDI+ and DirectX, with their own problems). However, we obtained a handle to the modern GUI font [in part 3](part-03.md#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance), and all that remains is a call of `SelectObject`, so the main problem is the text mangling.
 
 Full code for this example:
 
@@ -290,7 +290,7 @@ main.cpp
 
 ølkølk
 
-We now have a ~practical way to use the GDI so a natural next step is to save the generated image, e.g. as a “.png” file. Unfortunately GDI itself offers no save-to-file function or functionality that could help. So, either one has to step up a technology level and use GDI+ (which has its own peculiar problems); or generate a binary image file directly, which is tricky and much work; or use the old Windows “OLE” functionality, which however requires the file path as UTF-16 wide text.
+
 
 ---
 ### 5.x. Use C++ RAII to automate GDI object destruction.
