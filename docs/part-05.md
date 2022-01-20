@@ -40,7 +40,7 @@ The side of a device context that such code relates to, the “input side”, ma
 
 By default a device context typically has a black pen and a white brush. To draw a yellow circle filled with orange the code below uses the general GDI approach of (1) creating pen and brush objects, respectively yellow and orange; (2) **selecting** them in the device context; (3) drawing, which implicitly uses the selected objects; (4) deselecting the objects by selecting back in the original objects; and finally (5) destroying the objects. This is not necessarily inefficient, but, which is a general problem with the GDI, it’s quite verbose:
 
-[*part-05/code/on-screen-graphics/v1/main.cpp*](part-05/code/on-screen-graphics/v1/main.cpp)
+*[part-05/code/on-screen-graphics/v1/main.cpp](part-05/code/on-screen-graphics/v1/main.cpp)*:
 ~~~cpp
 # // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
@@ -121,7 +121,7 @@ Instead of creating, selecting, using, unselecting and destroying pen and brush 
 
 My experimentation showed that in Windows 11 these are not the default objects in a DC from `GetDC(0)`, so it’s necessary to explicitly select them:
 
-[*part-05/code/on-screen-graphics/v2/main.cpp*](part-05/code/on-screen-graphics/v2/main.cpp)
+*[part-05/code/on-screen-graphics/v2/main.cpp](part-05/code/on-screen-graphics/v2/main.cpp)*:
 ~~~cpp
 # // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
@@ -164,10 +164,133 @@ Result: same as before, just with shorter & more clear code.
 
 
 ---
-### 5.3. Draw UTF-8 text by converting to UTF-16 and using wide text API.
+### 5.3. Draw UTF-8 text by converting to UTF-16 and using the wide text API.
+
+As of early 2022 GDI’s `char` based text drawing functions unfortunately assume the global Windows ANSI encoding instead of the process’ ANSI encoding. The `wchar_t` based functions work. But with the incorrect encoding assumption the result of drawing `char` based international text can be a lot of gobbledygook:
+
+![Default result of drawing UTF-8 text](part-05/images/sshot-4.mangled-utf-8.cropped.png)
+
+Not only is the text “Every 日本国 кошка loves Norwegian blåbærsyltetøy!” mangled, but it’s also drawn with an old 1980’s raster font. As I see it this double whammy of problems is due to a Microsoft business tactic of not fixing or updating what they’ve made, but just moving on to ever more fancy stuff (like GDI+ and DirectX). However, we obtained a handle to the modern GUI font [in part 3](part-03.md#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance), and all that remains is a call of `SelectObject`, so the main problem is the text mangling.
+
+Full code for this example:
+
+*[part-05/code/on-screen-graphics/v3/resources/app-manifest.xml](part-05/code/on-screen-graphics/resources/app-manifest.xml)*:
+~~~xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+    <assemblyIdentity
+        version="0.3.0.0"
+        processorArchitecture="*"
+        name="Alfs.CppInPractice.GDI-stuff"
+        type="win32"
+    />
+    <description>Exemplifies that GDI text drawing doesn't support UTF-8 code page.</description>
+    <application>
+        <windowsSettings>
+            <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings"
+                >UTF-8</activeCodePage>
+        </windowsSettings>
+    </application>
+</assembly>
+~~~
+
+*[part-05/code/on-screen-graphics/v3/resources.rc](part-05/code/on-screen-graphics/v3/resources.rc)*:
+~~~c
+#pragma code_page( 65001 )  // UTF-8
+#include <windows.h>
 
 
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
+CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
+~~~
+
+
+*[part-05/code/on-screen-graphics/v3/main.cpp](part-05/code/on-screen-graphics/v3/main.cpp)*:
+~~~cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+#include <string_view>      // std::string_view
+#include <iterator>         // std::size
+
+#include <assert.h>
+
+using   std::string_view, std::size;
+
+template< class T > auto int_size( const T& o ) -> int { return static_cast<int>( size( o ) ); }
+
+void draw_on( const HDC canvas, const RECT& area )
+{
+    constexpr auto  white       = COLORREF( RGB( 0xFF, 0xFF, 0xFF ) );  (void) white;   // Unused.
+    constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
+    constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
+    constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
+    constexpr auto  black       = COLORREF( RGB( 0, 0, 0 ) );
+    
+    // Clear the background to blue.
+    SetDCBrushColor( canvas, blue );
+    FillRect( canvas, &area, 0 );
+
+    // Draw a yellow circle filled with orange.
+    SetDCPenColor( canvas, yellow );
+    SetDCBrushColor( canvas, orange );
+    Ellipse( canvas, area.left, area.top, area.right, area.bottom );
+    
+    // Draw some international text. Note: non-ASCII UTF-8 characters are incorrectly rendered.
+    constexpr auto text = string_view( "Every 日本国 кошка loves\nNorwegian blåbærsyltetøy!" );
+    auto text_rect = RECT{ area.left + 40, area.top + 150, area.right, area.bottom };
+    SetTextColor( canvas, black );              // This is also the default, but making it explicit.
+    SetBkMode( canvas, TRANSPARENT );           // Don't fill in the background of the text, please.
+    DrawText( canvas, text.data(), int_size( text ), &text_rect, DT_LEFT | DT_TOP | DT_NOPREFIX );
+}
+
+auto main() -> int
+{
+    assert( GetACP() == CP_UTF8 );
+    constexpr auto  no_window   = HWND( 0 );
+
+    const HDC canvas = GetDC( no_window );
+    SelectObject( canvas, GetStockObject( DC_PEN ) );
+    SelectObject( canvas, GetStockObject( DC_BRUSH ) );
+    
+    draw_on( canvas, RECT{ 10, 10, 10 + 400, 10 + 400 } );
+
+    ReleaseDC( no_window, canvas );
+}
+~~~
+
+And for completeness, building with Visual C++:
+
+~~~txt
+[T:\part-05\code\on-screen-graphics\v3\.build]
+> rc /nologo /c 65001 /fo r.res ..\resources.rc
+
+[T:\part-05\code\on-screen-graphics\v3\.build]
+> set common-code=t:\part-05\code\.include
+
+[T:\part-05\code\on-screen-graphics\v3\.build]
+> cl /I %common-code% ..\main.cpp user32.lib gdi32.lib r.res /Feb
+main.cpp
+~~~
+
+… and with MinGW g++:
+
+~~~txt
+[T:\part-05\code\on-screen-graphics\v3\.build]
+> windres ..\resources.rc -o res.o
+
+[T:\part-05\code\on-screen-graphics\v3\.build]
+> set common-code=t:\part-05\code\.include
+
+[T:\part-05\code\on-screen-graphics\v3\.build]
+> g++ -std=c++17 -I %common-code% ..\main.cpp res.o -lgdi32
+~~~
+
+ølkølk
+
+We now have a ~practical way to use the GDI so a natural next step is to save the generated image, e.g. as a “.png” file. Unfortunately GDI itself offers no save-to-file function or functionality that could help. So, either one has to step up a technology level and use GDI+ (which has its own peculiar problems); or generate a binary image file directly, which is tricky and much work; or use the old Windows “OLE” functionality, which however requires the file path as UTF-16 wide text.
 
 ---
 ### 5.x. Use C++ RAII to automate GDI object destruction.
