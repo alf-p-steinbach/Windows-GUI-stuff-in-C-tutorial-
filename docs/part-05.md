@@ -164,6 +164,12 @@ Result: same as before, just with shorter & more clear code.
 
 
 ---
+### 5.3. Draw UTF-8 text by converting to UTF-16 and using wide text API.
+
+
+
+
+---
 ### 5.x. Use C++ RAII to automate GDI object destruction.
 
 The preceding section’s code exemplified how GDI usage, and for that matter many other areas of Windows programming, involves establishing and tearing down local state, with these pairs of calls at least logically in nested scopes:
