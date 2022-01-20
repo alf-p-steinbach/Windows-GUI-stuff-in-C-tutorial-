@@ -294,7 +294,36 @@ In the above code `<windows.h>` defined the `DrawText` macro as `DrawTextA`, the
 
 Windows provides the `MultiByteToWideChar` and `WideCharToMultiByte` functions to convert to and from UTF-16. These functions assume that the input is sequence of complete code point specifications, i.e. that the input doesn’t start or end in the middle of a UTF-8 code point sequence or in the middle of a UTF-16 surrogate pair. However that’s usually the case and anyway easy to arrange, and this assumption makes the functions stateless, easy to use.
 
-The functions can be used to just determine the necessary minimum size of the output buffer. However for conversion UTF-8 → UTF-16 that’s not necessary, it would just introduce an inefficiency, because all single byte UTF-8 code points are single value as UTF-16, and UTF-16 never uses more than two values per code point, so that the number of UTF-16 values can’t be larger than the number of UTF-8 values, and usually is about the same.
+The functions can be used to just determine the necessary minimum size of the output buffer, quite common in the Windows API. However for conversion UTF-8 → UTF-16 that’s not necessary, it would just introduce an inefficiency, because the UTF-8 number of bytes is a known sufficient buffer size for the UTF-16 text. More precisely because all Unicode code points  that are single byte as UTF-8 are single value as UTF-16, and UTF-16 never uses more than two values per code point.
+
+*[part-05/code/convert-to-wide-text/main.cpp](part-05/code/convert-to-wide-text/main.cpp)*:
+~~~cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+#include <stdlib.h>         // EXIT_FAILURE
+#include <string>           // std::wstring;
+#include <string_view>      // std::string_view
+using   std::wstring, std::string_view;
+
+auto main() -> int
+{
+    constexpr auto& text        = "Every 日本国 кошка loves\nNorwegian blåbærsyltetøy!";
+    constexpr auto  text_length = static_cast<int>( string_view( text ).length() );
+    
+    constexpr auto buffer_size = text_length;
+    auto wide_text = wstring( buffer_size, L'\0' );
+    const auto flags = DWORD( 0 );
+    const int n_wide_values = MultiByteToWideChar(
+        CP_UTF8, flags, text, text_length, &wide_text[0], buffer_size
+        );
+    if( n_wide_values == 0 ) { return EXIT_FAILURE; }
+    wide_text.resize( n_wide_values );
+
+    MessageBoxW( 0, wide_text.c_str(), L"UTF-16 text:", MB_ICONINFORMATION | MB_SETFOREGROUND );
+}
+~~~
+
+![Wide text message box](part-05/images/sshot-5.wide-text-messagebox.png)
 
 
 
