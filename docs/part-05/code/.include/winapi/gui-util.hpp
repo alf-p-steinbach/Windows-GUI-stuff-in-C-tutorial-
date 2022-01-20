@@ -6,7 +6,7 @@
 #include <initializer_list>         // For using range-based `for` over initializer list.
 #include <string>
 
-namespace winapi::util {
+namespace winapi::gui {
     using std::string;
 
     // Invokes various <windowsx.h> “message cracker” macros like `HANDLE_WM_CLOSE`. Each such
@@ -108,4 +108,4 @@ namespace winapi::util {
         }
         return result;
     }
-}  // namespace winapi::util
+}  // namespace winapi::gui

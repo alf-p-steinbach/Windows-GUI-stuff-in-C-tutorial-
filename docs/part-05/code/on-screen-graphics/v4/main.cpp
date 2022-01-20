@@ -1,13 +1,16 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
+#include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
+#include <winapi/gdi-text-display.hpp>      // winapi::gdi::draw_text
+#include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
+
 #include <string_view>      // std::string_view
 #include <iterator>         // std::size
 
 #include <assert.h>
 
+namespace gdi   = winapi::gdi;
 using   std::string_view, std::size;
-
-template< class T > auto int_size( const T& o ) -> int { return static_cast<int>( size( o ) ); }
 
 void draw_on( const HDC canvas, const RECT& area )
 {
@@ -26,12 +29,19 @@ void draw_on( const HDC canvas, const RECT& area )
     SetDCBrushColor( canvas, orange );
     Ellipse( canvas, area.left, area.top, area.right, area.bottom );
     
-    // Draw some international text. Note: non-ASCII UTF-8 characters are incorrectly rendered.
+    // Draw some international (English, Russian, Chinese, Norwegian) text.
     constexpr auto text = string_view( "Every 日本国 кошка loves\nNorwegian blåbærsyltetøy!" );
-    auto text_rect = RECT{ area.left + 40, area.top + 150, area.right, area.bottom };
     SetTextColor( canvas, black );              // This is also the default, but making it explicit.
-    SetBkMode( canvas, TRANSPARENT );           // Don't fill in the background of the text, please.
-    DrawText( canvas, text.data(), int_size( text ), &text_rect, DT_LEFT | DT_TOP | DT_NOPREFIX );
+    auto text_rect = RECT{ area.left + 40, area.top + 150, area.right, area.bottom };
+    gdi::draw_text( canvas, text, text_rect );
+}
+
+void init( const HDC canvas )
+{
+    SelectObject( canvas, GetStockObject( DC_PEN ) );
+    SelectObject( canvas, GetStockObject( DC_BRUSH ) );
+    SetBkMode( canvas, TRANSPARENT );           // Don't fill in the background of text, please.
+    SelectObject( canvas, winapi::gui::std_gui_font.handle );
 }
 
 auto main() -> int
@@ -40,8 +50,7 @@ auto main() -> int
     constexpr auto  no_window   = HWND( 0 );
 
     const HDC canvas = GetDC( no_window );
-    SelectObject( canvas, GetStockObject( DC_PEN ) );
-    SelectObject( canvas, GetStockObject( DC_BRUSH ) );
+    init( canvas );
     
     draw_on( canvas, RECT{ 10, 10, 10 + 400, 10 + 400 } );
 

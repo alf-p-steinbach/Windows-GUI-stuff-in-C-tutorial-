@@ -1,14 +1,16 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 
-#include <assert.h>
-#include <random>
-#include <stdexcept>
-#include <string>
+#include <assert.h>         // assert
+#include <iterator>         // std::size
+#include <random>           // std::(random_device, mt19937, uniform_int_distribution)
+#include <stdexcept>        // std::(exception, runtime_error)
+#include <string>           // std::string
 
 #define CPPUTIL_FAIL( s ) ::cpp::util::fail( std::string( __func__ ) + " - " + (s) )
 
 namespace cpp::util {
-    using   std::random_device, std::mt19937, std::uniform_int_distribution,
+    using   std::size,
+            std::random_device, std::mt19937, std::uniform_int_distribution,
             std::exception, std::runtime_error,
             std::string;
 
@@ -54,4 +56,6 @@ namespace cpp::util {
         -> int
     { return random_in({ 0, beyond - 1 }); }
 
+    template< class T >
+    auto int_size( const T& c ) -> int { return static_cast<int>( size( c ) ); }
 }  // namespace cpp::util
