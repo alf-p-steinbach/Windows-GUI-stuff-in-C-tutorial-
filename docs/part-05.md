@@ -288,6 +288,16 @@ main.cpp
 > g++ -std=c++17 -I %common-code% ..\main.cpp res.o -lgdi32
 ~~~
 
+<p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+
+In the above code `<windows.h>` defined the `DrawText` macro as `DrawTextA`, the `char` based wrapper version of this function. The basic `wchar_t` based version, `DrawTextW`, doesn’t have an encoding assumption problem because it deals with only one encoding, namely UTF-16. So we just need the text re-encoded as UTF-16.
+
+Windows provides the `MultiByteToWideChar` and `WideCharToMultiByte` functions to convert to and from UTF-16. These functions assume that the input is sequence of complete code point specifications, i.e. that the input doesn’t start or end in the middle of a UTF-8 code point sequence or in the middle of a UTF-16 surrogate pair. However that’s usually the case and anyway easy to arrange, and this assumption makes the functions stateless, easy to use.
+
+The functions can be used to just determine the necessary minimum size of the output buffer. However for conversion UTF-8 → UTF-16 that’s not necessary, it would just introduce an inefficiency, because all single byte UTF-8 code points are single value as UTF-16, and UTF-16 never uses more than two values per code point, so that the number of UTF-16 values can’t be larger than the number of UTF-8 values, and usually is about the same.
+
+
+
 ølkølk
 
 
