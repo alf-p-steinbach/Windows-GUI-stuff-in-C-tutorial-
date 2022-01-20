@@ -27,7 +27,7 @@ void draw_on( const HDC canvas, const RECT& area )
     Ellipse( canvas, area.left, area.top, area.right, area.bottom );
     
     // Draw some international text. Note: non-ASCII UTF-8 characters are incorrectly rendered.
-    constexpr auto text = string_view( "Every 日本国 кошка loves\r\nNorwegian Blåbærsyltetøy!" );
+    constexpr auto text = string_view( "Every 日本国 кошка loves\nNorwegian Blåbærsyltetøy!" );
     auto text_rect = RECT{ area.left + 40, area.top + 150, area.right, area.bottom };   // Not `const`.
     SetTextColor( canvas, black );              // This is also the default, but making it explicit.
     SetBkMode( canvas, TRANSPARENT );
