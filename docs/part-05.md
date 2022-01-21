@@ -327,13 +327,156 @@ auto main() -> int
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-With now confidence that the convert-to-UTF-16 approach works we can express the text drawing as reusable code,
+With now confidence that the convert-to-UTF-16 approach works we can express the text drawing as reusable machinery,
 
+In *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
+~~~cpp
+    #define CPPUTIL_FAIL( s ) ::cpp::util::fail( std::string( __func__ ) + " - " + (s) )
 
+    template< class T >
+    auto int_size( const T& c ) -> int { return static_cast<int>( size( c ) ); }
+~~~
 
+*[part-05/code/.include/winapi/encoding-conversions.hpp](part-05/code/.include/winapi/encoding-conversions.hpp)*:
+~~~cpp
+#pragma once // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+#include <cpp/util.hpp>     // CPPUTIL_FAIL, cpp::util::(hopefully, int_size)
 
+#include <string>
+#include <string_view>
 
-ølkølk
+namespace winapi {
+    namespace cu = cpp::util;
+    using   cu::hopefully, cu::fail, cu::int_size;
+    using   std::wstring,
+            std::string_view;
+    
+    inline auto to_utf16( const string_view& s )
+        -> wstring
+    {
+        const auto s_length = int_size( s );
+        if( s_length == 0 ) { return L""; }
+
+        const auto buffer_size = s_length;  // May be a litte too large, but that's OK.
+        auto result = wstring( buffer_size, L'\0' );
+        constexpr auto flags = DWORD( 0 );
+        const int n_wide_values = MultiByteToWideChar(
+            CP_UTF8, flags, s.data(), s_length, &result[0], buffer_size
+            );
+        hopefully( n_wide_values != 0 ) or CPPUTIL_FAIL( "MultiByteToWideChar failed" );
+        result.resize( n_wide_values );
+        return result;
+    }
+}  // namespace winapi
+~~~
+
+*[part-05/code/.include/winapi/gdi-text-display.hpp](part-05/code/.include/winapi/gdi-text-display.hpp)*:
+~~~cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+#include <winapi/encoding-conversions.hpp>
+#include <cpp/util.hpp>
+
+#include    <assert.h>
+#include    <string_view>       // std::(string_view, wstring_view)
+
+namespace winapi::gdi {
+    using cpp::util::int_size;
+    using std::string_view, std::wstring_view;
+    
+    constexpr UINT  default_draw_format = DT_LEFT | DT_TOP | DT_NOPREFIX;
+
+    inline auto draw_text(
+        const HDC                   canvas,
+        const wstring_view&         wide_s,
+        RECT&                       area,
+        const UINT                  format  = default_draw_format
+        ) -> int
+    { return DrawTextW( canvas, wide_s.data(), int_size( wide_s ), &area, format ); }
+
+    inline auto draw_text(
+        const HDC                   canvas,
+        const string_view&          s,
+        RECT&                       area,
+        const UINT                  format  = default_draw_format
+        ) -> int
+    { return draw_text( canvas, to_utf16( s ), area, format ); }
+
+}  // namespace winapi::gdi
+~~~
+
+I’ve intentionally refrained from adressing the problem with introducing arbitrary implementation stuff such as standard library names, in the namespace that exports things. Fixing that is trivial but would reduce clarity by introducing additional COBOL-like verbosity, because C++17 lacks support for namespace [information hiding](https://en.wikipedia.org/wiki/Information_hiding). Alternatively one could use C++20 modules.
+
+However, there’s a more real problem with the above code: that it introduces the *possibility of failure*, i.e. an exception. In practice that can only happen if the input to `to_utf16` is a non-empty string that only contains malformed, invalid UTF-8, and, though I haven’t tested, I believe that it doesn’t happen even then, because per the documentation in modern Windows `MultiByteToWideChar` doesn’t ignore malformed UTF-8 sequences but replaces each with Unicode code point `L'\uFFFD'`.
+
+Anyway, the new version of the main program just assumes that there is no exception:
+
+*[part-05/code/on-screen-graphics/v4/main.cpp](part-05/code/on-screen-graphics/v4/main.cpp)*:
+~~~cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+#include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
+#include <winapi/gdi-text-display.hpp>      // winapi::gdi::draw_text
+#include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
+
+#include <string_view>      // std::string_view
+#include <iterator>         // std::size
+
+#include <assert.h>
+
+namespace gdi   = winapi::gdi;
+using   std::string_view, std::size;
+
+void draw_on( const HDC canvas, const RECT& area )
+{
+    constexpr auto  white       = COLORREF( RGB( 0xFF, 0xFF, 0xFF ) );  (void) white;   // Unused.
+    constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
+    constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
+    constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
+    constexpr auto  black       = COLORREF( RGB( 0, 0, 0 ) );
+    
+    // Clear the background to blue.
+    SetDCBrushColor( canvas, blue );
+    FillRect( canvas, &area, 0 );
+
+    // Draw a yellow circle filled with orange.
+    SetDCPenColor( canvas, yellow );
+    SetDCBrushColor( canvas, orange );
+    Ellipse( canvas, area.left, area.top, area.right, area.bottom );
+    
+    // Draw some international (English, Russian, Chinese, Norwegian) text.
+    constexpr auto text = string_view( "Every 日本国 кошка loves\nNorwegian blåbærsyltetøy!" );
+    SetTextColor( canvas, black );              // This is also the default, but making it explicit.
+    auto text_rect = RECT{ area.left + 40, area.top + 150, area.right, area.bottom };
+    gdi::draw_text( canvas, text, text_rect );
+}
+
+void init( const HDC canvas )
+{
+    SelectObject( canvas, GetStockObject( DC_PEN ) );
+    SelectObject( canvas, GetStockObject( DC_BRUSH ) );
+    SetBkMode( canvas, TRANSPARENT );           // Don't fill in the background of text, please.
+    SelectObject( canvas, winapi::gui::std_gui_font.handle );
+}
+
+auto main() -> int
+{
+    assert( GetACP() == CP_UTF8 );
+    constexpr auto  no_window   = HWND( 0 );
+
+    const HDC canvas = GetDC( no_window );
+    init( canvas );
+    
+    draw_on( canvas, RECT{ 10, 10, 10 + 400, 10 + 400 } );
+
+    ReleaseDC( no_window, canvas );
+}
+~~~
+
+Building examples were provided earlier; just note, if you don’t look at them, that since this code uses the `char` based Windows API functions with UTF-8 encoding, i.e. since it assumes and requires UTF-8 as the process’ ANSI code page,  it’s necessary to compile and link with the resources file that provides a minimal application manifest.
+
+![Presentation of international text](part-05/images/sshot-6.international-text.cropped.png)
 
 
 
