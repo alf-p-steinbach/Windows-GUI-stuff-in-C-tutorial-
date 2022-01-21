@@ -478,8 +478,11 @@ Building examples were provided earlier; just note, if you don’t look at them,
 
 ![Presentation of international text](part-05/images/sshot-6.international-text.cropped.png)
 
+---
+### 5.4. Save the generated graphics to an image file.
 
 
+asdasd
 ---
 ### 5.x. Use C++ RAII to automate GDI object destruction.
 
