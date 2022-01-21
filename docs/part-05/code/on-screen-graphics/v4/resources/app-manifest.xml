@@ -6,7 +6,7 @@
         name="Alfs.CppInPractice.GDI-stuff"
         type="win32"
     />
-    <description>Exemplifies that GDI text drawing doesn't support UTF-8 code page.</description>
+    <description>Exemplifies that GDI text drawing does support general UTF-16 text.</description>
     <application>
         <windowsSettings>
             <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings"
