@@ -483,7 +483,7 @@ Building examples were provided earlier; just note, if you don’t look at them,
 
 The GDI does not support saving graphics as modern image files.
 
-The GDI successor technology GDI+ does support saving to e.g. “.png” file, but that’s (hopefully) for a later part of the tutorial. For now let’s stick to the basic GDI, which provides the foundation for the later Microsoft graphics APIs. What options does one then have?
+The GDI successor technology GDI+ does support saving to e.g. “.png” file, but that’s, hopefully, for a later part of the tutorial. For now let’s stick to the basic GDI, which provides the foundation for the later Microsoft graphics APIs. What options does one then have?
 
 Well, there are two ways to save a graphics result as a now [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) (it was originally Windows-specific) “**.bmp**” image file:
 
