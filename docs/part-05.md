@@ -481,14 +481,14 @@ Building examples were provided earlier; just note, if you don’t look at them,
 ---
 ### 5.4. Save the generated graphics to an image file.
 
-The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.png” file, but that’s, hopefully, for a later part of the tutorial. For now let’s stick to the basic GDI, which provides the foundation for the later Microsoft graphics APIs. What saving options does one then have?
+The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.png” file, but that’s, hopefully, for a later part of the tutorial. For now let’s stick to the basic original GDI, which provides the foundation for the later Microsoft graphics APIs. What saving options does one then have?
 
-Well, the only file format supported by the GDI is the archaic “.wmf” (and possibly its cousin “.emf”), but though not supported by the GDI there are two ways to save a graphics result as a now reasonably [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) “**.bmp**” image file, namely
+The only file format supported by the GDI is the archaic “.wmf” (and possibly its cousin “.emf”), but though not supported by the GDI there are two ways to save a graphics result as a now reasonably [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) “**.bmp**” image file, namely
 
 * generate the binary contents of such a file (the DIY approach), or
 * use the `OleSavePictureFile` function.
 
-Using the Windows API function is complex and drags in dependencies that one might not want, and presumably for those reasons Microsoft’s documentation has generally recommended the DIY approach. I refer you to [that documentation](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) for the DIY code details, expressed in C. Here let’s instead use the API function; the road less travelled, so to speak… ☺
+Using this Windows API function is complex and drags in dependencies that one might not want, and presumably for those reasons Microsoft’s documentation has generally recommended the DIY approach. I refer you to [that documentation](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) for the DIY code details, there expressed in C. Here let’s instead use the API function; the road less travelled, so to speak… ☺
 
 
 

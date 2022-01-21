@@ -21,7 +21,7 @@ namespace winapi::ole2 {
         {
             const HRESULT hr = OleInitialize( {} );
             hopefully( SUCCEEDED( hr ) )
-                or fail( "OleInitialize failed" );
+                or CPPUTIL_FAIL( "OleInitialize failed" );
         }
     };
 }  // namespace winapi::ole2
