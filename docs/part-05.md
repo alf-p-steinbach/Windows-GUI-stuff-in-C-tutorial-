@@ -581,14 +581,14 @@ auto ole_picture_from( const HBITMAP bitmap )
 
     IPictureDisp* p_picture_disp;
     const HRESULT hr = OleCreatePictureIndirect(
-        &params, __uuidof( IPictureDisp ), false, (void**) &p_picture_disp
+        &params, __uuidof( IPictureDisp ), false, reinterpret_cast<void**>( &p_picture_disp )
         );
     hopefully( SUCCEEDED( hr ) ) or fail( "OleCreatePictureIndirect failed" );
     return p_picture_disp;
 }
 ~~~
 
-For Visual C++ **`__uuidof`** is a language extension that provides the UUID for an interface. For MinGW g++ it’s instead a macro that does the same job, but via a standard C++ based mechanism. Instead of `__uuidof(IPictureDisp)` one could write `&IID_IPictureDisp`, but this requires linking with an extra library that provides that UUID constant, namely “**uuid**”.
+For Visual C++ **`__uuidof`** is a language extension that provides the UUID for an interface. For MinGW g++ it’s instead a macro that does the same job, but via a standard C++ based mechanism. Instead of `__uuidof(IPictureDisp)` one could use the named UUID constant `IID_IPictureDisp` (and ditto for other interfaces), but this requires linking with an extra library that provides that UUID constant, namely “**uuid**”, plus it’s easier to get wrong.
 
 asdlkj 
 

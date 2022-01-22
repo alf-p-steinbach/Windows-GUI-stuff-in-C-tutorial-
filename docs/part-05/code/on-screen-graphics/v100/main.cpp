@@ -132,8 +132,7 @@ auto ole_picture_from( const HBITMAP bitmap )
 
     IPictureDisp* p_picture_disp;
     const HRESULT hr = OleCreatePictureIndirect(
-        // &params, __uuidof( IPictureDisp ), false, (void**) &p_picture_disp
-        &params, __uuidof( IPictureDisp ), false, (void**) &IID_IPictureDisp
+        &params, __uuidof( IPictureDisp ), false, reinterpret_cast<void**>( &p_picture_disp )
         );
     hopefully( SUCCEEDED( hr ) ) or fail( "OleCreatePictureIndirect failed" );
     return p_picture_disp;
