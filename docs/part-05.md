@@ -483,18 +483,25 @@ Building examples were provided earlier; just note, if you don’t look at them,
 ---
 ### 5.4. Save the generated graphics to an image file.
 
-The only file format supported by the GDI is the archaic [“.wmf”, and possibly its cousin “.emf”](https://en.wikipedia.org/wiki/Windows_Metafile). This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
+Seeing the graphics on the screen is nice, but it would be better to let the program itself save the graphics as a standard image file, e.g. a “.jpg” or “.png” image.
 
-The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.png” file, but that’s, hopefully, for a later part of the tutorial. For now let’s stick to the basic original GDI, which provides the foundation for the later Microsoft graphics APIs. Disregarding the WMF format, what  options does one then have for saving a graphics result?
+However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile), and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
+
+The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.jpg” or “.png” file, but that’s for a later part of the tutorial (hopefully). For now let’s stick to the basic original GDI, which via its ties to the basic window handling provides the foundation for the later Windows graphics APIs. What  options does one then have for saving a graphics result?
 
 Well, there are two ways to save a graphics result as a now reasonably [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) “**.bmp**” image file, namely
 
-* generate the binary contents of such a file (the DIY approach), or
+* [generate the binary contents](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) of such a file (the DIY approach), or
 * use the `OleSavePictureFile` function.
 
-Using this Windows API function is complex and drags in dependencies that one might not want, and presumably for those reasons Microsoft’s documentation has generally recommended the DIY approach. I refer you to [that documentation](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) for the DIY code details, there expressed in C. Here let’s instead use the API function; the road less travelled, so to speak… ☺
+Here we’ll use the API function.
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
+
+The `Ole` name prefix says that this function is part of the **OLE** library. And generally, even though it’s not documented for each function, one needs to initialize the *library* before calling any of its functions, and *uninitialize* it after using it. This init+cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique:
+
+
+[COM](https://en.wikipedia.org/wiki/Component_Object_Model)
 
 asdasd
 
