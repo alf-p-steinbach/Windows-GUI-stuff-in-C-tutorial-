@@ -550,7 +550,12 @@ template< class T >
 using Const_ = const T;
 ~~~
 
+One way to obtain the required `IPictureDisp*` is to call `OleCreatePictureIndirect`, which needs essentially two arguments:
 
+* A handle to a [**bitmap**](https://en.wikipedia.org/wiki/Bitmap).  
+  This is the generated graphics that we want to save, in the form of an array of pixel values plus some meta-info).
+* A 128-bit *universally unique id*, or [**UUID**](https://en.wikipedia.org/wiki/Universally_unique_identifier), of the COM interface one desires.  
+  The id is needed because a COM object can offer a multitude of interfaces, e.g. here including `IPicture` and `IPictureDisp`, and in order to make it reasonably easy to use from C  — which has no classes and no `dynamic_cast` — these interfaces are identified by id values instead of being accessible via C++ casting.
 
 asd
 
