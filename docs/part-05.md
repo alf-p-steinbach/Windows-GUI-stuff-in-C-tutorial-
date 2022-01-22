@@ -550,6 +550,14 @@ template< class T >
 using Const_ = const T;
 ~~~
 
+Any COM interface such `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release` when the interface pointer is no longer needed.
+
+To *guarantee* that `Release` call even in the face of exceptions or early function returns, it should ideally be performed by a C++ destructor; the RAII technique, again.
+
+For this exception safe cleanup it’s common to use a **COM pointer** template class, analogous to `std::shared_ptr` in the C++ standard library. Visual C++ provides one called [`_com_ptr_t`](https://docs.microsoft.com/en-us/cpp/cpp/com-ptr-t-class?view=msvc-170), via its `<comip.h>` header, and there are many others. But to make these examples compile also with MinGW g++ I just define a minimal DIY such class:
+
+arf
+
 One way to obtain the required `IPictureDisp*` is to call `OleCreatePictureIndirect`, which needs essentially two arguments:
 
 * A handle to a [**bitmap**](https://en.wikipedia.org/wiki/Bitmap).  
@@ -557,7 +565,7 @@ One way to obtain the required `IPictureDisp*` is to call `OleCreatePictureIndir
 * A 128-bit *universally unique id*, or [**UUID**](https://en.wikipedia.org/wiki/Universally_unique_identifier), of the COM interface one desires.  
   The id is needed because a COM object can offer a multitude of interfaces, e.g. here including `IPicture` and `IPictureDisp`, and in order to make it reasonably easy to use from C  — which has no classes and no `dynamic_cast` — these interfaces are identified by id values instead of being accessible via C++ casting.
 
-asd
+
 
 ---
 
