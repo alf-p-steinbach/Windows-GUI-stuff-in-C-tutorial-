@@ -410,9 +410,9 @@ namespace winapi::gdi {
 
 I’ve intentionally refrained from adressing the problem with introducing arbitrary implementation stuff such as standard library names, in the namespace that exports things. Fixing that is trivial but would reduce clarity by introducing additional COBOL-like verbosity, because C++17 lacks support for namespace [information hiding](https://en.wikipedia.org/wiki/Information_hiding). Alternatively one could use C++20 modules.
 
-However, there’s a more real problem with the above code: that it introduces the *possibility of failure*, i.e. an exception. In practice that can only happen if the input to `to_utf16` is a non-empty string that only contains malformed, invalid UTF-8, and, though I haven’t tested, I believe that it doesn’t happen even then, because per the documentation in modern Windows `MultiByteToWideChar` doesn’t ignore malformed UTF-8 sequences but replaces each with Unicode code point `L'\uFFFD'`.
+However, this code introduces the *possibility of failure*, i.e. an exception. But this is purely a technical possibility because per the documentation in modern Windows `MultiByteToWideChar` doesn’t ignore malformed UTF-8 sequences but replaces each with Unicode code point `L'\uFFFD'`, i.e. *some* output. Thus, except for the really remote possibility of failure due to internal resource exhaustion or the like, there’s no way that the result can be an empty string.
 
-Anyway, the new version of the main program just assumes that there is no exception:
+And thus the new version of the main program just assumes that there is no exception:
 
 *[part-05/code/on-screen-graphics/v4/main.cpp](part-05/code/on-screen-graphics/v4/main.cpp)*:
 ~~~cpp
