@@ -498,7 +498,9 @@ Here we’ll use the API function.
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-The `Ole` name prefix says that this function is part of the **OLE** library. And generally, even though it’s not documented for each function, one needs to initialize the *library* before calling any of its functions, and *uninitialize* it after using it. This init+cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique:
+The `Ole` name prefix says that this function is part of the **OLE** library, which once was a kind of infra-structure for Windows applications, but which now doesn’t seem to even be documented on its own. To use this old stuff you have to know that one needs to initialize the *library* before calling any of its functions, via `OleInitialize`, and *uninitialize* it after using it, via `OleUninitialize`. This init+cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique:
+
+
 
 
 [COM](https://en.wikipedia.org/wiki/Component_Object_Model)
