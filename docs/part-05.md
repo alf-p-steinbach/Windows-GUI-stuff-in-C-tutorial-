@@ -550,13 +550,47 @@ template< class T >
 using Const_ = const T;
 ~~~
 
-Any COM interface such `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release` when the interface pointer is no longer needed.
+Any COM interface such `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release`** when the interface pointer is no longer needed.
 
 To *guarantee* that `Release` call even in the face of exceptions or early function returns, it should ideally be performed by a C++ destructor; the RAII technique, again.
 
 For this exception safe cleanup it’s common to use a **COM pointer** template class, analogous to `std::shared_ptr` in the C++ standard library. Visual C++ provides one called [`_com_ptr_t`](https://docs.microsoft.com/en-us/cpp/cpp/com-ptr-t-class?view=msvc-170), via its `<comip.h>` header, and there are many others. But to make these examples compile also with MinGW g++ I just define a minimal DIY such class:
 
-arf
+~~~cpp
+template< class Interface >
+class Com_ptr_: No_copying
+{
+    Interface*  m_ptr;
+    
+public:
+    ~Com_ptr_() { m_ptr->Release(); }
+    Com_ptr_( Const_<Interface*> ptr ): m_ptr( ptr ) {}
+    auto raw_ptr() const -> Interface* { return m_ptr; }
+};
+~~~
+
+And with cleanup thus guaranteed,
+
+~~~cpp
+auto ole_picture_from( const HBITMAP bitmap )
+    -> Com_ptr_<IPictureDisp>
+{
+    PICTDESC params = { sizeof( PICTDESC ) };
+    params.picType      = PICTYPE_BITMAP;
+    params.bmp.hbitmap  = bitmap;
+
+    IPictureDisp* p_picture_disp;
+    const HRESULT hr = OleCreatePictureIndirect(
+        &params, __uuidof( IPictureDisp ), false, (void**) &p_picture_disp
+        );
+    hopefully( SUCCEEDED( hr ) ) or fail( "OleCreatePictureIndirect failed" );
+    return p_picture_disp;
+}
+~~~
+
+For Visual C++ **`__uuidof`** is a language extension that provides the UUID for an interface. For MinGW g++ it’s instead a macro that does the same job, but via a standard C++ based mechanism. Instead of `__uuidof(IPictureDisp)` one could write `&IID_IPictureDisp`, but this requires linking with an extra library that provides that UUID constant, namely “**uuid**”.
+
+asdlkj 
 
 One way to obtain the required `IPictureDisp*` is to call `OleCreatePictureIndirect`, which needs essentially two arguments:
 

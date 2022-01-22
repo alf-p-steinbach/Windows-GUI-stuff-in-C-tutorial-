@@ -112,23 +112,46 @@ void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
     hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
 }
 
+template< class Interface >
+class Com_ptr_: No_copying
+{
+    Interface*  m_ptr;
+    
+public:
+    ~Com_ptr_() { m_ptr->Release(); }
+    Com_ptr_( Const_<Interface*> ptr ): m_ptr( ptr ) {}
+    auto raw_ptr() const -> Interface* { return m_ptr; }
+};
+
+auto ole_picture_from( const HBITMAP bitmap )
+    -> Com_ptr_<IPictureDisp>
+{
+    PICTDESC params = { sizeof( PICTDESC ) };
+    params.picType      = PICTYPE_BITMAP;
+    params.bmp.hbitmap  = bitmap;
+
+    IPictureDisp* p_picture_disp;
+    const HRESULT hr = OleCreatePictureIndirect(
+        // &params, __uuidof( IPictureDisp ), false, (void**) &p_picture_disp
+        &params, __uuidof( IPictureDisp ), false, (void**) &IID_IPictureDisp
+        );
+    hopefully( SUCCEEDED( hr ) ) or fail( "OleCreatePictureIndirect failed" );
+    return p_picture_disp;
+}
+
+// void save_to( const string_view& file_path, const HBITMAP picture )
+// {
+// }
+
 void display_graphics()
 {
     const auto bitmap_dc = Bitmap_dc( Screen_dc().handle, 400, 400 );
     display_graphics_on( bitmap_dc.handle );
     BitBlt( Screen_dc().handle, 15, 15, 400, 400, bitmap_dc.handle, 0, 0, SRCCOPY );
     
-    PICTDESC params = {sizeof( params )};
-    params.picType = PICTYPE_BITMAP;
-    params.bmp.hbitmap = static_cast<HBITMAP>( GetCurrentObject( bitmap_dc.handle, OBJ_BITMAP ) );
-    IPictureDisp* p_picture_disp;
-    const HRESULT hr2 = OleCreatePictureIndirect( &params, __uuidof( IPictureDisp ), false, (void**) &p_picture_disp );
-    hopefully( SUCCEEDED( hr2 ) )
-        or fail( "OleCreatePictureIndirect failed" );
-
-    save_to( "generated-image.bmp", p_picture_disp );
-    
-    p_picture_disp->Release();
+    const auto bitmap = static_cast<HBITMAP>( GetCurrentObject( bitmap_dc.handle, OBJ_BITMAP ) );
+    const Com_ptr_<IPictureDisp> ole_picture = ole_picture_from( bitmap );
+    save_to( "generated-image.bmp", ole_picture.raw_ptr() );
 }
 
 auto main( int, char** args ) -> int
