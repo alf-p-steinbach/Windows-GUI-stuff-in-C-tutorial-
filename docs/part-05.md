@@ -492,7 +492,7 @@ The GDI successor technology GDI+ supports saving a graphics result to e.g. a mo
 Well, there are two ways to save a graphics result as a now reasonably [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) “**.bmp**” image file, namely
 
 * [generate the binary contents](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) of such a file (the DIY approach), or
-* use the [`OleSavePictureFile`](https://docs.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-olesavepicturefile) function.
+* use the [**`OleSavePictureFile`**](https://docs.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-olesavepicturefile) function.
 
 Here we’ll use the API function.
 
