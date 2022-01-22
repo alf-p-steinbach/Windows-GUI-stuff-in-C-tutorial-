@@ -535,7 +535,7 @@ The documentation’s parameter summary explains that this not just an `IDispatc
 `WINOLECTLAPI` also appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM **`HRESULT`**. That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure:
 
 ~~~cpp
-void save_to( const string_view& file_path, IPictureDisp* p_picture )
+void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
 {
     const auto b_string = B_string( file_path );
     const HRESULT hr = OleSavePictureFile( p_picture, b_string.pointer );
@@ -543,7 +543,12 @@ void save_to( const string_view& file_path, IPictureDisp* p_picture )
 }
 ~~~
 
+… where `Const_` is defined as
 
+~~~cpp
+template< class T >
+using Const_ = const T;
+~~~
 
 
 

@@ -58,4 +58,7 @@ namespace cpp::util {
 
     template< class T >
     auto int_size( const T& c ) -> int { return static_cast<int>( size( c ) ); }
+
+    template< class T >
+    using Const_ = const T;
 }  // namespace cpp::util

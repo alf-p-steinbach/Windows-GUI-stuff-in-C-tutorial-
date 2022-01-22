@@ -16,7 +16,7 @@
 
 namespace cu = cpp::util;
 namespace ole2 = winapi::ole2;
-using   cu::hopefully, cu::fail, cu::No_copying, cu::int_size;
+using   cu::hopefully, cu::fail, cu::No_copying, cu::int_size, cu::Const_;
 using   std::string,
         std::string_view, std::wstring_view;
 
@@ -105,7 +105,7 @@ struct B_string: No_copying
     {}
 };
 
-void save_to( const string_view& file_path, IPictureDisp* p_picture )
+void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
 {
     const auto b_string = B_string( file_path );
     const HRESULT hr = OleSavePictureFile( p_picture, b_string.pointer );
