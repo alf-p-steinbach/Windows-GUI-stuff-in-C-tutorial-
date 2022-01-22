@@ -13,6 +13,7 @@
 #include <string>           // std::string
 
 namespace cu = cpp::util;
+namespace ole2 = winapi::ole2;
 using   cu::hopefully, cu::fail;
 using   std::string;
 
@@ -32,60 +33,67 @@ void display_graphics_on( const HDC canvas )
     Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 }
 
+constexpr auto no_window = HWND( 0 );
+
+struct Screen_dc: cu::No_copying
+{
+    HDC     handle;
+        
+    ~Screen_dc() { ReleaseDC( no_window, handle ); }
+
+    Screen_dc():
+        handle( GetDC( no_window ) )
+    {
+        hopefully( handle != 0 )
+            or fail( "GetDC() failed" );
+    }
+};
+
+struct Memory_dc: cu::No_copying
+{
+    HDC     handle;
+        
+    ~Memory_dc() { DeleteDC( handle ); }
+
+    Memory_dc( const HDC properties ):
+        handle( CreateCompatibleDC( properties ) )
+    {
+        hopefully( handle != 0 )
+            or fail( "CreateCompatibleDC() failed" );
+        SelectObject( handle, GetStockObject( DC_PEN ) );
+        SelectObject( handle, GetStockObject( DC_BRUSH ) );
+    }
+};
+
+struct Bitmap_dc: Memory_dc
+{
+    ~Bitmap_dc()
+    {
+        DeleteObject( GetCurrentObject( handle, OBJ_BITMAP ) );
+    }
+
+    Bitmap_dc( const HDC properties, const int width, const int height ):
+        Memory_dc( properties )
+    {
+        const HBITMAP bmp = CreateCompatibleBitmap( properties, width, height );
+        BITMAP info = {};
+        GetObject( bmp, sizeof( info ), &info );
+        fprintf( stderr, "planes = %ld, bits-per-pixel = %ld, width = %ld\n", info.bmPlanes, info.bmBitsPixel, info.bmWidth );
+        hopefully( bmp != 0 )
+            or fail( "CreateCompatibleBitmap failed" );
+        SelectObject( handle, bmp );
+    }
+};
+
+void save_to( const string_view& file_path, IPicture* picture )
+{
+    const HRESULT hr = OleSavePictureFile( p_picture_disp, SysAllocString( L"generated_image.bmp" ) );
+    hopefully( SUCCEEDED( hr4 ) )
+        or fail( "OleSavePictureFile failed" );
+}
+
 void display_graphics()
 {
-    constexpr auto no_window = HWND( 0 );
- 
-    struct Screen_dc: cu::No_copying
-    {
-        HDC     handle;
-            
-        ~Screen_dc() { ReleaseDC( no_window, handle ); }
-
-        Screen_dc():
-            handle( GetDC( no_window ) )
-        {
-            hopefully( handle != 0 )
-                or fail( "GetDC() failed" );
-        }
-    };
-
-    struct Memory_dc: cu::No_copying
-    {
-        HDC     handle;
-            
-        ~Memory_dc() { DeleteDC( handle ); }
-
-        Memory_dc( const HDC properties ):
-            handle( CreateCompatibleDC( properties ) )
-        {
-            hopefully( handle != 0 )
-                or fail( "CreateCompatibleDC() failed" );
-            SelectObject( handle, GetStockObject( DC_PEN ) );
-            SelectObject( handle, GetStockObject( DC_BRUSH ) );
-        }
-    };
-
-    struct Bitmap_dc: Memory_dc
-    {
-        ~Bitmap_dc()
-        {
-            DeleteObject( GetCurrentObject( handle, OBJ_BITMAP ) );
-        }
-
-        Bitmap_dc( const HDC properties, const int width, const int height ):
-            Memory_dc( properties )
-        {
-            const HBITMAP bmp = CreateCompatibleBitmap( properties, width, height );
-            BITMAP info = {};
-            GetObject( bmp, sizeof( info ), &info );
-            fprintf( stderr, "planes = %ld, bits-per-pixel = %ld, width = %ld\n", info.bmPlanes, info.bmBitsPixel, info.bmWidth );
-            hopefully( bmp != 0 )
-                or fail( "CreateCompatibleBitmap failed" );
-            SelectObject( handle, bmp );
-        }
-    };
-
     const auto bitmap_dc = Bitmap_dc( Screen_dc().handle, 400, 400 );
     display_graphics_on( bitmap_dc.handle );
     BitBlt( Screen_dc().handle, 15, 15, 400, 400, bitmap_dc.handle, 0, 0, SRCCOPY );
@@ -98,10 +106,7 @@ void display_graphics()
     hopefully( SUCCEEDED( hr2 ) )
         or fail( "OleCreatePictureIndirect failed" );
 
-    const HRESULT hr4 = OleSavePictureFile( p_picture_disp, SysAllocString( L"generated_image.bmp" ) );
-    hopefully( SUCCEEDED( hr4 ) )
-        or fail( "OleSavePictureFile failed" );
-    
+x    
     p_picture_disp->Release();
 }
 
@@ -109,7 +114,7 @@ auto main( int, char** args ) -> int
 {
     using   std::exception;
     try {
-        const winapi::ole2::Ole_library_usage _;
+        const ole2::Library_usage _;
         display_graphics();
         return EXIT_SUCCESS;
     } catch( const exception& x ) {

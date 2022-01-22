@@ -485,7 +485,7 @@ Building examples were provided earlier; just note, if you don’t look at them,
 
 Seeing the graphics on the screen is nice, but it would be better to let the program itself save the graphics as a standard image file, e.g. a “.jpg” or “.png” image.
 
-However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile), and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
+However, *the only file format supported by the GDI* is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile), and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
 
 The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.jpg” or “.png” file, but that’s for a later part of the tutorial (hopefully). For now let’s stick to the basic original GDI, which via its ties to the basic window handling provides the foundation for the later Windows graphics APIs. What  options does one then have for saving a graphics result?
 
@@ -498,7 +498,39 @@ Here we’ll use the API function.
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-The `Ole` name prefix says that this function is part of the **OLE** library, which once was a kind of infra-structure for Windows applications, but which now doesn’t seem to even be documented on its own. To use this old stuff you have to know that one needs to initialize the *library* before calling any of its functions, via `OleInitialize`, and *uninitialize* it after using it, via `OleUninitialize`. This init+cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique:
+The documentation (link given above) gives this declaration of the function:
+
+~~~cpp
+WINOLECTLAPI OleSavePictureFile(
+  [in] LPDISPATCH lpdispPicture,
+  [in] BSTR       bstrFileName
+);
+~~~
+
+This is not even valid C or C++, so what does it mean?
+
+`WINOLECTLAPI` appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM **`HRESULT`**. That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure.
+
+`LPDISPATCH` likewise appears to be undocumented, but this follows a naming convention laid down in 16-bit Windows where `LP` was short for *long pointer*, which in modern programming just means “pointer”. And `DISPATCH` refers to the **`IDispatch`** COM interface class, i.e. this parameter type is really an `IDispatch*`. A **COM interface** is a fully abstract C++ class  —  and yes, we’re in the C++ territory of the Windows API now, though it’s a kind of hybrid C++ API intended to be usable from C.
+
+A **`BSTR`** is a pointer to the start of an UTF-16 encoded `wchar_t` based string. But instead of being zero-terminated it’s preceded by a 32-bit string length value. The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR`, with preceding length value, is required, and it makes it practically impossible to express that the string is `const`. As I vaguely remember the original rationale for Yet Another String Type&trade; was to support Visual Basic, a now dead language. Anyway, one way to get such a string is to allocate it via **`SysAllocStringLen`**, and later deallocate via **`SysFreeString`**.
+
+
+
+
+
+asd
+
+---
+
+Here’s an example of using `SUCCEEDED`, applied to the result of **`OleInitialize`** which (now apparently undocumented) one *has* to call before calling any OLE function:
+
+
+
+
+
+The `Ole` name prefix says that this function is part of the **OLE** library, which once was a kind of infra-structure for Windows applications, but which now doesn’t seem to even be documented on its own. To use this old stuff you have to know that one needs to initialize the *library* before calling any of its functions, via `OleInitialize`, and *uninitialize* it after using it, via `OleUninitialize`. This init + cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique:
+
 
 
 

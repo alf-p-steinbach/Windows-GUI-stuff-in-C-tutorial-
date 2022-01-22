@@ -10,15 +10,15 @@ namespace winapi::ole2 {
 
     struct Library_usage: No_copying
     {
-        ~Library_usage()
-        {
-            OleUninitialize();
-        }
-        
         Library_usage()
         {
             const HRESULT hr = OleInitialize( {} );
             hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleInitialize failed" );
+        }
+
+        ~Library_usage()
+        {
+            OleUninitialize();
         }
     };
 }  // namespace winapi::ole2
