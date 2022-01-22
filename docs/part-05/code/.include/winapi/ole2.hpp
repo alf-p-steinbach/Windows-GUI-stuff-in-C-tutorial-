@@ -1,27 +1,24 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
-#include <cpp/util.hpp>     // hopefully, fail
+#include <cpp/util.hpp>     // CPPUTIL_FAIL, cpp::util::hopefully
 
-#include <ole2.h>       // OleInitialize, OleUninitialize
-
-#include    <assert.h>
+#include <ole2.h>   // OleInitialize, OleUninitialize
 
 namespace winapi::ole2 {
     namespace cu = cpp::util;
-    using cu::hopefully, cu::fail;
+    using cu::hopefully, cu::No_copying;
 
-    struct Ole_library_usage
+    struct Library_usage: No_copying
     {
-        ~Ole_library_usage()
+        ~Library_usage()
         {
             OleUninitialize();
         }
         
-        Ole_library_usage()
+        Library_usage()
         {
             const HRESULT hr = OleInitialize( {} );
-            hopefully( SUCCEEDED( hr ) )
-                or CPPUTIL_FAIL( "OleInitialize failed" );
+            hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleInitialize failed" );
         }
     };
 }  // namespace winapi::ole2
