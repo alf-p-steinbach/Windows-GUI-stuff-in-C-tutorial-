@@ -483,9 +483,11 @@ Building examples were provided earlier; just note, if you don’t look at them,
 ---
 ### 5.4. Save the generated graphics to an image file.
 
-The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.png” file, but that’s, hopefully, for a later part of the tutorial. For now let’s stick to the basic original GDI, which provides the foundation for the later Microsoft graphics APIs. What saving options does one then have?
+The only file format supported by the GDI is the archaic [“.wmf”, and possibly its cousin “.emf”](https://en.wikipedia.org/wiki/Windows_Metafile). This is an archaic Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
 
-The only file format supported by the GDI is the archaic “.wmf” (and possibly its cousin “.emf”), but though not supported by the GDI there are two ways to save a graphics result as a now reasonably [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) “**.bmp**” image file, namely
+The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.png” file, but that’s, hopefully, for a later part of the tutorial. For now let’s stick to the basic original GDI, which provides the foundation for the later Microsoft graphics APIs. Disregarding WMF, what  options does one then have for saving a graphics result?
+
+Well, there are two ways to save a graphics result as a now reasonably [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) “**.bmp**” image file, namely
 
 * generate the binary contents of such a file (the DIY approach), or
 * use the `OleSavePictureFile` function.
