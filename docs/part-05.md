@@ -507,13 +507,41 @@ WINOLECTLAPI OleSavePictureFile(
 );
 ~~~
 
-This is not even valid C or C++, so what does it mean?
+A **`BSTR`**, the second parameter, is a pointer to the start of an UTF-16 encoded `wchar_t` based string. But in addition to being zero-terminated the string data is preceded by a 32-bit string length value. The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR` with preceding length value is required, and it makes it practically impossible to express that the string is `const`. As I vaguely remember it the original rationale for Yet Another String Type&trade; was to support Visual Basic, a now dead language. Anyway, one way to get such a string is to allocate it via **`SysAllocStringLen`**, and later deallocate via **`SysFreeString`**:
 
-`WINOLECTLAPI` appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM **`HRESULT`**. That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure.
+~~~cpp
+struct B_string: No_copying
+{
+    const BSTR  pointer;
+    
+    ~B_string() { SysFreeString( pointer ); }
 
-`LPDISPATCH`, the first parameter, likewise appears to be undocumented, but this follows a naming convention laid down in 16-bit Windows where `LP` was short for *long pointer*, which in modern programming just means “pointer”. And `DISPATCH` refers to the **`IDispatch`** COM interface class, i.e. this parameter type is really an `IDispatch*` (why they don’t write that is a mystery). A **COM interface** is a fully abstract C++ class that inherits from `IUnknown`.
+    B_string( const wstring_view& ws ):
+        pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
+    {
+        hopefully( pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+    }
+    
+    B_string( const string_view& s ):
+        B_string( winapi::to_utf16( s ) )
+    {}
+};
+~~~
 
-A **`BSTR`**, the second parameter, is a pointer to the start of an UTF-16 encoded `wchar_t` based string. But in addition to being zero-terminated the string data is preceded by a 32-bit string length value. The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR` with preceding length value is required, and it makes it practically impossible to express that the string is `const`. As I vaguely remember it the original rationale for Yet Another String Type&trade; was to support Visual Basic, a now dead language. Anyway, one way to get such a string is to allocate it via **`SysAllocStringLen`**, and later deallocate via **`SysFreeString`**.
+`LPDISPATCH`, the first parameter, appears to be undocumented, but this follows a naming convention laid down in 16-bit Windows where `LP` was short for *long pointer*, which in modern programming just means “pointer”. And `DISPATCH` refers to the **`IDispatch`** COM interface class, i.e. this parameter type is really an `IDispatch*`; why they don’t write that directly is a mystery. A **COM interface** is a fully abstract C++ class that inherits from `IUnknown`.
+
+The documentation’s parameter summary explains that this not just an `IDispatch*` but the more specific `IPictureDisp*`. Where `IPictureDisp` inherits from `IDispatch`. Why they explain that in text instead of expressing it in the function signature is a further mystery; it adds the possibility of a run time error for no conceivable advantage.
+
+`WINOLECTLAPI` also appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM **`HRESULT`**. That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure:
+
+~~~cpp
+void save_to( const string_view& file_path, IPictureDisp* p_picture )
+{
+    const auto b_string = B_string( file_path );
+    const HRESULT hr = OleSavePictureFile( p_picture, b_string.pointer );
+    hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
+}
+~~~
 
 
 

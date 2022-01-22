@@ -1,7 +1,8 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>     // hopefully, fail
+#include <cpp/util.hpp>                     // hopefully, fail
 #include <wrapped-winapi/windows-h.hpp>
-#include <winapi/ole2.hpp>  // Ole_library_usage
+#include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
+#include <winapi/ole2.hpp>                  // Ole_library_usage
 
 #include <shlwapi.h>        // SHCreateStreamOnFileEx
 #include <stdio.h>          // fprintf
@@ -11,11 +12,13 @@
 
 #include <stdexcept>        // std::exception&
 #include <string>           // std::string
+#include <string_view>      // std::(string_view, wstring_view)
 
 namespace cu = cpp::util;
 namespace ole2 = winapi::ole2;
-using   cu::hopefully, cu::fail;
-using   std::string;
+using   cu::hopefully, cu::fail, cu::No_copying, cu::int_size;
+using   std::string,
+        std::string_view, std::wstring_view;
 
 void display_graphics_on( const HDC canvas )
 {
@@ -35,7 +38,7 @@ void display_graphics_on( const HDC canvas )
 
 constexpr auto no_window = HWND( 0 );
 
-struct Screen_dc: cu::No_copying
+struct Screen_dc: No_copying
 {
     HDC     handle;
         
@@ -49,7 +52,7 @@ struct Screen_dc: cu::No_copying
     }
 };
 
-struct Memory_dc: cu::No_copying
+struct Memory_dc: No_copying
 {
     HDC     handle;
         
@@ -85,11 +88,28 @@ struct Bitmap_dc: Memory_dc
     }
 };
 
-void save_to( const string_view& file_path, IPicture* picture )
+struct B_string: No_copying
 {
-    const HRESULT hr = OleSavePictureFile( p_picture_disp, SysAllocString( L"generated_image.bmp" ) );
-    hopefully( SUCCEEDED( hr4 ) )
-        or fail( "OleSavePictureFile failed" );
+    const BSTR  pointer;
+    
+    ~B_string() { SysFreeString( pointer ); }
+
+    B_string( const wstring_view& ws ):
+        pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
+    {
+        hopefully( pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+    }
+    
+    B_string( const string_view& s ):
+        B_string( winapi::to_utf16( s ) )
+    {}
+};
+
+void save_to( const string_view& file_path, IPictureDisp* p_picture )
+{
+    const auto b_string = B_string( file_path );
+    const HRESULT hr = OleSavePictureFile( p_picture, b_string.pointer );
+    hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
 }
 
 void display_graphics()
@@ -106,7 +126,8 @@ void display_graphics()
     hopefully( SUCCEEDED( hr2 ) )
         or fail( "OleCreatePictureIndirect failed" );
 
-x    
+    save_to( "generated-image.bmp", p_picture_disp );
+    
     p_picture_disp->Release();
 }
 
