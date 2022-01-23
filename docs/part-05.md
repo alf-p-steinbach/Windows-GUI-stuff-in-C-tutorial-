@@ -503,7 +503,7 @@ Here we’ll use the API function.
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
-Heads up: in order to use most any OLE function you must first *initialize the library* via a call to `OleInitialize`, and after using the library call `OleUninitialize`. I discuss that at the end of this section. Let’s just dive straight into the details of the main job.
+Heads up: in order to use most any OLE library function you must first *initialize the library* via a call to `OleInitialize`, and after using the library call `OleUninitialize`. I discuss that at the end. Let’s just dive straight into the main job.
 
 The documentation (link given above) gives this declaration of the function:
 
@@ -514,24 +514,31 @@ WINOLECTLAPI OleSavePictureFile(
 );
 ~~~
 
-A **`BSTR`**, the second parameter, is a pointer to the start of an UTF-16 encoded `wchar_t` based string. But in addition to being zero-terminated the string data is preceded by a 32-bit string length value. The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR` with preceding length value is required, and it makes it practically impossible to express that the string is `const`. As I vaguely remember it the original rationale for Yet Another String Type&trade; was to support Visual Basic, a now dead language. Anyway, one way to get such a string is to allocate it via **`SysAllocStringLen`**, and later deallocate via **`SysFreeString`**:
+The apparent but non-standard C++ attribute `[in]` is just nonsense Microsoft baroque stuff, sort of like the hideous gargoyles on some churches: in the creators’ eyes they were pretty and useful, and/or serving some social purpose.
+
+<img alt="A gargoyle from Westminster Abbey" src="part-05/images/westminster-abbey-gargoyle.jpg" width="200">
+
+A **`BSTR`**, the second parameter, is in a sense more of that. It’s a pointer to the start of (i.e. the first character in) an UTF-16 encoded `wchar_t` based string, where in addition to the usual C zero-termination the string data is preceded by a 32-bit string length value. The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR` with preceding length value is required, and it makes it practically impossible to express that the string is `const`. As I vaguely remember it the original rationale for Yet Another String Type&trade; was to support Visual Basic, a now dead language. Anyway, one way to get such a string is to allocate it via **`SysAllocStringLen`**, and later deallocate via **`SysFreeString`**:
 
 ~~~cpp
-struct B_string: No_copying
+class B_string: No_copying
 {
-    const BSTR  pointer;
+    BSTR    m_pointer;
     
-    ~B_string() { SysFreeString( pointer ); }
+public:
+    ~B_string() { SysFreeString( m_pointer ); }
 
     B_string( const wstring_view& ws ):
-        pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
+        m_pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
     {
-        hopefully( pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+        hopefully( m_pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
     }
     
     B_string( const string_view& s ):
         B_string( winapi::to_utf16( s ) )
     {}
+    
+    operator BSTR() const { return m_pointer; }     // Intentionally ignores C++20 `<=>`.
 };
 ~~~
 
@@ -545,7 +552,7 @@ The documentation’s parameter summary explains that this not just an `IDispatc
 void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
 {
     const auto b_string = B_string( file_path );
-    const HRESULT hr = OleSavePictureFile( p_picture, b_string.pointer );
+    const HRESULT hr = OleSavePictureFile( p_picture, b_string );
     hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
 }
 ~~~

@@ -88,27 +88,30 @@ struct Bitmap_dc: Memory_dc
     }
 };
 
-struct B_string: No_copying
+class B_string: No_copying
 {
-    const BSTR  pointer;
+    BSTR    m_pointer;
     
-    ~B_string() { SysFreeString( pointer ); }
+public:
+    ~B_string() { SysFreeString( m_pointer ); }
 
     B_string( const wstring_view& ws ):
-        pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
+        m_pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
     {
-        hopefully( pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+        hopefully( m_pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
     }
     
     B_string( const string_view& s ):
         B_string( winapi::to_utf16( s ) )
     {}
+    
+    operator BSTR() const { return m_pointer; }     // Intentionally ignores C++20 `<=>`.
 };
 
 void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
 {
     const auto b_string = B_string( file_path );
-    const HRESULT hr = OleSavePictureFile( p_picture, b_string.pointer );
+    const HRESULT hr = OleSavePictureFile( p_picture, b_string );
     hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
 }
 

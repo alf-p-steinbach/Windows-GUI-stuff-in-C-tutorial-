@@ -29,6 +29,9 @@ namespace cpp::util {
         No_copying( const No_copying& ) = delete;
         auto operator=( const No_copying& ) -> No_copying& = delete;
         No_copying() {}
+        
+        No_copying( No_copying&& ) {}
+        auto operator=( No_copying&& ) -> No_copying& { return *this; }
     };
 
     constexpr auto squared( const int v ) -> int { return v*v; }
