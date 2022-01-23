@@ -503,6 +503,8 @@ Here we’ll use the API function.
 
 <p align="center">❁ &nbsp; ❁ &nbsp; ❁</p>
 
+Heads up: in order to use most any OLE function you must first *initialize the library* via a call to `OleInitialize`, and after using the library call `OleUninitialize`. I discuss that at the end of this section. Let’s just dive straight into the details of the main job.
+
 The documentation (link given above) gives this declaration of the function:
 
 ~~~cpp
