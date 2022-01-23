@@ -138,9 +138,10 @@ auto ole_picture_from( const HBITMAP bitmap )
     return p_picture_disp;
 }
 
-// void save_to( const string_view& file_path, const HBITMAP picture )
-// {
-// }
+void save_to( const string_view& file_path, const HBITMAP bitmap )
+{
+    save_to( file_path, ole_picture_from( bitmap ).raw_ptr() );
+}
 
 void display_graphics()
 {
@@ -149,8 +150,7 @@ void display_graphics()
     BitBlt( Screen_dc().handle, 15, 15, 400, 400, bitmap_dc.handle, 0, 0, SRCCOPY );
     
     const auto bitmap = static_cast<HBITMAP>( GetCurrentObject( bitmap_dc.handle, OBJ_BITMAP ) );
-    const Com_ptr_<IPictureDisp> ole_picture = ole_picture_from( bitmap );
-    save_to( "generated-image.bmp", ole_picture.raw_ptr() );
+    save_to( "generated-image.bmp", bitmap );
 }
 
 auto main( int, char** args ) -> int

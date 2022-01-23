@@ -16,9 +16,14 @@ Unfortunately Windows doesn’t yet support UTF-8 based text for *drawing* text 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 *Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
 
-- [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
-- [5.2. Use C++ RAII to automate GDI object destruction.](#52-use-c-raii-to-automate-gdi-object-destruction)
-- [5.3. In passing: support `assert` messages in a GUI program built with Visual C++.](#53-in-passing-support-assert-messages-in-a-gui-program-built-with-visual-c)
+  - [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
+  - [5.2 Use pseudo-mutable `DC_PEN` and `DC_BRUSH` stock objects to reduce verbosity.](#52-use-pseudo-mutable-dc_pen-and-dc_brush-stock-objects-to-reduce-verbosity)
+  - [5.3. Draw UTF-8 text by converting to UTF-16 and using the wide text API.](#53-draw-utf-8-text-by-converting-to-utf-16-and-using-the-wide-text-api)
+  - [5.4. Save the generated graphics to an image file.](#54-save-the-generated-graphics-to-an-image-file)
+- [asdasd](#asdasd)
+  - [5.x. Use C++ RAII to automate GDI object destruction.](#5x-use-c-raii-to-automate-gdi-object-destruction)
+  - [5.3. In passing: support `assert` messages in a GUI program built with Visual C++.](#53-in-passing-support-assert-messages-in-a-gui-program-built-with-visual-c)
+  - [5.4. A potpourri of GDI things introduced via a C curve example.](#54-a-potpourri-of-gdi-things-introduced-via-a-c-curve-example)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -552,7 +557,7 @@ using Const_ = const T;
 
 Any COM interface such as `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release`** when the interface pointer is no longer needed.
 
-To *guarantee* that `Release` call even in the face of exceptions or early function returns, it should ideally be performed by a C++ destructor; the RAII technique, again.
+To *guarantee* that `Release` call even in the face of exceptions or early function returns, it should ideally be performed by a C++ destructor; the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique.
 
 For this exception safe cleanup it’s common to use a **COM pointer** template class, analogous to `std::shared_ptr` in the C++ standard library. Visual C++ provides one called [`_com_ptr_t`](https://docs.microsoft.com/en-us/cpp/cpp/com-ptr-t-class?view=msvc-170), via its `<comip.h>` header, and there are many others. But to make these examples compile also with MinGW g++ I just define a minimal DIY such class:
 
@@ -593,9 +598,16 @@ auto ole_picture_from( const HBITMAP bitmap )
 }
 ~~~
 
-For Visual C++ **`__uuidof`** is a language extension that provides the UUID for an interface. For MinGW g++ it’s instead a macro that does the same job, but via a standard C++ based mechanism. Instead of `__uuidof(IPictureDisp)` one could use the named UUID constant `IID_IPictureDisp` (and ditto for other interfaces), but this requires linking with an extra library that provides that UUID constant, namely “**uuid**”, plus it’s easier to get wrong.
+Detail: for Visual C++ **`__uuidof`** is a language extension that provides the UUID for an interface. For MinGW g++ it’s instead a macro that does the same job, but via a standard C++ based mechanism. Instead of `__uuidof(IPictureDisp)` one could use the named UUID constant `IID_IPictureDisp` (and ditto for other interfaces), but this requires linking with an extra library that provides that UUID constant, namely “**uuid**”, plus it’s easier to get wrong.
 
-asdlkj 
+Combining the earlier `save_to` and now `ole_picture_from` yields a general function to save a bitmap as a “.bmp” file (it’s saved in BMP format regardless of filename extension):
+
+~~~cpp
+void save_to( const string_view& file_path, const HBITMAP bitmap )
+{
+    save_to( file_path, ole_picture_from( bitmap ).raw_ptr() );
+}
+~~~
 
 
 
