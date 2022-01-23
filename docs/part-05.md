@@ -533,7 +533,7 @@ struct B_string: No_copying
 };
 ~~~
 
-`LPDISPATCH`, the first parameter, appears to be undocumented, but this follows a naming convention laid down in 16-bit Windows where `LP` was short for *long pointer*, which in modern programming just means “pointer”. And `DISPATCH` refers to the **`IDispatch`** COM interface class, i.e. this parameter type is really an `IDispatch*`; why they don’t write that directly is a mystery. A **COM interface** is a fully abstract C++ class that inherits from `IUnknown`.
+`LPDISPATCH`, the first parameter, appears to be undocumented, but this follows a naming convention laid down in 16-bit Windows where `LP` was short for *long pointer*, which in modern programming just means “pointer”. And `DISPATCH` refers to the **`IDispatch`** COM interface class, i.e. this parameter type is really an `IDispatch*`; why they don’t write that directly is a mystery. [**COM**](https://en.wikipedia.org/wiki/Component_Object_Model) is short for *component object model*, and a **COM interface** is a fully abstract C++ class that inherits from `IUnknown`.
 
 The documentation’s parameter summary explains that this not just an `IDispatch*` but the more specific `IPictureDisp*`. Where [`IPictureDisp`](https://docs.microsoft.com/en-us/windows/win32/api/ocidl/nn-ocidl-ipicturedisp) inherits from `IDispatch`. Why they explain that in text instead of expressing it in the function signature is a further mystery; it adds the possibility of a run time error for no conceivable advantage.
 
@@ -614,19 +614,16 @@ void save_to( const string_view& file_path, const HBITMAP bitmap )
 
 ---
 
-Here’s an example of using `SUCCEEDED`, applied to the result of **`OleInitialize`** which (now apparently undocumented) one *has* to call before calling any OLE function:
+
+
+
+The `Ole` name prefix says that this function is part of the **OLE** library, which once was a kind of infra-structure for Windows applications, but which now doesn’t seem to even be documented on its own. To use this old stuff you have to know that one needs to initialize the *library* before calling any of its functions, via `OleInitialize`, and *uninitialize* it after using it, via `OleUninitialize`. This init + cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ *RAII technique again:
 
 
 
 
 
-The `Ole` name prefix says that this function is part of the **OLE** library, which once was a kind of infra-structure for Windows applications, but which now doesn’t seem to even be documented on its own. To use this old stuff you have to know that one needs to initialize the *library* before calling any of its functions, via `OleInitialize`, and *uninitialize* it after using it, via `OleUninitialize`. This init + cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique:
 
-
-
-
-
-[COM](https://en.wikipedia.org/wiki/Component_Object_Model)
 
 asdasd
 
