@@ -550,7 +550,7 @@ template< class T >
 using Const_ = const T;
 ~~~
 
-Any COM interface such `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release`** when the interface pointer is no longer needed.
+Any COM interface such as `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release`** when the interface pointer is no longer needed.
 
 To *guarantee* that `Release` call even in the face of exceptions or early function returns, it should ideally be performed by a C++ destructor; the RAII technique, again.
 
