@@ -531,7 +531,7 @@ public:
     B_string( const wstring_view& ws ):
         m_pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
     {
-        hopefully( m_pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+        hopefully( m_pointer ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
     }
     
     B_string( const string_view& s ):
@@ -544,7 +544,7 @@ public:
 
 `LPDISPATCH`, the first parameter, appears to be undocumented, but this follows a naming convention laid down in 16-bit Windows where `LP` was short for *long pointer*, which in modern programming just means “pointer”. And `DISPATCH` refers to the **`IDispatch`** COM interface class, i.e. this parameter type is really an `IDispatch*`; why they don’t write that directly is a mystery. [**COM**](https://en.wikipedia.org/wiki/Component_Object_Model) is short for *component object model*, and a **COM interface** is a fully abstract C++ class that inherits from `IUnknown`.
 
-The documentation’s parameter summary explains that this not just an `IDispatch*` but the more specific `IPictureDisp*`. Where [`IPictureDisp`](https://docs.microsoft.com/en-us/windows/win32/api/ocidl/nn-ocidl-ipicturedisp) inherits from `IDispatch`. Why they explain that in text instead of expressing it in the function signature is a further mystery; it adds the possibility of a run time error for no conceivable advantage.
+The documentation’s parameter summary explains that this not just an `IDispatch*` but the more specific `IPictureDisp*`. Where [`IPictureDisp`](https://docs.microsoft.com/en-us/windows/win32/api/ocidl/nn-ocidl-ipicturedisp) inherits from `IDispatch`. Why they explain that in text instead of expressing it in the function signature is a further mystery; it adds the possibility of UB or a run time error for no conceivable advantage.
 
 `WINOLECTLAPI` also appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM **[`HRESULT`](https://docs.microsoft.com/en-us/windows/win32/com/error-handling-in-com)**. That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure:
 

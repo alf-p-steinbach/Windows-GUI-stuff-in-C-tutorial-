@@ -98,7 +98,7 @@ public:
     B_string( const wstring_view& ws ):
         m_pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
     {
-        hopefully( m_pointer != 0 ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+        hopefully( m_pointer ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
     }
     
     B_string( const string_view& s ):
