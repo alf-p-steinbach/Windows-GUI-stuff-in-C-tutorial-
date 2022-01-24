@@ -1,4 +1,5 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <cpp/util.hpp>                     // CPPUTIL_FAIL, cpp::util::(hopefully)
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
 #include <winapi/gdi-text-display.hpp>      // winapi::gdi::draw_text
@@ -14,8 +15,10 @@
 
 #include <assert.h>
 
+namespace cu    = cpp::util;
 namespace gdi   = winapi::gdi;
 namespace ole2  = winapi::ole2;
+using   cu::hopefully;
 using   std::exception, std::string_view, std::size;
 
 void draw_on( const HDC canvas, const RECT& area )

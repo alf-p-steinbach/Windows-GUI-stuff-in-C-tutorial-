@@ -2,6 +2,7 @@
 #include <cpp/util.hpp>                     // hopefully, fail
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
+#include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
 #include <winapi/ole2.hpp>                  // Ole_library_usage
 
 #include <shlwapi.h>        // SHCreateStreamOnFileEx
@@ -36,6 +37,67 @@ void display_graphics_on( const HDC canvas )
     Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 }
 
+struct Bitmap_format
+{ enum Enum{
+    implied                 = 0,
+    monochrome              = 1,
+    palette_16_colors       = 4,
+    palette_256_colors      = 8,
+    rgb_compressed          = 16,
+    rgb_24_bits             = 24,
+    rgb_32_bits             = 32
+}; };
+
+struct Bitmap_and_memory
+{
+    HBITMAP     handle;
+    void*       p_bits;         // Owned by but cannot be obtained from the handle.
+};
+
+auto create_rgb32_bitmap(
+    const int                   width,
+    const int                   height
+    ) -> Bitmap_and_memory
+{
+    BITMAPINFO params  = {};
+    BITMAPINFOHEADER& info = params.bmiHeader;
+    info.biSize             = {sizeof( info )};
+    info.biWidth            = width;
+    info.biHeight           = height;
+    info.biPlanes           = 1;
+    info.biBitCount         = Bitmap_format::rgb_32_bits;
+    info.biCompression      = BI_RGB;
+
+    void* p_bits;
+    const HBITMAP handle = CreateDIBSection(
+        HDC(),              // Not needed because no DIB_PAL_COLORS palette.
+        &params,
+        DIB_RGB_COLORS,     // Irrelevant, but.
+        &p_bits,
+        HANDLE(),           // Section.
+        0                   // Secotion offset.
+        );
+    hopefully( handle != 0 ) or CPPUTIL_FAIL( "CreateDibSection failed" );
+    return Bitmap_and_memory{ handle, p_bits };
+}
+
+class Bitmap
+{
+    HBITMAP     m_handle;
+
+public:
+    ~Bitmap() { DeleteObject( m_handle ); }
+    
+    Bitmap( const int width, const int height ):
+        m_handle( create_rgb32_bitmap( width, height ).handle )
+    {
+        hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "CreateDIBSection failed" );
+    }
+    
+    auto handle() const -> HBITMAP { return m_handle; }
+};
+
+
 constexpr auto no_window = HWND( 0 );
 
 struct Screen_dc: No_copying
@@ -47,44 +109,39 @@ struct Screen_dc: No_copying
     Screen_dc():
         handle( GetDC( no_window ) )
     {
-        hopefully( handle != 0 )
-            or fail( "GetDC() failed" );
+        hopefully( handle != 0 ) or CPPUTIL_FAIL( "GetDC() failed" );
     }
 };
 
-struct Memory_dc: No_copying
+class Memory_dc: No_copying
 {
-    HDC     handle;
+    HDC     m_handle;
         
-    ~Memory_dc() { DeleteDC( handle ); }
+public:
+    ~Memory_dc() { DeleteDC( m_handle ); }
 
-    Memory_dc( const HDC properties ):
-        handle( CreateCompatibleDC( properties ) )
+    Memory_dc():
+        m_handle( CreateCompatibleDC( {} ) )
     {
-        hopefully( handle != 0 )
-            or fail( "CreateCompatibleDC() failed" );
-        SelectObject( handle, GetStockObject( DC_PEN ) );
-        SelectObject( handle, GetStockObject( DC_BRUSH ) );
+        hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "CreateCompatibleDC() failed" );
     }
+    
+    auto handle() const -> HDC { return m_handle; }
 };
 
 struct Bitmap_dc: Memory_dc
 {
     ~Bitmap_dc()
     {
-        DeleteObject( GetCurrentObject( handle, OBJ_BITMAP ) );
+        DeleteObject( GetCurrentObject( handle(), OBJ_BITMAP ) );
     }
 
-    Bitmap_dc( const HDC properties, const int width, const int height ):
-        Memory_dc( properties )
+    Bitmap_dc( const int width, const int height ):
+        Memory_dc()
     {
-        const HBITMAP bmp = CreateCompatibleBitmap( properties, width, height );
-        BITMAP info = {};
-        GetObject( bmp, sizeof( info ), &info );
-        fprintf( stderr, "planes = %ld, bits-per-pixel = %ld, width = %ld\n", info.bmPlanes, info.bmBitsPixel, info.bmWidth );
-        hopefully( bmp != 0 )
-            or fail( "CreateCompatibleBitmap failed" );
-        SelectObject( handle, bmp );
+        const HBITMAP bmp = create_rgb32_bitmap( width, height ).handle;
+        hopefully( bmp != 0 ) or CPPUTIL_FAIL( "CreateCompatibleBitmap failed" );
+        SelectObject( handle(), bmp );
     }
 };
 
@@ -146,14 +203,27 @@ void save_to( const string_view& file_path, const HBITMAP bitmap )
     save_to( file_path, ole_picture_from( bitmap ).raw_ptr() );
 }
 
+auto bitmap_of( const HDC dc )
+    -> HBITMAP
+{ return static_cast<HBITMAP>( GetCurrentObject( dc, OBJ_BITMAP ) ); }
+    
+void init( const HDC canvas )
+{
+    SelectObject( canvas, GetStockObject( DC_PEN ) );
+    SelectObject( canvas, GetStockObject( DC_BRUSH ) );
+    SetBkMode( canvas, TRANSPARENT );       // Don't fill in the background of text, please.
+    SelectObject( canvas, winapi::gui::std_gui_font.handle );
+}
+
 void display_graphics()
 {
-    const auto bitmap_dc = Bitmap_dc( Screen_dc().handle, 400, 400 );
-    display_graphics_on( bitmap_dc.handle );
-    BitBlt( Screen_dc().handle, 15, 15, 400, 400, bitmap_dc.handle, 0, 0, SRCCOPY );
-    
-    const auto bitmap = static_cast<HBITMAP>( GetCurrentObject( bitmap_dc.handle, OBJ_BITMAP ) );
-    save_to( "generated-image.bmp", bitmap );
+    const int width     = 400;
+    const int height    = 400;
+    const auto bitmap_dc = Bitmap_dc( width, height );
+    init( bitmap_dc.handle() );
+    display_graphics_on( bitmap_dc.handle() );
+    //BitBlt( Screen_dc().handle, 15, 15, width, height, bitmap_dc.handle, 0, 0, SRCCOPY );
+    save_to( "generated-image.bmp", bitmap_of( bitmap_dc.handle() ) );
 }
 
 auto main( int, char** args ) -> int
