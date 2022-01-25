@@ -41,9 +41,9 @@ Drawing directly on the screen is just a special case of drawing in a window, th
 
 This involves first calling `GetDC(0)` (with `0` for “no window”) to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is often called a **canvas**, emphasizing that it’s used for painting.
 
-On the “output side” — the right side in the figure below — a device context works as a common abstraction of various quite different devices. It generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics “meta-files”. So, you can use roughly the same code to generate graphics for all these devices.
+On the output side — the right side in the figure below — a device context generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics “meta-files”. So, you can use roughly the same code to generate graphics for all these destinations, much like with a polymorphic C++ object. There is probably some historical reason why Microsoft refers to all these graphics destinations as “devices”; maybe originally only screens and printers were supported.
 
-The side of a device context that such code relates to, the “input side”, mainly executes drawing commands such as calls of the `Ellipse` function, but it also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, in particular the fill color.
+The side of a device context that such code relates to, its input side, mainly executes drawing commands such as calls of the `Ellipse` function, but it also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, in particular the fill color.
 
 <img alt="DC inputs and outputs" src="part-05/images/dc.png" width="500">
 
@@ -89,7 +89,7 @@ Originally the effect was probably to actually draw directly on the screen, bypa
 
 ![A filled ellips drawn directly on the screen](part-05/images/sshot-1.graphics-on-screen.cropped.png)
 
-The effect is not entirely consistent between runs. Sometimes, if one doesn’t fill in the background, there’s a black background around the disk; sometimes (but rarely) there’s only the disk, then with essentially transparent background; and with some other graphics I’ve seen the background from one run of one program being retained as background for the graphics from another program, which was pretty confusing, huh where did *that* come from, before I understood what was going on. This is much like the rest of Windows 11’s functionality, i.e. it’s pretty shaky, not very reliable, depending on the phase of the moon, but the unreliability doesn’t really matter here.
+The effect is not entirely consistent between runs. Usually, if one doesn’t fill in the background, there’s a black background around the disk; but sometimes (rarely) there’s only the disk, then with essentially transparent background; and with some other graphics I’ve seen the background from one run of one program being retained as background for the graphics from another program, which was pretty confusing, huh where did *that* come from, before I understood what was going on. This is much like the rest of Windows 11’s functionality, i.e. it’s pretty shaky, not very reliable, depending on the phase of the moon, but the unreliability doesn’t really matter here.
 
 For completeness, the `COLORREF` type is a 32-bit [RGB](https://en.wikipedia.org/wiki/RGB_color_model) **color** specification (3×8 = 24 bits used), and the `RECT` type is a simple struct with `left`, `top`, `right` and `bottom` integer value members.
 
@@ -304,7 +304,7 @@ main.cpp
 
 In the above code `<windows.h>` defined the `DrawText` macro as `DrawTextA`, the `char` based wrapper version of this function. The basic `wchar_t` based version, `DrawTextW`, doesn’t have an encoding assumption problem because it deals with only one encoding, namely UTF-16. So we just need the text re-encoded as UTF-16.
 
-Windows provides the `MultiByteToWideChar` and `WideCharToMultiByte` functions to convert to and from UTF-16. These functions assume that the input is sequence of complete code point specifications, i.e. that the input doesn’t start or end in the middle of a UTF-8 code point sequence or in the middle of a UTF-16 surrogate pair. However that’s usually the case and anyway easy to arrange, and this assumption makes the functions stateless, easy to use.
+Windows provides the `MultiByteToWideChar` and `WideCharToMultiByte` functions to convert to and from UTF-16. These functions assume that the input is a sequence of complete code point specifications, i.e. that the input doesn’t start or end in the middle of a UTF-8 code point sequence or in the middle of a UTF-16 surrogate pair. However that’s usually the case and anyway easy to arrange, and this assumption makes the functions stateless, easy to use.
 
 The functions can be used to just determine the necessary minimum size of the output buffer, quite common in C-oriented libraries. However for conversion UTF-8 → UTF-16 that preparation is not necessary, it would just introduce an inefficiency, because the UTF-8 number of bytes is a known sufficient buffer size for the UTF-16 text. More precisely because all Unicode code points  that are single byte as UTF-8 are single value as UTF-16, and UTF-16 never uses more than two values per code point.
 
@@ -559,7 +559,7 @@ public:
 
 The documentation’s parameter summary explains that this not just an `IDispatch*` but the more specific `IPictureDisp*`. Where [`IPictureDisp`](https://docs.microsoft.com/en-us/windows/win32/api/ocidl/nn-ocidl-ipicturedisp) inherits from `IDispatch`. Why they explain that in text instead of expressing it in the function signature is a further mystery; it adds the possibility of UB or a run time error for no conceivable advantage.
 
-`WINOLECTLAPI` also appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM **[`HRESULT`](https://docs.microsoft.com/en-us/windows/win32/com/error-handling-in-com)**. That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure:
+`WINOLECTLAPI` also appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM [**`HRESULT`**](https://docs.microsoft.com/en-us/windows/win32/com/error-handling-in-com). That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure:
 
 ```cpp
 void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
