@@ -514,9 +514,9 @@ Well, there are two ways to save a graphics result as a now reasonably [portable
 
 Here we’ll use the API function.
 
-<p align="center">❁   ❁   ❁</p>
-
 Heads up: in order to use most any OLE library function you must first *initialize the library* via a call to `OleInitialize`, and after using the library call `OleUninitialize`. I discuss that at the end. Let’s just dive straight into the main job.
+
+<p align="center">❁ ❁ ❁</p>
 
 The documentation (link given above) gives this declaration of the function:
 
@@ -527,11 +527,15 @@ WINOLECTLAPI OleSavePictureFile(
 );
 ```
 
-The apparent but non-standard C++ attribute `[in]` is just nonsense Microsoft baroque stuff, sort of like the hideous gargoyles on some churches: in the creators’ eyes they were pretty and useful, and/or serving some social purpose.
+The apparent but non-standard C++ attribute `[in]` is just nonsense Microsoft baroque stuff, sort of like the hideous gargoyles on some churches: in the creators’ eyes they were pretty and useful (e.g. for rainwater drainage), and/or serving some social purpose.
 
 <img alt="A gargoyle from Westminster Abbey" src="part-05/images/westminster-abbey-gargoyle.jpg" width="200">
 
-A **`BSTR`**, the second parameter, is in a sense more of that. It’s a pointer to the start of (i.e. to the first character in) an UTF-16 encoded `wchar_t` based string, where in addition to the usual C zero-termination the string data is preceded by a 32-bit string length value. The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR` with preceding length value is required, and it makes it practically impossible to express that the string is `const`. As I vaguely remember it the original rationale for Yet Another String Type&trade; was to support Visual Basic, a now dead language. Anyway, one way to get such a string is to allocate it via **`SysAllocStringLen`**, and later deallocate via **`SysFreeString`**:
+A **`BSTR`**, the second parameter, is in a sense more of that baroque, archaic, beautifully ugly stuff. It’s a pointer to the start of (i.e. to the first character in) an UTF-16 encoded `wchar_t` based string, where in addition to the usual C zero-termination the string data is preceded by a 32-bit string length value. As I vaguely remember it the original rationale for Yet Another String Type™ was to support Visual Basic, a now dead language.
+
+The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR` with preceding length value is required, and it makes it practically impossible to express that the string is `const`.
+
+At one time, perhaps for C++ libraries called from (now dead) Visual Basic, the `BSTR` format possibly supported efficiency by avoiding string conversions. If that was so, then today it’s opposite: `BSTR` arguments necessitate extra string conversions, needless inefficiency. You can create a `BSTR` via **`SysAllocStringLen`**, with deallocation via **`SysFreeString`**:
 
 ```cpp
 class B_string: No_copying
@@ -576,6 +580,8 @@ void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
 template< class T >
 using Const_ = const T;
 ```
+
+<p align="center">❁ ❁ ❁</p>
 
 Any COM interface such as `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release`** when the interface pointer is no longer needed.
 
@@ -631,9 +637,11 @@ void save_to( const string_view& file_path, const HBITMAP bitmap )
 }
 ```
 
-Of course that needs the graphics result in an `HBITMAP` bitmap, but since our `display_graphics` function just draws in a device context, that drawing code needs no change to draw in a device context that creates the graphics in a bitmap.
+<p align="center">❁ ❁ ❁</p>
 
-For this we first need a bitmap, and to create a device independent one you can use [**`CreateDIBSection`**](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdibsection). `DIB` is short for *device independent bitmap*. `Section` indicates that this function can create the bitmap in a memory mapped file, which conceivably can be useful when the bitmap size is large compared to available real memory, but irrelevant here:
+`save_to` needs the graphics result in an `HBITMAP` bitmap, but our `display_graphics` function just draws in a device context so that drawing code needs no change to draw in a device context that creates the graphics in a bitmap.
+
+For this we first need a bitmap, and to create a device independent one you can use [**`CreateDIBSection`**](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdibsection). “**DIB**” is short for *device independent bitmap*. “Section” indicates that this function can create the bitmap in a memory mapped file, which conceivably can be useful when the bitmap size is large compared to available real memory, but irrelevant here:
 
 ```cpp
 struct Bitmap_format
@@ -643,11 +651,11 @@ struct Bitmap_format
     palette_16_colors       = 4,
     palette_256_colors      = 8,
     rgb_compressed          = 16,
-    rgb_24_bits             = 24,
+    rgb_24_bits            = 24,
     rgb_32_bits             = 32
 }; };
 
-struct Bitmap_and_memory
+struct Bitmap_handle_and_memory
 {
     HBITMAP     handle;
     void*       p_bits;         // Owned by but cannot be obtained from the handle.
@@ -656,7 +664,7 @@ struct Bitmap_and_memory
 auto create_rgb32_bitmap(
     const int                   width,
     const int                   height
-    ) -> Bitmap_and_memory
+    ) -> Bitmap_handle_and_memory
 {
     BITMAPINFO params  = {};
     BITMAPINFOHEADER& info = params.bmiHeader;
@@ -670,20 +678,16 @@ auto create_rgb32_bitmap(
     void* p_bits;
     const HBITMAP handle = CreateDIBSection(
         HDC(),              // Not needed because no DIB_PAL_COLORS palette.
-        &params,
+        ¶ms,
         DIB_RGB_COLORS,     // Irrelevant, but.
         &p_bits,
         HANDLE(),           // Section.
         0                   // Secotion offset.
         );
     hopefully( handle != 0 ) or CPPUTIL_FAIL( "CreateDibSection failed" );
-    return Bitmap_and_memory{ handle, p_bits };
+    return Bitmap_handle_and_memory{ handle, p_bits };
 }
 ```
-
----
-
-The `Ole` name prefix says that this function is part of the **OLE** library, which once was a kind of infra-structure for Windows applications, but which now doesn’t seem to even be documented on its own. To use this old stuff you have to know that one needs to initialize the *library* before calling any of its functions, via `OleInitialize`, and *uninitialize* it after using it, via `OleUninitialize`. This init + cleanup pair is naturally expressed as a C++ constructor and destructor, the C++ *RAII technique again:
 
 asdasd
 
@@ -1115,4 +1119,8 @@ namespace c_curve {
         return points;
     }
 }  // namespace c_curve
+```
+
+```cpp
+
 ```

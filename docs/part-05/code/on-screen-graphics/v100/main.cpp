@@ -48,7 +48,7 @@ struct Bitmap_format
     rgb_32_bits             = 32
 }; };
 
-struct Bitmap_and_memory
+struct Bitmap_handle_and_memory
 {
     HBITMAP     handle;
     void*       p_bits;         // Owned by but cannot be obtained from the handle.
@@ -57,7 +57,7 @@ struct Bitmap_and_memory
 auto create_rgb32_bitmap(
     const int                   width,
     const int                   height
-    ) -> Bitmap_and_memory
+    ) -> Bitmap_handle_and_memory
 {
     BITMAPINFO params  = {};
     BITMAPINFOHEADER& info = params.bmiHeader;
@@ -78,7 +78,7 @@ auto create_rgb32_bitmap(
         0                   // Secotion offset.
         );
     hopefully( handle != 0 ) or CPPUTIL_FAIL( "CreateDibSection failed" );
-    return Bitmap_and_memory{ handle, p_bits };
+    return Bitmap_handle_and_memory{ handle, p_bits };
 }
 
 class Bitmap
