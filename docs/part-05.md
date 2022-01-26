@@ -639,7 +639,7 @@ void save_to( const string_view& file_path, const HBITMAP bitmap )
 
 <p align="center">❁ ❁ ❁</p>
 
-`save_to` needs the graphics result in an `HBITMAP` bitmap, but our `display_graphics` function just draws in a device context so that drawing code needs no change to draw in a device context that creates the graphics in a bitmap.
+`save_to` needs the graphics result in an `HBITMAP` bitmap, and our `display_graphics` function just draws in a device context so that drawing code needs no change to draw in a device context that creates the graphics in a bitmap.
 
 For this we first need a bitmap, and to create a device independent one you can use [**`CreateDIBSection`**](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdibsection). “**DIB**” is short for *device independent bitmap*. “Section” indicates that this function can create the bitmap in a memory mapped file, which conceivably can be useful when the bitmap size is large compared to available real memory, but irrelevant here:
 
