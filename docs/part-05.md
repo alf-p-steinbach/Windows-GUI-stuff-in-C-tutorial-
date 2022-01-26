@@ -682,7 +682,7 @@ auto create_rgb32_bitmap(
         DIB_RGB_COLORS,     // Irrelevant, but.
         &p_bits,
         HANDLE(),           // Section.
-        0                   // Secotion offset.
+        0                   // Section offset.
         );
     hopefully( handle != 0 ) or CPPUTIL_FAIL( "CreateDibSection failed" );
     return Bitmap_handle_and_memory{ handle, p_bits };
