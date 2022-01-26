@@ -167,8 +167,8 @@ public:
 
 void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
 {
-    const auto b_string = B_string( file_path );
-    const HRESULT hr = OleSavePictureFile( p_picture, b_string );
+    const auto bstr_file_path = B_string( file_path );
+    const HRESULT hr = OleSavePictureFile( p_picture, bstr_file_path );
     hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
 }
 
@@ -180,7 +180,7 @@ class Com_ptr_: No_copying
 public:
     ~Com_ptr_() { m_ptr->Release(); }
     Com_ptr_( Const_<Interface*> ptr ): m_ptr( ptr ) {}
-    auto raw_ptr() const -> Interface* { return m_ptr; }
+    auto raw() const -> Interface* { return m_ptr; }
 };
 
 auto ole_picture_from( const HBITMAP bitmap )
@@ -200,7 +200,7 @@ auto ole_picture_from( const HBITMAP bitmap )
 
 void save_to( const string_view& file_path, const HBITMAP bitmap )
 {
-    save_to( file_path, ole_picture_from( bitmap ).raw_ptr() );
+    save_to( file_path, ole_picture_from( bitmap ).raw() );
 }
 
 auto bitmap_of( const HDC dc )

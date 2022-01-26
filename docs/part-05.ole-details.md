@@ -1,0 +1,178 @@
+Heads up: in order to use most any OLE library function you must first *initialize the library* via a call to `OleInitialize`, and after using the library call `OleUninitialize`. I discuss that at the end. Let’s just dive straight into the main job.
+
+<p align="center">❁ ❁ ❁</p>
+
+The documentation (link given above) gives this declaration of the function:
+
+```cpp
+WINOLECTLAPI OleSavePictureFile(
+  [in] LPDISPATCH lpdispPicture,
+  [in] BSTR       bstrFileName
+);
+```
+
+The apparent but non-standard C++ attribute `[in]` is just nonsense Microsoft baroque stuff, like the hideous gargoyles on some churches: in the creators’ eyes they were pretty and useful, e.g. for rainwater drainage, and/or serving some social purpose.
+
+<img alt="A gargoyle from Westminster Abbey" src="part-05/images/westminster-abbey-gargoyle.jpg" width="200">
+
+A **`BSTR`**, the second parameter, is in a sense more of that baroque, archaic, beautifully ugly stuff. It’s a pointer to the start of (i.e. to the first character in) an UTF-16 encoded `wchar_t` based string, where in addition to the usual C zero-termination the string data is preceded by a 32-bit string length value. As I vaguely remember it the original rationale for this Yet Another String Type™ was to support Visual Basic, a now dead language.
+
+The representation with a pointer to the start of the string makes it easy to use with functions that require pointers to wide strings, especially in C, but it also makes it easy to inadvertently pass an ordinary wide string where a `BSTR` with preceding length value is required, and it makes it practically impossible to express that the string is `const`.
+
+At one time, perhaps for C++ libraries called from now dead Visual Basic, the `BSTR` format possibly supported efficiency by avoiding string conversions. If that was so, then today it’s opposite: `BSTR` arguments necessitate extra string conversions, needless inefficiency. You can create a `BSTR` via **`SysAllocStringLen`**, with deallocation via **`SysFreeString`**:
+
+```cpp
+class B_string: No_copying
+{
+    BSTR    m_pointer;
+
+public:
+    ~B_string() { SysFreeString( m_pointer ); }
+
+    B_string( const wstring_view& ws ):
+        m_pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
+    {
+        hopefully( m_pointer ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+    }
+
+    B_string( const string_view& s ):
+        B_string( winapi::to_utf16( s ) )
+    {}
+
+    operator BSTR() const { return m_pointer; }     // Intentionally ignores C++20 `<=>`.
+};
+```
+
+`LPDISPATCH`, the first parameter, appears to be undocumented, but this follows a naming convention laid down in 16-bit Windows where `LP` was short for *long pointer*, which in modern programming just means “pointer”. And `DISPATCH` refers to the **`IDispatch`** COM interface class, i.e. this parameter type is really an `IDispatch*`; why they don’t write that directly is a mystery. [**COM**](https://en.wikipedia.org/wiki/Component_Object_Model) is short for *component object model*, and a **COM interface** is a fully abstract C++ class that inherits from `IUnknown`.
+
+The documentation’s parameter summary explains that this not just an `IDispatch*` but the more specific `IPictureDisp*`. Where [`IPictureDisp`](https://docs.microsoft.com/en-us/windows/win32/api/ocidl/nn-ocidl-ipicturedisp) inherits from `IDispatch`. Why they explain that in text instead of expressing it in the function signature is a further mystery; it adds the possibility of UB or a run time error for no conceivable advantage.
+
+`WINOLECTLAPI` also appears to be undocumented, but farther down on the page the documentation states that “This method returns standard COM error codes”, which means that the return type defined by `WINOLECTLAPI` is a COM [**`HRESULT`**](https://docs.microsoft.com/en-us/windows/win32/com/error-handling-in-com). That’s a 32-bit **result code** that has multiple success values such as `S_OK` and `S_FALSE` in addition to the phletora of failure values such as `E_FAIL`. An `HRESULT` is negative for failure, but the very strong convention is to use the macros **`SUCCEEDED`** and **`FAILED`** to determine whether a value represents success or failure:
+
+```cpp
+void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
+{
+    const auto bstr_file_path = B_string( file_path );
+    const HRESULT hr = OleSavePictureFile( p_picture, bstr_file_path );
+    hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
+}
+```
+
+… where `Const_` is defined as
+
+```cpp
+template< class T >
+using Const_ = const T;
+```
+
+<p align="center">❁ ❁ ❁</p>
+
+Any COM interface such as `IPictureDisp` ultimately inherits from `IUnknown`, which provides **reference counting** of the COM object. When the last reference to the object is removed the object is destroyed. And to support that mechanism, to avoid leaks, one should call the `IUnknown` method **`Release`** when the interface pointer is no longer needed.
+
+To *guarantee* that `Release` call even in the face of exceptions or early function returns, it should ideally be performed by a C++ destructor; the C++ [**RAII**](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique.
+
+For this exception safe cleanup it’s common to use a general **COM pointer** template class, analogous to `std::shared_ptr` in the C++ standard library. Visual C++ provides one called [`_com_ptr_t`](https://docs.microsoft.com/en-us/cpp/cpp/com-ptr-t-class?view=msvc-170), via its `<comip.h>` header, and there are many others. But to make these examples compile also with MinGW g++ I just define a minimal DIY such class:
+
+```cpp
+template< class Interface >
+class Com_ptr_: No_copying
+{
+    Interface*  m_ptr;
+
+public:
+    ~Com_ptr_() { m_ptr->Release(); }
+    Com_ptr_( Const_<Interface*> ptr ): m_ptr( ptr ) {}
+    auto raw() const -> Interface* { return m_ptr; }
+};
+```
+
+One way to obtain the required `IPictureDisp*` is now to call `OleCreatePictureIndirect`, which needs essentially two arguments:
+
+* A handle to a [**bitmap**](https://en.wikipedia.org/wiki/Bitmap).  
+  This is the generated graphics that we want to save, in the form of an array of pixel values plus some meta-info.
+* A 128-bit *universally unique id*, or [**UUID**](https://en.wikipedia.org/wiki/Universally_unique_identifier), of the COM interface one desires.  
+  The id is needed because a COM object can offer a multitude of interfaces, e.g. here including `IPicture` and `IPictureDisp`, and in order to make it reasonably easy to use from C  — which has no classes and no `dynamic_cast` — these interfaces are identified by id values instead of being accessible via C++ casting.
+
+```cpp
+auto ole_picture_from( const HBITMAP bitmap )
+    -> Com_ptr_<IPictureDisp>
+{
+    PICTDESC params = { sizeof( PICTDESC ) };
+    params.picType      = PICTYPE_BITMAP;
+    params.bmp.hbitmap  = bitmap;
+
+    IPictureDisp* p_picture_disp;
+    const HRESULT hr = OleCreatePictureIndirect(
+        &params, __uuidof( IPictureDisp ), false, reinterpret_cast<void**>( &p_picture_disp )
+        );
+    hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleCreatePictureIndirect failed" );
+    return p_picture_disp;
+}
+```
+
+For Visual C++ **`__uuidof`** is a language extension that provides the UUID for an interface, while for MinGW g++ it’s a macro that does the same job via a standard C++ template based mechanism. 
+
+Instead of `__uuidof(IPictureDisp)` one could use the named UUID constant `IID_IPictureDisp`, and ditto for other interfaces, but this requires linking with an extra library that provides that UUID constant, namely “**uuid**”, plus it’s easier to get wrong.
+
+Combining the earlier `save_to` and now `ole_picture_from` yields a general function to save a bitmap as a “.bmp” file:
+
+```cpp
+void save_to( const string_view& file_path, const HBITMAP bitmap )
+{
+    save_to( file_path, ole_picture_from( bitmap ).raw() );
+}
+```
+
+Note: the image is saved in BMP format regardless of filename extension.
+
+<p align="center">❁ ❁ ❁</p>
+
+`save_to` needs the graphics result in an `HBITMAP` bitmap, and our `display_graphics` function just draws in a device context so that drawing code needs no change to draw in a device context that creates the graphics in a bitmap.
+
+For this we first need a bitmap, and to create a device independent one you can use [**`CreateDIBSection`**](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createdibsection). “**DIB**” is short for *device independent bitmap*. “Section” indicates that this function can create the bitmap in a memory mapped file, which conceivably can be useful when the bitmap size is large compared to available real memory, but irrelevant here:
+
+```cpp
+struct Bitmap_format
+{ enum Enum{
+    implied                 = 0,
+    monochrome              = 1,
+    palette_16_colors       = 4,
+    palette_256_colors      = 8,
+    rgb_compressed          = 16,
+    rgb_24_bits            = 24,
+    rgb_32_bits             = 32
+}; };
+
+struct Bitmap_handle_and_memory
+{
+    HBITMAP     handle;
+    void*       p_bits;         // Owned by but cannot be obtained from the handle.
+};
+
+auto create_rgb32_bitmap(
+    const int                   width,
+    const int                   height
+    ) -> Bitmap_handle_and_memory
+{
+    BITMAPINFO params  = {};
+    BITMAPINFOHEADER& info = params.bmiHeader;
+    info.biSize             = {sizeof( info )};
+    info.biWidth            = width;
+    info.biHeight           = height;
+    info.biPlanes           = 1;
+    info.biBitCount         = Bitmap_format::rgb_32_bits;
+    info.biCompression      = BI_RGB;
+
+    void* p_bits;
+    const HBITMAP handle = CreateDIBSection(
+        HDC(),              // Not needed because no DIB_PAL_COLORS palette.
+        ¶ms,
+        DIB_RGB_COLORS,     // Irrelevant, but.
+        &p_bits,
+        HANDLE(),           // Section.
+        0                   // Section offset.
+        );
+    hopefully( handle != 0 ) or CPPUTIL_FAIL( "CreateDibSection failed" );
+    return Bitmap_handle_and_memory{ handle, p_bits };
+}
+```
