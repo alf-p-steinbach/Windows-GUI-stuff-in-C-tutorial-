@@ -35,7 +35,7 @@ Happily Windows does support conversion between UTF-8 and UTF-16 via API functio
 
 ### 5.1. Draw directly on the screen to learn GDI basics.
 
-With GDI you can draw more or less directly on the screen.
+With the GDI you can draw more or less directly on the screen.
 
 Drawing directly on the screen is just a special case of drawing in a window, the slightly paradoxical case of “no window”.
 
