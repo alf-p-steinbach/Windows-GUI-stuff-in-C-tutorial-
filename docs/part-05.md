@@ -41,9 +41,9 @@ Drawing directly on the screen is just a special case of drawing in a window, th
 
 This involves first calling `GetDC(0)` (with `0` for “no window”) to get a handle to a drawing surface covering the screen. In Windows terminology that’s called a **device context** for the screen, and the handle type is a `HDC`, handle to device context. In more general programming the equivalent of a Windows DC is often called a **canvas**, emphasizing that it’s used for painting.
 
-On the output side — the right side in the figure below — a device context generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” Windows binary vector graphics “meta-files”. So, you can use roughly the same code to generate graphics for all these destinations, much like with a polymorphic C++ object. There is probably some historical reason why Microsoft refers to all these graphics destinations as “devices”; maybe originally only screens and printers were supported.
+On the *output side* — the right side in the figure below — a device context generates graphics in windows, in bitmap images, to printers, and to now archaic “.wmf” image files. So, you can use roughly the same code to generate graphics for all these destinations, much like with a C++ abstract base class with `virtual` functions. There is probably some historical reason why Microsoft incongruously refers to all these graphics destinations as “devices”; maybe originally only screens and printers were supported.
 
-The side of a device context that such code relates to, its input side, mainly executes drawing commands such as calls of the `Ellipse` function, but it also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, in particular the fill color.
+The side of a device context that such code relates to, its *input side*, mainly executes drawing commands such as calls of the `Ellipse` function, but it also receives and retains drawing attributes such as a **pen** that specifies attributes of lines (e.g. color, width and pattern), and such as a **brush** that specifies attributes of color fills, in particular the fill color.
 
 <img alt="DC inputs and outputs" src="part-05/images/dc.png" width="500">
 
