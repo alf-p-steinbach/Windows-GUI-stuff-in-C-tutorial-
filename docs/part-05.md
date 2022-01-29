@@ -501,20 +501,20 @@ Building examples were provided earlier; just note, if you don’t look at them,
 
 ### 5.4. Save the generated graphics to an image file.
 
-Seeing the graphics on the screen is nice, but it would be better to let the program itself save the graphics as a standard image file, e.g. a “.jpg” or “.png” image.
+Seeing the graphics imperfectly on the screen is nice, well, so-so, better than not seeing the graphics at all. But it would be better to let the program itself save the graphics as a standard image file. For communicating one's result to others, or using it in other work, a modern “.jpg” or “.png” image would be perfect.
 
-However, *the only file format supported by the GDI* is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile), and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
+However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile), and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
 
-The GDI successor technology GDI+ supports saving a graphics result to e.g. a modern “.jpg” or “.png” file. But GDI+ and DirectX have their own problems and complexity that must be tackled. For example, the GDI+ headers are not directly usable as-is in C++ code because they rely on `<windows.h>` C++ sabotaging macros such as `min` and `max`.
-
-So, GDI+ is for a later part of the tutorial (hopefully). For now let’s stick to the basic original GDI, which via its ties to the basic window handling provides the foundation for the later Windows graphics APIs. What  options does one then have for saving a graphics result?
+The GDI successor technologies GDI+ and DirectX are for later parts of the tutorial (hopefully). For now let’s stick to the basic original, simple GDI. What  options does one then have for saving a graphics result — other than “.wmf”?
 
 Well, there are two ways to save a GDI graphics result as a now reasonably [portable](https://en.wikipedia.org/wiki/BMP_file_format#Usage_of_BMP_format) “**.bmp**” image file, namely
 
-* [generate the binary contents](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) of such a file (the DIY approach), or
+* directly [generate the binary contents](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) of such a file (the DIY approach), or
 * use the [**`OleSavePictureFile`**](https://docs.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-olesavepicturefile) function.
 
-Here we’ll use the API function, because that involves learning about how to use such Windows API functions, which is knowledge that can come in very handy indeed.
+Here we’ll use the API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge.
+
+
 
 asdasd
 
