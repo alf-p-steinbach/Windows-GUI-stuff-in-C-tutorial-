@@ -514,9 +514,19 @@ Well, there are two ways to save a GDI graphics result as a now reasonably [port
 
 Here we’ll use the API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge.
 
+<p align="center">❁ ❁ ❁</p>
+
+The `OleSavePictureFile` function expects the graphics image as an `IPicture` C++ object. That may be surprising, but the OLE library that this function belongs to was built on top of the COM library, which was designed primarily for C++ use.  As you’ll (hopefully) see in a later part the GDI+ and DirectX libraries are also provided in a C++-friendly way, parts of the Windows API that are mainly designed for C++ rather than C.
+
+An `IPicture` object, in turn, is created from a **bitmap**, essentially an array of pixel values plus some meta-information such as the image size.
+
+Our drawing code draws to a device context, and as mentioned a device context can generate the graphics in a bitmap, so the flow is roughly
 
 
-asdasd
+
+
+
+
 
 asdasd
 ---
