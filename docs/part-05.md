@@ -516,7 +516,7 @@ Here we’ll use the API function because that involves *learning about how to u
 
 <p align="center">❁ ❁ ❁</p>
 
-The `OleSavePictureFile` function expects the graphics image as an `IPicture` C++ object. That may be surprising, but the OLE library that this function belongs to was built on top of the COM library, which was designed primarily for C++ use.  As you’ll (hopefully) see in  later tutorial parts the GDI+ and DirectX libraries are also provided in a C++-friendly way; they’re parts of the Windows API that are mainly designed for C++ rather than C.
+The `OleSavePictureFile` function expects the graphics image as an `IPicture` C++ object. That may be surprising, but the OLE library that this function belongs to was built on top of the COM library, which was designed primarily for C++ use.  As you’ll (hopefully) see in  later tutorial parts the GDI+ and DirectX libraries are also provided in a C++-friendly way; these are all parts of the Windows API that are mainly designed for C++ rather than C.
 
 An `IPicture` object, in turn, is created from a **bitmap**, essentially an array of pixel values plus some meta-information such as the image size.
 
