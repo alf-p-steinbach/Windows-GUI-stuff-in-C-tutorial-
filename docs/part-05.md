@@ -522,7 +522,7 @@ An `IPicture` object, in turn, is created from a **bitmap**, essentially an arra
 
 Our drawing code draws to a device context, and as mentioned a device context can generate the graphics in a bitmap, so the flow is roughly
 
-<img title="" src="part-05/images/data-flow-for-saving.x.png" alt="Data flow for saving" width="400">
+<img src="part-05/images/data-flow-for-zaving.png" title="" alt="asdlkj" width="391"> 
 
 asdasd
 
