@@ -501,9 +501,9 @@ Building examples were provided earlier; just note, if you don’t look at them,
 
 ### 5.4. Save the generated graphics to an image file.
 
-Seeing the graphics imperfectly on the screen is nice, well, so-so, better than not seeing the graphics at all. But it would be better to let the program itself save the graphics as a standard image file. For communicating one's result to others, or using it in other work, a modern “.jpg” or “.png” image would be perfect.
+Seeing the graphics imperfectly on the screen is nice, or well, it’s at least so-so, better than not seeing the graphics at all. But it would be even better to let the program itself save the graphics as a standard image file. A modern “.jpg” or “.png” image would be perfect for communicating one's result to others, or for using it in other work.
 
-However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile), and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
+However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile) and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
 
 The GDI successor technologies GDI+ and DirectX are for later parts of the tutorial (hopefully). For now let’s stick to the basic original, simple GDI. What  options does one then have for saving a graphics result — other than “.wmf”?
 
@@ -516,13 +516,13 @@ Here we’ll use the API function because that involves *learning about how to u
 
 <p align="center">❁ ❁ ❁</p>
 
-The `OleSavePictureFile` function expects the graphics image as an `IPicture` abstract C++ object.
+The `OleSavePictureFile` function expects the graphics image as an `IPictureDisp` abstract C++ object.
 
-An `IPicture` object, in turn, is created from a **bitmap**, essentially an array of pixel values plus some meta-information such as the image size.
+An `IPictureDisp` object, in turn, is created from a **bitmap**, essentially an array of pixel values plus some meta-information such as the image size.
 
 Our drawing code draws to a device context, and as mentioned a device context can generate the graphics in a bitmap, so the flow is roughly
 
-<img src="part-05/images/data-flow-for-zaving.png" title="" alt="asdlkj" width="391"> 
+<img src="part-05/images/data-flow-for-saving.png" title="" alt="asdlkj" width="391"> 
 
 asdasd
 

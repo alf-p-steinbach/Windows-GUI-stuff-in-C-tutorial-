@@ -1,4 +1,4 @@
-﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi"). v100
 #include <cpp/util.hpp>                     // hopefully, fail
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
