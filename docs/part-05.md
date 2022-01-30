@@ -524,7 +524,7 @@ Our drawing code draws to a device context, and as mentioned a device context ca
 
 <img src="part-05/images/data-flow-for-saving.png" title="" alt="asdlkj" width="391"> 
 
-<para align="center">❁ ❁ ❁</p>
+<p align="center">❁ ❁ ❁</p>
 
 Creating a bitmap with the same format as the main screen is easy via `CreateCompatibleBitmap`. Creating a *device independent bitmap* with a known common format, a **DIB**, is more involved, using a function called `CreateDIBSection`. It can go like this:
 
@@ -601,16 +601,19 @@ namespace winapi::gdi {
         Bitmap( const int width, const int height ):
             Bitmap( bitmap::create_rgb32( width, height ).handle )
         {}
-        
+
         auto handle() const -> HBITMAP { return m_handle; }
     };
 }  // namespace winapi::gdi
-
 ```
 
+A  bitmap is destroyed via [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject), the same as with a pen or brush object. That’s roughly the definition of a **GDI object**, that it’s destroyed by `DeleteObject`. Other common functions include [`GetObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobject), which obtains information about a GDI object, and `SelectObject`, which selects a GDI object into a device context.
 
+However, a bitmap can only be selected in a special kind of device context called a **memory device context**, where selecting it has the effect that the device context generates its graphics result in the bitmap.
 
+<p align="center">❁ ❁ ❁</p>
 
+asd
 
 asdasd
 
