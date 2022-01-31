@@ -3,6 +3,7 @@
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
 #include <winapi/gdi-Bitmap.hpp>            // winapi::gdi::Bitmap
+#include <winapi/gdi-device-contexts.hpp>   // winapi::gdi::(Screen_dc, Memory_dc)
 #include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
 #include <winapi/ole2.hpp>                  // Ole_library_usage
 
@@ -39,53 +40,6 @@ void display_graphics_on( const HDC canvas )
     SetDCBrushColor( canvas, orange );
     Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 }
-
-
-class Dc: No_copying
-{
-    HDC     m_handle;
-       
-protected:
-    inline virtual ~Dc() = 0;
-
-    Dc( const HDC handle ): m_handle( handle )
-    {
-        hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Device context handle is 0." );
-    }
-
-public:    
-    auto handle() const -> HDC { return m_handle; }
-};
-inline Dc::~Dc() {}
-
-
-class Screen_dc: public Dc
-{
-    static constexpr auto no_window = HWND( 0 );
-
-public:        
-    ~Screen_dc() { ReleaseDC( no_window, handle() ); }
-    Screen_dc(): Dc( GetDC( no_window ) ) {}
-};
-
-
-class Memory_dc: public Dc
-{
-public:
-    ~Memory_dc() { DeleteDC( handle() ); }
-    Memory_dc(): Dc( CreateCompatibleDC( {} ) ) {}
-};
-
-class Bitmap_dc: public Memory_dc
-{
-    Bitmap  m_bitmap;
-
-public:
-    Bitmap_dc( const int width, const int height ): Memory_dc(), m_bitmap( width, height )
-    {
-        SelectObject( handle(), m_bitmap.handle() );
-    }
-};
 
 
 class B_string: No_copying
@@ -161,7 +115,7 @@ void display_graphics()
 {
     const int width     = 400;
     const int height    = 400;
-    const auto bitmap_dc = Bitmap_dc( width, height );
+    const auto bitmap_dc = winapi::gdi::Bitmap_dc( width, height );
     init( bitmap_dc.handle() );
     display_graphics_on( bitmap_dc.handle() );
     //BitBlt( Screen_dc().handle, 15, 15, width, height, bitmap_dc.handle, 0, 0, SRCCOPY );
