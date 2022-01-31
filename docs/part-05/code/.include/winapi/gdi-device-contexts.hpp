@@ -50,6 +50,7 @@ namespace winapi::gdi {
         {}
     };
 
+
     class Bitmap_dc: public Memory_dc
     {
         Bitmap  m_bitmap;
