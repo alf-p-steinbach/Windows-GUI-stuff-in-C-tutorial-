@@ -615,7 +615,7 @@ That is, this is an originally C API that generally can be viewed as a C++ class
 
 One of the non-Liskov features is that a bitmap only can be selected in a special kind of device context called a **memory device context**, where selecting it has the effect that the device context generates its graphics result in the bitmap.
 
-The only way to create a memory device context is to base it on a device context representing the main screen as an *exemplar*, a **screen device context**. I guess that’s because early Windows had to support e.g. [16 color displays](https://en.wikipedia.org/wiki/Video_Graphics_Array#Standard_graphics_modes) on rather slowish computers with very limited memory, so that the default was device dependent bitmaps and device contexts that matched the hardware. It doesn't matter now, when one subsequently selects a DIB into the device context, but it did matter in the device dependent bitmap days.
+The only way to create a memory device context is to base it on a device context representing the main screen, a **screen device context**, as an *exemplar*. I guess that’s because early Windows had to support e.g. [16 color displays](https://en.wikipedia.org/wiki/Video_Graphics_Array#Standard_graphics_modes) on rather slowish computers with very limited memory, so that the default was device dependent bitmaps and device contexts that matched the hardware. It doesn't matter now, when one subsequently selects a DIB into the device context, but it did matter in the device dependent bitmap days.
 
 This is again an originally C API that can be generally viewed as a C++ class hierarchy, but one where device contexts created by different functions must be *destroyed by corresponding different functions*, here `ReleaseDC` and `DestroyDC`:
 
