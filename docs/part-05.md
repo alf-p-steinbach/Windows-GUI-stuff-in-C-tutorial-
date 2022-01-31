@@ -607,15 +607,15 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
-A  bitmap is destroyed via [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject), the same as with a pen or brush object. That’s roughly the definition of a **GDI object**, that it’s destroyed by `DeleteObject`. Other common functions include [`GetObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobject), which obtains information about a GDI object, except regions; and `SelectObject`, which selects a GDI object, except palettes, into a device context.
+As with a pen or brush object and other **GDI objects**, a  bitmap is destroyed via [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject).
 
-That is, this is an originally C API that generally can be viewed as a C++ class hierarchy, and that even supports corresponding implicit conversions of the handle types from “derived” to “base”, e.g. `HBITMAP` → `HGDIOBJ`, but which has a couple of decidedly non-Liskov features.
+That is, this is an originally C API that generally can be viewed as a C++ class hierarchy, and that even supports corresponding implicit conversions of the handle types from “derived” to “base”, e.g. `HBITMAP` → `HGDIOBJ`, but it has a couple of decidedly non-Liskov features.
 
 <p align="center">❁ ❁ ❁</p>
 
-Another of those non-Liskov features is that a bitmap only can be selected in a special kind of device context called a **memory device context**, where selecting it has the effect that the device context generates its graphics result in the bitmap.
+One of those non-Liskov features is that a bitmap only can be selected in a special kind of device context called a **memory device context**, where selecting it has the effect that the device context generates its graphics result in the bitmap.
 
-Early Windows had to support e.g. [16 color displays](https://en.wikipedia.org/wiki/Video_Graphics_Array#Standard_graphics_modes) on rather slowish computers with very limited memory, so the default was device dependent bitmaps and device contexts. The only way to create a memory device context is therefore to base it on a device context representing the main screen as an *exemplar*. It doesn't matter when one subsequently selects a DIB into it, but it did matter in the device dependent bitmap days.
+The only way to create a memory device context is to base it on a device context representing the main screen as an *exemplar*, a **screen device context**. I guess that’s because early Windows had to support e.g. [16 color displays](https://en.wikipedia.org/wiki/Video_Graphics_Array#Standard_graphics_modes) on rather slowish computers with very limited memory, so that the default was device dependent bitmaps and device contexts that matched the hardware. It doesn't matter now, when one subsequently selects a DIB into the device context, but it did matter in the device dependent bitmap days.
 
 This is again an originally C API that can be generally viewed as a C++ class hierarchy, so:
 
