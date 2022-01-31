@@ -656,7 +656,7 @@ namespace winapi::gdi {
         static constexpr auto no_window = HWND( 0 );
 
     public:        
-        ~Screen_dc() { ReleaseDC( no_window, handle() ); }
+        ~Screen_dc() override { ReleaseDC( no_window, handle() ); }
 
         Screen_dc():
             Dc( GetDC( no_window ) )
@@ -667,7 +667,7 @@ namespace winapi::gdi {
     class Memory_dc: public Dc
     {
     public:
-        ~Memory_dc() { DeleteDC( handle() ); }
+        ~Memory_dc() override { DeleteDC( handle() ); }
 
         Memory_dc():
             Dc( CreateCompatibleDC( 0 ) )   // Screen DC for main screen specified implicitly.
