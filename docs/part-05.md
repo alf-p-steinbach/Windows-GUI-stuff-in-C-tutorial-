@@ -104,7 +104,7 @@ Also, for completeness, here’s how to build and run with the Microsoft toolcha
 > set common-code=t:\part-05\code\.include
 
 [T:\part-05\code\on-screen-graphics\v1\.build]
-> cl /I %common% ..\main.cpp user32.lib gdi32.lib /Feb
+> cl /I %common-code% ..\main.cpp user32.lib gdi32.lib /Feb
 main.cpp
 
 [T:\part-05\code\on-screen-graphics\v1\.build]
