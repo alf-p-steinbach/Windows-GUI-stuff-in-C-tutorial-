@@ -526,7 +526,7 @@ Our drawing code draws to a device context, and as mentioned a device context ca
 
 <p align="center">❁ ❁ ❁</p>
 
-Creating a bitmap with the same format as the main screen is easy via `CreateCompatibleBitmap`. Creating a *device independent bitmap* with a known common format, a **DIB**, is more involved, using a function called `CreateDIBSection`. It can go like this:
+Creating a bitmap with the same format (bits per color value, layout in memory) as the main screen is easy via `CreateCompatibleBitmap`. Creating a *device independent bitmap* with a known common format, a **DIB**, is more involved, using a function called `CreateDIBSection`. It can go like this:
 
 *[part-05/code/.include/winapi/gdi-Bitmap.hpp](part-05/code/.include/winapi/gdi-Bitmap.hpp)*
 
@@ -607,11 +607,23 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
-A  bitmap is destroyed via [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject), the same as with a pen or brush object. That’s roughly the definition of a **GDI object**, that it’s destroyed by `DeleteObject`. Other common functions include [`GetObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobject), which obtains information about a GDI object, and `SelectObject`, which selects a GDI object into a device context.
+A  bitmap is destroyed via [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject), the same as with a pen or brush object. That’s roughly the definition of a **GDI object**, that it’s destroyed by `DeleteObject`. Other common functions include [`GetObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getobject), which obtains information about a GDI object, except regions; and `SelectObject`, which selects a GDI object, except palettes, into a device context.
 
-However, a bitmap can only be selected in a special kind of device context called a **memory device context**, where selecting it has the effect that the device context generates its graphics result in the bitmap.
+That is, this is an originally C API that generally can be viewed as a C++ class hierarchy, and that even supports corresponding implicit conversions of the handle types from “derived” to “base”, e.g. `HBITMAP` → `HGDIOBJ`, but which has a couple of decidedly non-Liskov features.
 
 <p align="center">❁ ❁ ❁</p>
+
+Another of those non-Liskov features is that a bitmap only can be selected in a special kind of device context called a **memory device context**, where selecting it has the effect that the device context generates its graphics result in the bitmap.
+
+Early Windows had to support e.g. [16 color displays](https://en.wikipedia.org/wiki/Video_Graphics_Array#Standard_graphics_modes) on rather slowish computers with very limited memory, so the default was device dependent bitmaps and device contexts. The only way to create a memory device context is therefore to base it on a device context representing the main screen as an *exemplar*. It doesn't matter when one subsequently selects a DIB into it, but it did matter in the device dependent bitmap days.
+
+This is again an originally C API that can be generally viewed as a C++ class hierarchy, so:
+
+```cpp
+
+```
+
+
 
 asd
 
