@@ -520,7 +520,7 @@ The `OleSavePictureFile` function expects the graphics image as an `IPictureDisp
 
 An `IPictureDisp` object, in turn, is created from a **bitmap**, essentially an array of pixel values plus some meta-information such as the image size.
 
-Our drawing code draws to a device context, and as mentioned a device context can generate the graphics in a bitmap, so the flow is roughly
+Our drawing code draws to a device context, and as mentioned a device context can generate the graphics in a bitmap, so the flow is roughly DC → bitmap → `IPictureDisp` → file:
 
 <img src="part-05/images/data-flow-for-saving.png" title="" alt="asdlkj" width="391"> 
 
