@@ -670,7 +670,7 @@ namespace winapi::gdi {
         ~Memory_dc() { DeleteDC( handle() ); }
 
         Memory_dc():
-            Dc( CreateCompatibleDC( {} ) )
+            Dc( CreateCompatibleDC( 0 ) )   // Screen DC for main screen specified implicitly.
         {}
     };
 
