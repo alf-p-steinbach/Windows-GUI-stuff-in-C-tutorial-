@@ -1,6 +1,5 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>                     // hopefully, fail
-#include <wrapped-winapi/windows-h.hpp>
+#include <winapi/gdi/Object_.hpp>
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
@@ -52,23 +51,15 @@ namespace winapi::gdi {
         }
     }  // namespace bitmap
 
-    class Bitmap: No_copying
+    class Bitmap: public Object_<HBITMAP>
     {
-        HBITMAP     m_handle;
-
     public:
-        ~Bitmap() { DeleteObject( m_handle ); }
-
         Bitmap( const HBITMAP handle ):
-            m_handle( handle )
-        {
-            hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Bitmap handle is 0." );
-        }
+            Object_<HBITMAP>( handle )
+        {}
 
         Bitmap( const int width, const int height ):
             Bitmap( bitmap::create_rgb32( width, height ).handle )
         {}
-        
-        auto handle() const -> HBITMAP { return m_handle; }
     };
 }  // namespace winapi::gdi

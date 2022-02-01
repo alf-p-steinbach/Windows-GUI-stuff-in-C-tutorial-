@@ -2,11 +2,11 @@
 #include <cpp/util.hpp>                     // hopefully, fail
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
-#include <winapi/gdi-Bitmap.hpp>            // winapi::gdi::Bitmap
-#include <winapi/gdi-device-contexts.hpp>   // winapi::gdi::(Screen_dc, Memory_dc)
+#include <winapi/gdi/Bitmap.hpp>            // winapi::gdi::Bitmap
+#include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::(Screen_dc, Memory_dc)
 #include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
-#include <winapi/ole-B_string.hpp>          // winapi::ole::B_string
-#include <winapi/ole-Library_usage.hpp>     // winapi::ole::Library_usage
+#include <winapi/ole/B_string.hpp>          // winapi::ole::B_string
+#include <winapi/ole/Library_usage.hpp>     // winapi::ole::Library_usage
 
 #include <shlwapi.h>        // SHCreateStreamOnFileEx
 #include <stdio.h>          // fprintf

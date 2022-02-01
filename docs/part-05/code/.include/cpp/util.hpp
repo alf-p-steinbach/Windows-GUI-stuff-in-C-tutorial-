@@ -5,6 +5,7 @@
 #include <random>           // std::(random_device, mt19937, uniform_int_distribution)
 #include <stdexcept>        // std::(exception, runtime_error)
 #include <string>           // std::string
+#include <type_traits>      // std::is_same_v
 
 #define CPPUTIL_FAIL( s ) ::cpp::util::fail( std::string( __func__ ) + " - " + (s) )
 
@@ -12,7 +13,8 @@ namespace cpp::util {
     using   std::size,
             std::random_device, std::mt19937, std::uniform_int_distribution,
             std::exception, std::runtime_error,
-            std::string;
+            std::string,
+            std::is_same_v;
 
     constexpr auto utf8_is_the_execution_character_set()
         -> bool
@@ -64,4 +66,8 @@ namespace cpp::util {
 
     template< class T >
     using Const_ = const T;
+    
+    template< class T, class... Types >
+    constexpr bool includes_type_ = (... or is_same_v<T, Types>);
+
 }  // namespace cpp::util

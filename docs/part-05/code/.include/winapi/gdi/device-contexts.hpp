@@ -1,6 +1,6 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <cpp/util.hpp>                     // cpp::util::(hopefully, fail)
-#include <winapi/gdi-Bitmap.hpp>            // winapi::gdi::*
+#include <winapi/gdi/Bitmap.hpp>            // winapi::gdi::*
 #include <wrapped-winapi/windows-h.hpp>
 
 namespace winapi::gdi {
