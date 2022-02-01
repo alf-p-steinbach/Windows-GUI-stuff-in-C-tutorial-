@@ -5,7 +5,8 @@
 #include <winapi/gdi-Bitmap.hpp>            // winapi::gdi::Bitmap
 #include <winapi/gdi-device-contexts.hpp>   // winapi::gdi::(Screen_dc, Memory_dc)
 #include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
-#include <winapi/ole2.hpp>                  // Ole_library_usage
+#include <winapi/ole-B_string.hpp>          // winapi::ole::B_string
+#include <winapi/ole-Library_usage.hpp>     // winapi::ole::Library_usage
 
 #include <shlwapi.h>        // SHCreateStreamOnFileEx
 #include <stdio.h>          // fprintf
@@ -18,7 +19,7 @@
 #include <string_view>      // std::(string_view, wstring_view)
 
 namespace cu = cpp::util;
-namespace ole2 = winapi::ole2;
+namespace ole = winapi::ole;
 namespace gdi = winapi::gdi;
 using   cu::hopefully, cu::fail, cu::No_copying, cu::int_size, cu::Const_;
 using   gdi::Bitmap;
@@ -42,28 +43,9 @@ void display_graphics_on( const HDC canvas )
 }
 
 
-class B_string: No_copying
-{
-    BSTR    m_pointer;
-    
-public:
-    ~B_string() { SysFreeString( m_pointer ); }
-
-    B_string( const wstring_view& ws ):
-        m_pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
-    {
-        hopefully( m_pointer ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
-    }
-    
-    B_string( const string_view& s ): B_string( winapi::to_utf16( s ) ) {}
-    
-    operator BSTR() const { return m_pointer; }     // Intentionally ignores C++20 `<=>`.
-};
-
-
 void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
 {
-    const auto bstr_file_path = B_string( file_path );
+    const auto bstr_file_path = ole::B_string( file_path );
     const HRESULT hr = OleSavePictureFile( p_picture, bstr_file_path );
     hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
 }
@@ -126,7 +108,7 @@ auto main( int, char** args ) -> int
 {
     using   std::exception;
     try {
-        const ole2::Library_usage _;
+        const ole::Library_usage _;
         display_graphics();
         return EXIT_SUCCESS;
     } catch( const exception& x ) {
