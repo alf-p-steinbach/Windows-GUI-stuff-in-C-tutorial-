@@ -17,9 +17,9 @@ namespace winapi::ole {
         ~B_string() { SysFreeString( m_pointer ); }
 
         B_string( const wstring_view& ws ):
-            m_pointer( SysAllocStringLen( ws.data(), int_size( ws ) ) )
+            m_pointer( SysAllocStringLen( ws.data(), 1u*int_size( ws ) ) )
         {
-            hopefully( m_pointer ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
+            hopefully( !!m_pointer ) or CPPUTIL_FAIL( "SysAllocStringLen failed" );
         }
         
         B_string( const string_view& s ): B_string( winapi::to_utf16( s ) ) {}

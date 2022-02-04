@@ -176,9 +176,15 @@ Result: same as before, just with shorter & more clear code.
 
 ### 5.3. Automate cleanup for device contexts and GDI objects.
 
-aasd
+<img title="" src="part-05/images/yoda.png" alt="">
+
+To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. You can automate the `DeleteObject` object destruction calls via C++ destructors to make such code shorter and safer, e.g. like this:
 
 
+asdf
+
+
+(Yes, I'm aware that the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But. It looks forceful and I like Yoda. ☺)
 
 ### ---
 

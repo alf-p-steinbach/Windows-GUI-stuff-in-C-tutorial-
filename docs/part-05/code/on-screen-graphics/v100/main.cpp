@@ -2,7 +2,7 @@
 #include <cpp/util.hpp>                     // hopefully, fail
 #include <wrapped-winapi/windows-h.hpp>
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
-#include <winapi/gdi/Bitmap.hpp>            // winapi::gdi::Bitmap
+#include <winapi/gdi/Bitmap_32.hpp>         // winapi::gdi::Bitmap_32
 #include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::(Screen_dc, Memory_dc)
 #include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
 #include <winapi/ole/B_string.hpp>          // winapi::ole::B_string
@@ -22,7 +22,7 @@ namespace cu = cpp::util;
 namespace ole = winapi::ole;
 namespace gdi = winapi::gdi;
 using   cu::hopefully, cu::fail, cu::No_copying, cu::int_size, cu::Const_;
-using   gdi::Bitmap;
+using   gdi::Bitmap_32;
 using   std::string,
         std::string_view, std::wstring_view;
 
@@ -81,9 +81,9 @@ void save_to( const string_view& file_path, const HBITMAP bitmap )
     save_to( file_path, ole_picture_from( bitmap ).raw() );
 }
 
-auto bitmap_of( const HDC dc )
-    -> HBITMAP
-{ return static_cast<HBITMAP>( GetCurrentObject( dc, OBJ_BITMAP ) ); }
+// auto bitmap_of( const HDC dc )
+    // -> HBITMAP
+// { return static_cast<HBITMAP>( GetCurrentObject( dc, OBJ_BITMAP ) ); }
     
 void init( const HDC canvas )
 {
@@ -97,11 +97,12 @@ void display_graphics()
 {
     const int width     = 400;
     const int height    = 400;
-    const auto bitmap_dc = winapi::gdi::Bitmap_dc( width, height );
-    init( bitmap_dc.handle() );
-    display_graphics_on( bitmap_dc.handle() );
-    //BitBlt( Screen_dc().handle, 15, 15, width, height, bitmap_dc.handle, 0, 0, SRCCOPY );
-    save_to( "generated-image.bmp", bitmap_of( bitmap_dc.handle() ) );
+    auto bitmap = Bitmap_32( width, height );
+    const auto dc = winapi::gdi::Bitmap_dc( bitmap );
+    init( dc.handle() );
+    display_graphics_on( dc.handle() );
+    //BitBlt( Screen_dc().handle, 15, 15, width, height, dc.handle(), 0, 0, SRCCOPY );
+    save_to( "generated-image.bmp", bitmap.handle() );
 }
 
 auto main( int, char** args ) -> int

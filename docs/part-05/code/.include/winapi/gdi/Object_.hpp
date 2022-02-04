@@ -7,25 +7,29 @@
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
-    using   cu::No_copying, cu::includes_type_;
-    using   std::is_same_v,
-            std::enable_if_t, std::exchange;
+    using   cu::No_copying, cu::Type_list_;
+    using   std::enable_if_t, std::exchange;
+
+    using Object_handle_types = Type_list_<HGDIOBJ, HPEN, HBRUSH, HFONT, HBITMAP, HRGN, HPALETTE>;
 
     template<
-        class Handle,
-        class = enable_if_t< includes_type_< Handle,
-            HGDIOBJ, HPEN, HBRUSH, HFONT, HBITMAP, HRGN, HPALETTE
-            > >
+        class Handle_type,
+        class = enable_if_t< Object_handle_types::includes_<Handle_type> >
         >
     class Object_: No_copying
     {
+    public:
+        using Handle = Handle_type;
+
+    private:
         Handle      m_handle;
         
     public:
         ~Object_()
         {
-            const bool ok = !!::DeleteObject( m_handle );
-            assert(( "DeleteObject", ok ));  (void) ok;
+            // Deletion may possibly fail if the object is selected in a device context.
+            const bool deleted = ::DeleteObject( m_handle );
+            assert(( "DeleteObject", deleted ));  (void) deleted;
         }
         
         Object_( const Handle handle ):
@@ -39,4 +43,12 @@ namespace winapi::gdi {
         auto handle() const -> Handle { return m_handle; }
         operator Handle() const { return handle(); }
     };
+    
+    using   Object      = Object_<HGDIOBJ>;
+    using   Pen         = Object_<HPEN>;
+    using   Brush       = Object_<HBRUSH>;
+    using   Font        = Object_<HFONT>;
+    using   Bitmap      = Object_<HBITMAP>;
+    using   Region      = Object_<HRGN>;
+    using   Palette     = Object_<HPALETTE>;
 }  // namespace winapi::gdi

@@ -1,5 +1,5 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <winapi/gdi/Object_.hpp>
+#include <winapi/gdi/Object_.hpp>       // winapi::gdi::Bitmap
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
@@ -50,16 +50,21 @@ namespace winapi::gdi {
             return Handle_and_memory{ handle, p_bits };
         }
     }  // namespace bitmap
-
-    class Bitmap: public Object_<HBITMAP>
+    
+    class Bitmap_32: public Bitmap
     {
+        void*       m_p_bits;
+
     public:
-        Bitmap( const HBITMAP handle ):
-            Object_<HBITMAP>( handle )
+        Bitmap_32( const bitmap::Handle_and_memory& pieces ):
+            Bitmap( pieces.handle ),
+            m_p_bits( pieces.p_bits )
         {}
 
-        Bitmap( const int width, const int height ):
-            Bitmap( bitmap::create_rgb32( width, height ).handle )
+        Bitmap_32( const int w, const int h ):
+            Bitmap_32( bitmap::create_rgb32( w, h ) )
         {}
+        
+        auto bits() const -> void* { return m_p_bits; }
     };
 }  // namespace winapi::gdi

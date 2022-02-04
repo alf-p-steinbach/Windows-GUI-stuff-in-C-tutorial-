@@ -75,7 +75,7 @@ namespace winapi::gui {
 
     inline void set_standard_gui_font( const HWND window )
     {
-        const auto callback = []( HWND control, LPARAM ) -> BOOL
+        const auto callback = []( HWND control, LPARAM ) noexcept -> BOOL
         {
             SetWindowFont( control, std_gui_font.handle, true );
             return true;
@@ -101,10 +101,10 @@ namespace winapi::gui {
         -> string
     {
         const int buffer_size = 1 + GetWindowTextLength( window );
-        auto result = string( buffer_size, '\0' );
+        auto result = string( 1u*buffer_size, '\0' );
         if( buffer_size > 0 ) {
             const int length = GetWindowText( window, &result[0], buffer_size );
-            result.resize( length );
+            result.resize( 1u*length );
         }
         return result;
     }

@@ -1,6 +1,7 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 
 #include <assert.h>         // assert
+#include <functional>       // std::reference_wrapper
 #include <iterator>         // std::size
 #include <random>           // std::(random_device, mt19937, uniform_int_distribution)
 #include <stdexcept>        // std::(exception, runtime_error)
@@ -10,7 +11,8 @@
 #define CPPUTIL_FAIL( s ) ::cpp::util::fail( std::string( __func__ ) + " - " + (s) )
 
 namespace cpp::util {
-    using   std::size,
+    using   std::reference_wrapper,
+            std::size,
             std::random_device, std::mt19937, std::uniform_int_distribution,
             std::exception, std::runtime_error,
             std::string,
@@ -67,7 +69,14 @@ namespace cpp::util {
     template< class T >
     using Const_ = const T;
     
-    template< class T, class... Types >
-    constexpr bool includes_type_ = (... or is_same_v<T, Types>);
+    template< class... Types >
+    struct Type_list_
+    {
+        static constexpr int count = static_cast<int>( sizeof...( Types ) );
 
+        template< class T >
+        static constexpr bool includes_ = (... or is_same_v<T, Types>);
+    };
+
+    template< class T > using Std_ref_ = reference_wrapper<T>;
 }  // namespace cpp::util

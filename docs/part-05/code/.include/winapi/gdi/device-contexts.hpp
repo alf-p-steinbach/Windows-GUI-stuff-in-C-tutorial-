@@ -1,11 +1,11 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <cpp/util.hpp>                     // cpp::util::(hopefully, fail)
-#include <winapi/gdi/Bitmap.hpp>            // winapi::gdi::*
+#include <winapi/gdi/Object_.hpp>           // winapi::gdi::Bitmap
 #include <wrapped-winapi/windows-h.hpp>
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
-    using cu::hopefully, cu::No_copying;
+    using cu::hopefully, cu::No_copying, cu::Std_ref_;
 
     class Dc: No_copying
     {
@@ -29,13 +29,11 @@ namespace winapi::gdi {
 
     class Screen_dc: public Dc
     {
-        static constexpr auto no_window = HWND( 0 );
-
     public:        
-        ~Screen_dc() override { ReleaseDC( no_window, handle() ); }
+        ~Screen_dc() override { ReleaseDC( 0, handle() ); }
 
         Screen_dc():
-            Dc( GetDC( no_window ) )
+            Dc( GetDC( 0 ) )                // Main screen specified implicitly.
         {}
     };
 
@@ -53,14 +51,16 @@ namespace winapi::gdi {
 
     class Bitmap_dc: public Memory_dc
     {
-        Bitmap  m_bitmap;
+        Bitmap* m_p_bitmap;
 
     public:
-        Bitmap_dc( const int width, const int height ):
+        Bitmap_dc( const Std_ref_<Bitmap> bitmap ):
             Memory_dc(),
-            m_bitmap( width, height )
+            m_p_bitmap( &bitmap.get() )
         {
-            SelectObject( handle(), m_bitmap.handle() );
+            SelectObject( handle(), m_p_bitmap->handle() );
         }
+        
+        auto bitmap() const -> const Bitmap& { return *m_p_bitmap; }
     };
 }  // namespace winapi::gdi
