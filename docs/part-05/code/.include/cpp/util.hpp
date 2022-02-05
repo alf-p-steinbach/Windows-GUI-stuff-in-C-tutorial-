@@ -70,12 +70,12 @@ namespace cpp::util {
     using Const_ = const T;
     
     template< class... Types >
-    struct Type_list_
+    struct Types_
     {
         static constexpr int count = static_cast<int>( sizeof...( Types ) );
 
         template< class T >
-        static constexpr bool includes_ = (... or is_same_v<T, Types>);
+        static constexpr bool contain_ = (... or is_same_v<T, Types>);
     };
 
     template< class T > using Std_ref_ = reference_wrapper<T>;
