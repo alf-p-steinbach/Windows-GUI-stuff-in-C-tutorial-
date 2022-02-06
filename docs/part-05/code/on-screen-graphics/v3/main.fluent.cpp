@@ -10,8 +10,6 @@ namespace gdi = winapi::gdi;
 using   gdi::Brush, gdi::Pen, gdi::Dc, gdi::Screen_dc;
 using   std::string_view, std::size;
 
-template< class... Args > void evaluate( const Args&... ) {}
-
 void draw_on( const Dc& canvas, const RECT& area )
 {
     constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
@@ -19,16 +17,13 @@ void draw_on( const Dc& canvas, const RECT& area )
     constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
     
     // Clear the background to blue.
-    FillRect( canvas,  &area, Brush( CreateSolidBrush( blue ) ) );
+    FillRect( canvas + CreateSolidBrush( blue ), &area, 0 );
 
-    { // Draw a yellow circle filled with orange.
-        const auto pen      = Pen( CreatePen( PS_SOLID, 1, yellow ) );
-        const auto brush    = Brush( CreateSolidBrush( orange ) );
-
-        const auto s1       = Dc::Selection( canvas, pen );
-        const auto s2       = Dc::Selection( canvas, brush );
-        Ellipse( canvas, area.left, area.top, area.right, area.bottom );
-    }
+    // Draw a yellow circle filled with orange.
+    Ellipse(
+        canvas + CreatePen( PS_SOLID, 1, yellow ) + CreateSolidBrush( orange ),
+        area.left, area.top, area.right, area.bottom
+        );
 }
 
 auto main() -> int

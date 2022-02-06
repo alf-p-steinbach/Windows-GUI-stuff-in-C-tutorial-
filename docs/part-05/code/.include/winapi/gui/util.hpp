@@ -1,5 +1,6 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 
+#include <winapi/gui/std_font.hpp>          // winapi::gui::"font stuff"
 #include <wrapped-winapi/windowsx-h.hpp>    // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
 #include <wrapped-winapi/commctrl-h.hpp>    // InitCommonControlsEx
 
@@ -47,42 +48,6 @@ namespace winapi::gui {
     void remove_topmost_style_for( const HWND window )
     {
         SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
-    }
-
-    struct Standard_gui_font
-    {
-        Standard_gui_font( const Standard_gui_font& ) = delete;
-        auto operator=( const Standard_gui_font& ) -> Standard_gui_font& = delete;
-
-        HFONT   handle;
-
-        ~Standard_gui_font()
-        {
-            DeleteFont( handle );
-        }
-
-        Standard_gui_font()
-        {
-            // Get the system message box font
-            const auto ncm_size = sizeof( NONCLIENTMETRICS );
-            NONCLIENTMETRICS metrics = {ncm_size};
-            SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm_size, &metrics, 0 );
-            handle = CreateFontIndirect( &metrics.lfMessageFont );
-        }
-    };
-
-    inline const auto   std_gui_font    = Standard_gui_font();
-
-    inline void set_standard_gui_font( const HWND window )
-    {
-        const auto callback = []( HWND control, LPARAM ) noexcept -> BOOL
-        {
-            SetWindowFont( control, std_gui_font.handle, true );
-            return true;
-        };
-
-        SetWindowFont( window, std_gui_font.handle, true );
-        EnumChildWindows( window, callback, 0 );
     }
 
     constexpr DWORD basic_common_controls = ICC_STANDARD_CLASSES | ICC_WIN95_CLASSES;

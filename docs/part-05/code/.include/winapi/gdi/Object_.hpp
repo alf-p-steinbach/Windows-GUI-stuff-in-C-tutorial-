@@ -7,7 +7,7 @@
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
-    using   cu::No_copying, cu::Types_;
+    using   cu::hopefully, cu::No_copying, cu::Types_;
     using   std::enable_if_t, std::exchange;
 
     // The handle types below are the types that have destruction via GDI `DestroyObject`.

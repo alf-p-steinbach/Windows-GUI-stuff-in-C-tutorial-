@@ -4,7 +4,7 @@
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
 #include <winapi/gdi/Bitmap_32.hpp>         // winapi::gdi::Bitmap_32
 #include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::(Screen_dc, Memory_dc)
-#include <winapi/gui-util.hpp>              // winapi::gui::std_gui_font
+#include <winapi/gui/util.hpp>              // winapi::gui::std_gui_font
 #include <winapi/ole/B_string.hpp>          // winapi::ole::B_string
 #include <winapi/ole/Library_usage.hpp>     // winapi::ole::Library_usage
 
@@ -90,7 +90,7 @@ void init( const HDC canvas )
     SelectObject( canvas, GetStockObject( DC_PEN ) );
     SelectObject( canvas, GetStockObject( DC_BRUSH ) );
     SetBkMode( canvas, TRANSPARENT );       // Don't fill in the background of text, please.
-    SelectObject( canvas, winapi::gui::std_gui_font.handle );
+    SelectObject( canvas, winapi::gui::std_font.handle() );
 }
 
 void display_graphics()
