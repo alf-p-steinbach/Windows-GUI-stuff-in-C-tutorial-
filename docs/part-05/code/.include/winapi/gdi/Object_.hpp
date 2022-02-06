@@ -35,8 +35,7 @@ namespace winapi::gdi {
             assert(( "DeleteObject", deleted ));  (void) deleted;
         }
         
-        Object_( const Handle handle ):
-            m_handle( handle )
+        Object_( Handle&& handle ): m_handle( handle )
         {
             hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Handle is 0." );
         }
