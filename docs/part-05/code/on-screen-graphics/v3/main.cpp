@@ -1,11 +1,6 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::*
 
-#include <string_view>      // std::string_view
-#include <iterator>         // std::size
-
-#include <assert.h>
-
 namespace gdi = winapi::gdi;
 using   gdi::Dc, gdi::Screen_dc;
 

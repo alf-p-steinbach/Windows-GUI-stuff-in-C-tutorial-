@@ -178,7 +178,50 @@ Result: same as before, just with shorter & more clear code.
 
 <img title="" src="part-05/images/yoda.png" alt="">
 
-To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. You can automate the `DeleteObject` object destruction calls via C++ destructors to make such code shorter and safer, e.g. like this:
+To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. You can automate the `DeleteObject` object destruction calls via C++ destructors to make such code shorter and safer, C++ [RAII](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization), which essentially means defining small handle ownership classes such as `Brush` and `Pen`.
+
+This RAII idea of leveraging C++ construction and destruction can also be applied to device contexts, e.g. via a general abstract base class `Dc` with concrete derived classes such as `Screen_dc` and `Bitmap_dc`.
+
+For exception safety — to be able to use exceptions freely — even the `SelectObject` call pairs can/should be automated via C++ construction and destruction, e.g. a class `Dc::Selection` whose instances retain the requisite information to undo the selection.
+
+Finally, most of these objects will ordinarily be tempory short lived ones, created for single calls of graphics primitives such as `FillRect` and `Ellipse`.
+To reduce that verbosity one can support *implicit creation* of the objects via operators such `+` or `->`, using the same return-reference-to-self *call chaining* idea as with iostream `<<` expressions.
+
+For example, “adding” a device context and e.g. a temporary GDI pen object handle with `+` can result in a temporary `Pen` object (ensuring `DeleteObject`) and a `Dc::Selection` instance that converts implicitly to `HDC`, so that such an expression can be used where a `HDC` is required, and where further addition can be chained on the first one. The key C++ language support for this is that a temporary object is destroyed at the end of the full-expression, not immediately after the function call it appears as argument to. So the temporary objects created by `+` arguments persist until the full expression, e.g. with the outermost level a call of `FillRect` or `Ellipse`, has been evaluated.
+
+Using such machinery the example with dynamic creation of brushes and pens can be rewritten as much shorter and now exception safe C++ level code:
+
+```cpp
+# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::*
+
+namespace gdi = winapi::gdi;
+using   gdi::Dc, gdi::Screen_dc;
+
+void draw_on( const Dc& canvas, const RECT& area )
+{
+    constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
+    constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
+    constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
+    
+    FillRect( canvas + CreateSolidBrush( blue ), &area, 0 );
+    Ellipse(
+        canvas + CreatePen( PS_SOLID, 1, yellow ) + CreateSolidBrush( orange ),
+        area.left, area.top, area.right, area.bottom
+        );
+}
+
+auto main() -> int
+{
+    draw_on( Screen_dc(), RECT{ 10, 10, 10 + 400, 10 + 400 } );
+}
+```
+
+
+
+
+
+, e.g. like this:
 
 *[part-05/code/.include/winapi/gdi/Object_.hpp](part-05/code/.include/winapi/gdi/Object_.hpp)*:
 
@@ -211,7 +254,7 @@ namespace winapi::gdi {
 
     private:
         Handle      m_handle;
-        
+
     public:
         ~Object_()
         {
@@ -219,7 +262,7 @@ namespace winapi::gdi {
             const bool deleted = ::DeleteObject( m_handle );
             assert(( "DeleteObject", deleted ));  (void) deleted;
         }
-        
+
         Object_( Handle&& handle ): m_handle( handle )
         {
             hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Handle is 0." );
@@ -240,8 +283,6 @@ namespace winapi::gdi {
     using   Region      = Object_<HRGN>;
     using   Palette     = Object_<HPALETTE>;
 }  // namespace winapi::gdi
-
-
 ```
 
 … where
@@ -260,6 +301,12 @@ in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
 ```
 
 The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes do not inherit from `Object` because, while that would faithfully reproduce the conceptual GDI class hierarchy it would require e.g. adding handle type downcasts, complication!, for no real advantage.
+
+
+
+
+
+
 
 The Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
