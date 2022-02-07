@@ -178,7 +178,7 @@ Result: same as before, just with shorter & more clear code.
 
 <img title="" src="part-05/images/yoda.png" alt="">
 
-To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. You can automate the `DeleteObject` object destruction calls via C++ destructors to make such code shorter and safer, C++ [RAII](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization), which essentially means defining small handle ownership classes such as `Brush` and `Pen`.
+To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. But you can automate the `DeleteObject` object destruction calls via C++ destructors to make such code shorter and safer, C++ [RAII](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization), which essentially means defining small handle ownership classes such as `Brush` and `Pen`.
 
 This RAII idea of leveraging C++ construction and destruction can also be applied to device contexts, e.g. via a general abstract base class `Dc` with concrete derived classes such as `Screen_dc` and `Bitmap_dc`.
 
