@@ -191,6 +191,8 @@ For example, “adding” a device context and e.g. a temporary GDI pen object h
 
 Using such machinery the example with dynamic creation of brushes and pens can be rewritten as much shorter and now exception safe C++ level code:
 
+*[part-05/code/on-screen-graphics/v3/main.cpp](part-05/code/on-screen-graphics/v3/main.cpp)*:
+
 ```cpp
 # // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::*
@@ -216,6 +218,20 @@ auto main() -> int
     draw_on( Screen_dc(), RECT{ 10, 10, 10 + 400, 10 + 400 } );
 }
 ```
+
+<img title="" src="part-05/images/sshot-2.cpp-graphics-on-screen.cropped.png" alt="">
+
+This program does exactly the same as the first, C style example, in order to be able to easily compare the programs.
+
+But if one just wants solid color lines and fills then using the DC pen and DC brush colors, as exemplified in the previous section, is simple enough without requiring this kind of machinery with behind-the-scenes doings.
+
+So, for a more “what’s it useful for” example, consider using e.g. patterned pens and brushes, which can not be expressed via only DC pen and DC brush coloring:
+
+
+
+---
+
+
 
 
 
