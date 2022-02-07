@@ -223,7 +223,7 @@ auto main() -> int
 
 This program does exactly the same as the first, C style example, in order to make it easy to compare the programs.
 
-But if one just wants solid color lines and fills then using the DC pen and DC brush colors, as exemplified in the previous section, is simple enough without requiring this kind of machinery with behind-the-scenes doings.
+But if one just wants solid color lines and fills like this, then using the DC pen and DC brush colors, as exemplified in the previous section, is simple enough without requiring this kind of advanced machinery with behind-the-scenes doings.
 
 So, for a more “what’s it useful for” example, consider using e.g. patterned pens and brushes, which can not be expressed via only DC pen and DC brush coloring:
 
