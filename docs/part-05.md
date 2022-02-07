@@ -221,7 +221,7 @@ auto main() -> int
 
 <img title="" src="part-05/images/sshot-2.cpp-graphics-on-screen.cropped.png" alt="">
 
-This program does exactly the same as the first, C style example, in order to be able to easily compare the programs.
+This program does exactly the same as the first, C style example, in order to make it easy to compare the programs.
 
 But if one just wants solid color lines and fills then using the DC pen and DC brush colors, as exemplified in the previous section, is simple enough without requiring this kind of machinery with behind-the-scenes doings.
 
