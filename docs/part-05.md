@@ -185,7 +185,8 @@ This RAII idea of leveraging C++ construction and destruction can also be applie
 For exception safety — to be able to use exceptions freely — even the `SelectObject` call pairs can/should be automated via C++ construction and destruction, e.g. a class `Dc::Selection` whose instances retain the requisite information to undo the selection.
 
 Finally, most of these objects will ordinarily be very short lived ones, created for single calls of graphics primitives such as `FillRect` and `Ellipse`.
-To reduce or eliminate that phletora of named variables one can support *implicit creation* of the objects via operators such `+` or `->`, using the same return-reference-to-self *call chaining* idea as with iostream `<<` expressions.
+
+To reduce or eliminate a phletora of named short lived variables one can support *implicit creation* of the objects via operators such `+` or `->`, using the same return-reference-to-self *call chaining* idea as with iostream `<<` expressions.
 
 For example, “adding” a device context and e.g. a temporary GDI pen object handle with `+` can result in a temporary `Pen` object (ensuring `DeleteObject`) and a `Dc::Selection` instance that converts implicitly to `HDC`, so that such an expression can be used where an `HDC` is required, and where further addition can be chained on the first one. The key C++ language support for this is that a temporary object is destroyed at the end of the full-expression, not immediately after the function call it appears as argument to. So the temporary objects created by `+` arguments persist until the full expression, e.g. with the outermost level a call of `FillRect` or `Ellipse`, has been evaluated.
 
@@ -221,23 +222,35 @@ auto main() -> int
 
 <img title="" src="part-05/images/sshot-2.cpp-graphics-on-screen.cropped.png" alt="">
 
-This program does exactly the same as the first, C style example, in order to make it easy to compare the programs.
+This program does exactly the same as the first and second C style examples, in order to make it easy to compare the three programs.
 
-But if one just wants solid color lines and fills like this, then using the DC pen and DC brush colors, as exemplified in the previous section, is simple enough without requiring this kind of advanced machinery with behind-the-scenes doings.
-
-So, for a more “what’s it useful for” example, consider using e.g. patterned pens and brushes, which can not be expressed via only DC pen and DC brush coloring:
-
-
+Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
 ---
 
+Technical details: for the implementation of GDI object RAII wrappers I found it useful to define a little **type list** class template,
 
+in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
 
+```cpp
+    template< class... Types >
+    struct Types_
+    {
+        static constexpr int count = static_cast<int>( sizeof...( Types ) );
 
+        template< class T >
+        static constexpr bool contain_ = (... or is_same_v<T, Types>);
+    };
+```
 
+… which supports definitions like
 
+```cpp
+using Object_handle_types = Types_<HGDIOBJ, HPEN, HBRUSH, HFONT, HBITMAP, HRGN, HPALETTE>;
 
-, e.g. like this:
+```
+
+The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes below do not inherit from `Object` because, while that would faithfully reproduce the conceptual GDI class hierarchy it would require e.g. adding handle type downcasts, complication!, for no real advantage.
 
 *[part-05/code/.include/winapi/gdi/Object_.hpp](part-05/code/.include/winapi/gdi/Object_.hpp)*:
 
@@ -301,30 +314,13 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
-… where
-
-in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
-
-```cpp
-    template< class... Types >
-    struct Types_
-    {
-        static constexpr int count = static_cast<int>( sizeof...( Types ) );
-
-        template< class T >
-        static constexpr bool contain_ = (... or is_same_v<T, Types>);
-    };
-```
-
-The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes do not inherit from `Object` because, while that would faithfully reproduce the conceptual GDI class hierarchy it would require e.g. adding handle type downcasts, complication!, for no real advantage.
+Fine detail: the rvalue reference `Handle&&` for the `Object_` constructor parameter expresses an **ownerhip transfer**. It helps to avoid incorrect usage by allowing only a temporary handle, such as from a call of `CreatePen` or `CreateSolidBrush`.
 
 
 
 
 
 
-
-The Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
 ### ---
 
