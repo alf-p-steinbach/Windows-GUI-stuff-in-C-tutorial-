@@ -251,7 +251,7 @@ in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
 using Object_handle_types = Types_<HGDIOBJ, HPEN, HBRUSH, HFONT, HBITMAP, HRGN, HPALETTE>;
 ```
 
-The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes below do not inherit from `Object` because, while that would faithfully reproduce the conceptual GDI class hierarchy it would require e.g. adding handle type downcasts, complication!, for no real advantage.
+The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes below do not inherit from `Object` because, while that would faithfully reproduce the conceptual GDI class hierarchy it would require e.g. adding handle type downcasts for no real advantage.
 
 *[part-05/code/.include/winapi/gdi/Object_.hpp](part-05/code/.include/winapi/gdi/Object_.hpp)*:
 
