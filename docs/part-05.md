@@ -525,7 +525,11 @@ Our drawing code draws to a device context, and as mentioned a device context ca
 
 <p align="center">❁ ❁ ❁</p>
 
-Creating a bitmap with the same format (bits per color value, layout in memory) as the main screen is easy via `CreateCompatibleBitmap`. Creating a *device independent bitmap* with a known common format, a **DIB**, is more involved, using a function called `CreateDIBSection`. It can go like this:
+We already have a `Bitmap_dc` class suitable for drawing in a bitmap, and if the GDI had offered a simple to use function to create a bitmap with a specified format, then that would have sufficed.
+
+Creating a bitmap with the same format (bits per color value, layout in memory) as the main screen *is* easy via `CreateCompatibleBitmap`. But e.g. I have one screen with a mode with 10 bits per R, G and B. So, using the simple and for-most-screens-working `CreateCompatibleBitmap` falls in the category of “oh, but it worked on *my* machine…”.
+
+Creating a *device independent bitmap* with a known common format, a **DIB**, can be done via a function called `CreateDIBSection` but is more complex, with lots of details involved; it can go like this:
 
 *[part-05/code/.include/winapi/gdi/Bitmap_32.hpp](part-05/code/.include/winapi/gdi/Bitmap_32.hpp)*
 
