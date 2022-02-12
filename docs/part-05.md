@@ -511,7 +511,7 @@ Well, there are two ways to save a GDI graphics result as a now reasonably [port
 
 Here we’ll use the API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge, and because this is information that’s difficult to come by nowadays.
 
-The Microsoft documentation linked to above is one of many sources that show how generate binary “.bmp” file contents, if you want to go that route.
+The Microsoft documentation linked to above is one of many sources that show how to generate binary “.bmp” file contents, if you want to go that route.
 
 <p align="center">❁ ❁ ❁</p>
 
