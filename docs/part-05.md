@@ -527,12 +527,11 @@ Our drawing code draws to a device context, and as mentioned a device context ca
 
 Creating a bitmap with the same format (bits per color value, layout in memory) as the main screen is easy via `CreateCompatibleBitmap`. Creating a *device independent bitmap* with a known common format, a **DIB**, is more involved, using a function called `CreateDIBSection`. It can go like this:
 
-*[part-05/code/.include/winapi/gdi-Bitmap.hpp](part-05/code/.include/winapi/gdi-Bitmap.hpp)*
+*[part-05/code/.include/winapi/gdi/Bitmap_32.hpp](part-05/code/.include/winapi/gdi/Bitmap_32.hpp)*
 
 ```cpp
 #pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>                     // hopefully, fail
-#include <wrapped-winapi/windows-h.hpp>
+#include <winapi/gdi/Object_.hpp>       // winapi::gdi::Bitmap
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
@@ -583,27 +582,25 @@ namespace winapi::gdi {
             return Handle_and_memory{ handle, p_bits };
         }
     }  // namespace bitmap
-
-    class Bitmap: No_copying
+    
+    class Bitmap_32: public Bitmap
     {
-        HBITMAP     m_handle;
+        void*       m_p_bits;
 
     public:
-        ~Bitmap() { DeleteObject( m_handle ); }
-
-        Bitmap( const HBITMAP handle ):
-            m_handle( handle )
-        {
-            hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Bitmap handle is 0." );
-        }
-
-        Bitmap( const int width, const int height ):
-            Bitmap( bitmap::create_rgb32( width, height ).handle )
+        Bitmap_32( const bitmap::Handle_and_memory& pieces ):
+            Bitmap( pieces.handle ),
+            m_p_bits( pieces.p_bits )
         {}
 
-        auto handle() const -> HBITMAP { return m_handle; }
+        Bitmap_32( const int w, const int h ):
+            Bitmap_32( bitmap::create_rgb32( w, h ) )
+        {}
+        
+        auto bits() const -> void* { return m_p_bits; }
     };
 }  // namespace winapi::gdi
+
 ```
 
 As with a pen or brush object and other **GDI objects**, a  bitmap is destroyed via [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject).
