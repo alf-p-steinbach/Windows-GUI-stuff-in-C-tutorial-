@@ -23,7 +23,7 @@ namespace winapi::gdi {
     protected:
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
 
-        Dc( const HDC handle, const bool do_extended_init = true ):
+        Dc( HDC&& handle, const bool do_extended_init = true ):
             m_handle( handle )
         {
             hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Device context handle is 0." );
