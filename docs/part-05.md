@@ -362,10 +362,96 @@ namespace winapi:gui {
         set_font( window, std_font );
     }
 }  // namespace winapi::gui
-
 ```
 
-asdasd
+---
+
+The standard GUI font is used in the `Dc` class’ default initialization of a device context:
+
+In *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <cpp/util.hpp>                     // cpp::util::(hopefully, fail)
+#include <winapi/gdi/Object_.hpp>           // winapi::gdi::(Brush, Pen, Bitmap)
+#include <winapi/gui/std_font.hpp>          // winapi::gui::std_font
+#include <wrapped-winapi/windows-h.hpp>
+
+namespace winapi::gdi {
+    namespace cu = cpp::util;
+    using cu::hopefully, cu::No_copying, cu::Std_ref_;
+
+    inline void make_practical( const HDC dc )
+    {
+        SelectObject( dc, GetStockObject( DC_PEN ) );
+        SelectObject( dc, GetStockObject( DC_BRUSH ) );
+        SetBkMode( dc, TRANSPARENT );       // Don't fill in the background of text, please.
+        SelectObject( dc, gui::std_font.handle() );
+    }
+
+    class Dc: No_copying
+    {
+        HDC     m_handle;
+
+    protected:
+        inline virtual ~Dc() = 0;                           // Derived-class responsibility.
+
+        Dc( const HDC handle, const bool do_extended_init = true ):
+            m_handle( handle )
+        {
+            hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Device context handle is 0." );
+            if( do_extended_init ) { make_practical( m_handle ); }
+        }
+
+    public:
+        class Selection;                                    // RAII for SelectObject, separate.
+
+        auto handle() const -> HDC { return m_handle; }
+        operator HDC() const { return handle(); }
+    };
+
+    inline Dc::~Dc() {}
+
+
+    class Screen_dc: public Dc
+    {
+    public:        
+        ~Screen_dc() override { ReleaseDC( 0, handle() ); }
+        Screen_dc(): Dc( GetDC( 0 ) ) {}                    // Main screen specified implicitly.
+    };
+
+
+    class Memory_dc: public Dc
+    {
+    public:
+        ~Memory_dc() override { DeleteDC( handle() ); }
+        Memory_dc(): Dc( CreateCompatibleDC( 0 ) ) {}       // Implicitly DC for main screen.
+    };
+
+
+    class Bitmap_dc: public Memory_dc
+    {
+        Bitmap* m_p_bitmap;
+
+    public:
+        Bitmap_dc( const Std_ref_<Bitmap> bitmap ):
+            Memory_dc(),
+            m_p_bitmap( &bitmap.get() )
+        {
+            SelectObject( handle(), m_p_bitmap->handle() );
+        }
+
+        auto bitmap() const -> const Bitmap& { return *m_p_bitmap; }
+    };
+
+    ⋮
+```
+
+&hellip; where, in the `Bitmap_dc` constructor `Std_ref` is an alias for a `std::reference_wrapper`, used to make clear in using code that the argument bitmap is referenced, not copied.
+
+
+
+
 
 ---
 

@@ -30,44 +30,14 @@ namespace winapi::gdi {
             if( do_extended_init ) { make_practical( m_handle ); }
         }
 
-    public:    
-        class Selection: No_copying
-        {
-            const Dc&   m_dc;
-            HGDIOBJ     m_original_object;
-            
-        public:
-            ~Selection() { SelectObject( m_dc, m_original_object ); }
-
-            struct From_api_handle {};  // Intentionally explicit, verbose & ugly interface.
-            Selection( From_api_handle, const HGDIOBJ object_handle, const Dc& dc ):
-                m_dc( dc ),  m_original_object( SelectObject( dc, object_handle ) )
-            {}
-
-            template< class Handle >    // Easy to use interface.
-            Selection( const Dc& dc, const Object_<Handle>& object ):
-                Selection( From_api_handle(), object.handle(), dc )
-            {}
-
-            auto dc() const -> const Dc& { return m_dc; }
-
-            operator const Dc&() const { return dc(); }     // Supports `+` operator.
-            operator HDC() const { return m_dc.handle(); }  // Supports using Selection as DC.
-        };
+    public:
+        class Selection;                                    // RAII for SelectObject, separate.
 
         auto handle() const -> HDC { return m_handle; }
         operator HDC() const { return handle(); }
     };
 
     inline Dc::~Dc() {}
-
-    inline auto operator+( const Dc& dc, const Brush& object )
-        -> Dc::Selection
-    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
-
-    inline auto operator+( const Dc& dc, const Pen& object )
-        -> Dc::Selection
-    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
 
 
     class Screen_dc: public Dc
@@ -100,4 +70,37 @@ namespace winapi::gdi {
         
         auto bitmap() const -> const Bitmap& { return *m_p_bitmap; }
     };
+
+
+    class Dc::Selection: No_copying
+    {
+        const Dc&   m_dc;
+        HGDIOBJ     m_original_object;
+        
+    public:
+        ~Selection() { SelectObject( m_dc, m_original_object ); }
+
+        struct From_api_handle {};  // Intentionally explicit, verbose & ugly interface.
+        Selection( From_api_handle, const HGDIOBJ object_handle, const Dc& dc ):
+            m_dc( dc ),  m_original_object( SelectObject( dc, object_handle ) )
+        {}
+
+        template< class Handle >    // Easy to use interface.
+        Selection( const Dc& dc, const Object_<Handle>& object ):
+            Selection( From_api_handle(), object.handle(), dc )
+        {}
+
+        auto dc() const -> const Dc& { return m_dc; }
+
+        operator const Dc&() const { return dc(); }     // Supports `+` operator.
+        operator HDC() const { return m_dc.handle(); }  // Supports using Selection as DC.
+    };
+
+    inline auto operator+( const Dc& dc, const Brush& object )
+        -> Dc::Selection
+    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
+
+    inline auto operator+( const Dc& dc, const Pen& object )
+        -> Dc::Selection
+    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
 }  // namespace winapi::gdi
