@@ -326,7 +326,7 @@ The [part 3 machinery to obtain a handle to the standard GUI font](part-03.md#34
 #include <winapi/gdi/Object_.hpp>           // winapi::gdi::Font
 #include <wrapped-winapi/windowsx-h.hpp>    // windows.h + SetWindowFont    
 
-namespace winapi::gui {
+namespace winapi:gui {
     inline auto create_std_font()
         -> HFONT
     {
@@ -343,20 +343,26 @@ namespace winapi::gui {
         Standard_font(): gdi::Font( create_std_font() ) {}
     };
 
-    inline const auto std_font = Standard_font();
+    inline const auto std_font = Standard_font();       // Converts implicitly to HFONT.
 
-    inline void set_standard_font( const HWND window )
+    inline void set_font( const HWND window, const HFONT font )
     {
-        const auto callback = []( HWND control, LPARAM ) noexcept -> BOOL
+        const auto callback = []( const HWND control, const LPARAM font ) noexcept -> BOOL
         {
-            SetWindowFont( control, std_font.handle(), true );
+            SetWindowFont( control, reinterpret_cast<HFONT>( font ), true );
             return true;
         };
 
-        SetWindowFont( window, std_font.handle(), true );
-        EnumChildWindows( window, callback, 0 );
+        SetWindowFont( window, font, true );
+        EnumChildWindows( window, callback, reinterpret_cast<LPARAM>( font ) );
+    }
+
+    inline void set_standard_font( const HWND window )
+    {
+        set_font( window, std_font );
     }
 }  // namespace winapi::gui
+
 ```
 
 asdasd
