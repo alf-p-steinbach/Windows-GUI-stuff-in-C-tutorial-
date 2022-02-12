@@ -228,9 +228,7 @@ Oh, the Yoda picture is really about absorbing a great destructive force rather 
 
 ---
 
-Technical details:
-
-for the implementation of GDI object RAII wrappers I found it useful to define a little **type list** class template,
+For the implementation of GDI object RAII wrappers I found it useful to define a little **type list** class template,
 
 in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
 
@@ -316,6 +314,56 @@ namespace winapi::gdi {
 ```
 
 Fine detail: the rvalue reference `Handle&&` for the `Object_` constructor parameter expresses an **ownerhip transfer**. It helps to avoid incorrect usage by allowing only a temporary handle such as from a call of `CreatePen` or `CreateSolidBrush`.
+
+---
+
+The [part 3 machinery to obtain a handle to the standard GUI font](#33-factor-out-windowsh-inclusion-support-machinery-window-message-cracking) can now be re-expressed in terms of the `Font` class, and to reduce coupling I now put it in its own little header:
+
+*[part-05/code/.include/winapi/gui/std_font.hpp](part-05/code/.include/winapi/gui/std_font.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+#include <winapi/gdi/Object_.hpp>           // winapi::gdi::Font
+#include <wrapped-winapi/windowsx-h.hpp>    // windows.h + SetWindowFont    
+
+namespace winapi::gui {
+    inline auto create_std_font()
+        -> HFONT
+    {
+        // Get the system message box font
+        const auto ncm_size = sizeof( NONCLIENTMETRICS );
+        NONCLIENTMETRICS metrics = {ncm_size};
+        SystemParametersInfo( SPI_GETNONCLIENTMETRICS, ncm_size, &metrics, 0 );
+        return CreateFontIndirect( &metrics.lfMessageFont );
+    }
+
+    class Standard_font: public gdi::Font
+    {
+    public:
+        Standard_font(): gdi::Font( create_std_font() ) {}
+    };
+
+    inline const auto std_font = Standard_font();
+
+    inline void set_standard_font( const HWND window )
+    {
+        const auto callback = []( HWND control, LPARAM ) noexcept -> BOOL
+        {
+            SetWindowFont( control, std_font.handle(), true );
+            return true;
+        };
+
+        SetWindowFont( window, std_font.handle(), true );
+        EnumChildWindows( window, callback, 0 );
+    }
+}  // namespace winapi::gui
+```
+
+asdasd
+
+---
+
+The device context abstraction is strongly coupled with the `operator+` machinery for temporary objects.
 
 ### ---
 
