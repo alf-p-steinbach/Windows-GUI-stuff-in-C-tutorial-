@@ -572,7 +572,7 @@ namespace winapi::gdi {
             void* p_bits;
             const HBITMAP handle = CreateDIBSection(
                 HDC(),              // Not needed because no DIB_PAL_COLORS palette.
-                &params,
+                ¶ms,
                 DIB_RGB_COLORS,     // Irrelevant, but.
                 &p_bits,
                 HANDLE(),           // Section.
@@ -588,7 +588,7 @@ namespace winapi::gdi {
         void*       m_p_bits;
 
     public:
-        Bitmap_32( const bitmap::Handle_and_memory& pieces ):
+        Bitmap_32( bitmap::Handle_and_memory&& pieces ):
             Bitmap( pieces.handle ),
             m_p_bits( pieces.p_bits )
         {}
@@ -600,6 +600,7 @@ namespace winapi::gdi {
         auto bits() const -> void* { return m_p_bits; }
     };
 }  // namespace winapi::gdi
+
 
 ```
 

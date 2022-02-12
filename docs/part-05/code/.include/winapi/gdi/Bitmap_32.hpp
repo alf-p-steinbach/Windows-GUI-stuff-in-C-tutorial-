@@ -56,7 +56,7 @@ namespace winapi::gdi {
         void*       m_p_bits;
 
     public:
-        Bitmap_32( const bitmap::Handle_and_memory& pieces ):
+        Bitmap_32( bitmap::Handle_and_memory&& pieces ):
             Bitmap( pieces.handle ),
             m_p_bits( pieces.p_bits )
         {}
