@@ -368,7 +368,7 @@ namespace winapi:gui {
 
 The standard GUI font is used in the `Dc` class’ default initialization of a device context:
 
-In *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
+Start of *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
 
 ```cpp
 #pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
@@ -451,19 +451,56 @@ namespace winapi::gdi {
 
 
 
-
-
 ---
 
-The device context abstraction is strongly coupled with the `operator+` machinery for temporary objects.
+The temporary GDI object automation via `+` is very closely tied to the `Dc::Selection` class, so I present it all together in one little package. This class is full of subtleties and I’m not sure my design choices here were the best. I’m not even sure that I managed to make it difficult to use incorrectly, but anyway, the complexity is in large part due to that *goal*.
 
-### ---
+End of *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
+
+```cpp
+    ⋮
+
+    class Dc::Selection: No_copying
+    {
+        const Dc&   m_dc;
+        HGDIOBJ     m_original_object;
+        
+    public:
+        ~Selection() { SelectObject( m_dc, m_original_object ); }
+
+        struct From_api_handle {};  // Intentionally explicit, verbose & ugly interface.
+        Selection( From_api_handle, const HGDIOBJ object_handle, const Dc& dc ):
+            m_dc( dc ),  m_original_object( SelectObject( dc, object_handle ) )
+        {}
+
+        template< class Handle >    // Easy to use interface.
+        Selection( const Dc& dc, const Object_<Handle>& object ):
+            Selection( From_api_handle(), object.handle(), dc )
+        {}
+
+        auto dc() const -> const Dc& { return m_dc; }
+
+        operator const Dc&() const { return dc(); }     // Supports `+` operator.
+        operator HDC() const { return m_dc.handle(); }  // Supports using Selection as DC.
+    };
+
+    inline auto operator+( const Dc& dc, const Brush& object )
+        -> Dc::Selection
+    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
+
+    inline auto operator+( const Dc& dc, const Pen& object )
+        -> Dc::Selection
+    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
+}  // namespace winapi::gdi
+
+
+```
+
+
 
 ### 5.4. Save the generated graphics to an image file.
 
-Seeing the graphics imperfectly on the screen is nice, or well, it’s at least so-so, better than not seeing the graphics at all. But it would be even better to let the program itself save the graphics as a standard image file. A modern “.jpg” or “.png” image would be perfect for communicating one's result to others, or for using it in other work.
-
-However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile) and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today. There’s now not even preview of such images in Windows Explorer.
+A modern “.jpg” or “.png” image would be perfect for communicating one's result to others, or for using it in other work. However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile) and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today, not even in Windows Explorer.
 
 The GDI successor technologies GDI+ and DirectX are for later parts of the tutorial (hopefully). For now let’s stick to the basic original, simple GDI. What  options does one then have for saving a graphics result — other than “.wmf”?
 
@@ -472,7 +509,9 @@ Well, there are two ways to save a GDI graphics result as a now reasonably [port
 * directly [generate the binary contents](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) of such a file (the DIY approach), or
 * use the [**`OleSavePictureFile`**](https://docs.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-olesavepicturefile) function.
 
-Here we’ll use the API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge.
+Here we’ll use the API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge, and because this is information that’s difficult to come by nowadays.
+
+The Microsoft documentation linked to above is one of many sources that show how generate binary “.bmp” file contents, if you want to go that route.
 
 <p align="center">❁ ❁ ❁</p>
 
