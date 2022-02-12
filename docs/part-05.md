@@ -315,7 +315,7 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
-Fine detail: the rvalue reference `Handle&&` for the `Object_` constructor parameter expresses an **ownerhip transfer**. It helps to avoid incorrect usage by allowing only a temporary handle, such as from a call of `CreatePen` or `CreateSolidBrush`.
+Fine detail: the rvalue reference `Handle&&` for the `Object_` constructor parameter expresses an **ownerhip transfer**. It helps to avoid incorrect usage by allowing only a temporary handle such as from a call of `CreatePen` or `CreateSolidBrush`.
 
 ### ---
 
