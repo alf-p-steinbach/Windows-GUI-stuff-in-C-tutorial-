@@ -228,7 +228,9 @@ Oh, the Yoda picture is really about absorbing a great destructive force rather 
 
 ---
 
-Technical details: for the implementation of GDI object RAII wrappers I found it useful to define a little **type list** class template,
+Technical details:
+
+for the implementation of GDI object RAII wrappers I found it useful to define a little **type list** class template,
 
 in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
 
