@@ -317,7 +317,7 @@ Fine detail: the rvalue reference `Handle&&` for the `Object_` constructor param
 
 ---
 
-The [part 3 machinery to obtain a handle to the standard GUI font](part-03.md#33-factor-out-windowsh-inclusion-support-machinery-window-message-cracking) can now be re-expressed in terms of the `Font` class, and to reduce coupling I now put it in its own little header:
+The [part 3 machinery to obtain a handle to the standard GUI font](part-03.md#34-fix-gross-imperfections-standard-font-window-just-on-top-modern-appearance) can now be re-expressed in terms of the `Font` class, and to reduce coupling I now put it in its own little header:
 
 *[part-05/code/.include/winapi/gui/std_font.hpp](part-05/code/.include/winapi/gui/std_font.hpp)*:
 
