@@ -178,9 +178,9 @@ Result: same as before, just with shorter & more clear code.
 
 <img title="" src="part-05/images/yoda.png" alt="">
 
-To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. But you can automate the `DeleteObject` object destruction calls via C++ destructors to make such code shorter and safer, C++ [RAII](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization), which essentially means defining small handle ownership classes such as `Brush` and `Pen`.
+To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. But you can automate the `DeleteObject` object destruction calls via C++ destructors, the C++ [RAII](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique, to make such code shorter and safer. Essentially it means defining small handle ownership classes such as `Brush` and `Pen`. For simplicity and efficiency these classes can be made non-copyable.
 
-This RAII idea of leveraging C++ construction and destruction can also be applied to device contexts, e.g. (because DC destruction depends on the kind of DC) via a general abstract base class `Dc` with concrete derived classes such as `Screen_dc` and `Bitmap_dc`.
+The RAII idea of leveraging C++ construction and destruction can also be applied to device contexts, e.g. (because device context destruction depends on the kind of DC) via a general abstract base class `Dc` with concrete derived classes such as `Screen_dc` and `Bitmap_dc`.
 
 For exception safety — to be able to use exceptions freely — even the `SelectObject` call pairs can/should be automated via C++ construction and destruction, e.g. a class `Dc::Selection` whose instances retain the requisite information to undo the selection.
 
@@ -206,7 +206,7 @@ void draw_on( const Dc& canvas, const RECT& area )
     constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
     constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
     constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
-    
+
     FillRect( canvas + CreateSolidBrush( blue ), &area, 0 );
     Ellipse(
         canvas + CreatePen( PS_SOLID, 1, yellow ) + CreateSolidBrush( orange ),
@@ -247,7 +247,6 @@ in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
 
 ```cpp
 using Object_handle_types = Types_<HGDIOBJ, HPEN, HBRUSH, HFONT, HBITMAP, HRGN, HPALETTE>;
-
 ```
 
 The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes below do not inherit from `Object` because, while that would faithfully reproduce the conceptual GDI class hierarchy it would require e.g. adding handle type downcasts, complication!, for no real advantage.
@@ -315,12 +314,6 @@ namespace winapi::gdi {
 ```
 
 Fine detail: the rvalue reference `Handle&&` for the `Object_` constructor parameter expresses an **ownerhip transfer**. It helps to avoid incorrect usage by allowing only a temporary handle, such as from a call of `CreatePen` or `CreateSolidBrush`.
-
-
-
-
-
-
 
 ### ---
 
