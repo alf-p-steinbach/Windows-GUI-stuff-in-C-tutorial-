@@ -447,7 +447,7 @@ namespace winapi::gdi {
     ⋮
 ```
 
-&hellip; where, in the `Bitmap_dc` constructor `Std_ref` is an alias for a `std::reference_wrapper`, used to make clear in using code that the argument bitmap is referenced, not copied.
+&hellip; where, in the `Bitmap_dc` constructor, `Std_ref_` is an alias for `std::reference_wrapper`, used to make clear in using code that the argument bitmap is referenced, not copied.
 
 
 
