@@ -13,7 +13,7 @@ namespace winapi::gdi {
         SelectObject( dc, GetStockObject( DC_PEN ) );
         SelectObject( dc, GetStockObject( DC_BRUSH ) );
         SetBkMode( dc, TRANSPARENT );       // Don't fill in the background of text, please.
-        SelectObject( dc, gui::std_font.handle() );
+        SelectObject( dc, gui::std_font );
     }
 
     class Dc: No_copying
