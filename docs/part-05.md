@@ -392,7 +392,7 @@ namespace winapi::gdi {
     class Dc: No_copying
     {
         HDC     m_handle;
-       
+
     protected:
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
 
@@ -440,7 +440,7 @@ namespace winapi::gdi {
         {
             SelectObject( handle(), m_p_bitmap->handle() );
         }
-        
+
         auto bitmap() const -> const Bitmap& { return *m_p_bitmap; }
     };
 
@@ -449,8 +449,6 @@ namespace winapi::gdi {
 ```
 
 &hellip; where, in the `Bitmap_dc` constructor, `Explicit_ref_` is a just tiny helper class that derives from and is initialized with a `std::reference_wrapper`, that makes clear in using code that the argument (e.g. `std::ref(image)`) bitmap is referenced, not copied.
-
-
 
 ---
 
@@ -465,7 +463,7 @@ End of *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.inc
     {
         const Dc&   m_dc;
         HGDIOBJ     m_original_object;
-        
+
     public:
         ~Selection() { SelectObject( m_dc, m_original_object ); }
 
@@ -493,11 +491,7 @@ End of *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.inc
         -> Dc::Selection
     { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
 }  // namespace winapi::gdi
-
-
 ```
-
-
 
 ### 5.4. Save the generated graphics to an image file.
 
@@ -588,7 +582,7 @@ namespace winapi::gdi {
             return Handle_and_memory{ handle, p_bits };
         }
     }  // namespace bitmap
-    
+
     class Bitmap_32: public Bitmap
     {
         void*       m_p_bits;
@@ -602,93 +596,8 @@ namespace winapi::gdi {
         Bitmap_32( const int w, const int h ):
             Bitmap_32( bitmap::create_rgb32( w, h ) )
         {}
-        
+
         auto bits() const -> void* { return m_p_bits; }
-    };
-}  // namespace winapi::gdi
-
-
-```
-
-As with a pen or brush object and other **GDI objects**, a  bitmap is destroyed via [`DeleteObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteobject).
-
-That is, this is an originally C API that generally can be viewed as a C++ class hierarchy, and that even supports corresponding implicit conversions of the handle types from “derived” to “base”, e.g. `HBITMAP` → `HGDIOBJ`, but it has a couple of decidedly non-Liskov features.
-
-<p align="center">❁ ❁ ❁</p>
-
-One of the non-Liskov features is that a bitmap only can be selected in a special kind of device context called a **memory device context**, where selecting it has the effect that the device context generates its graphics result in the bitmap.
-
-The only way to create a memory device context is to base it on a device context representing the main screen, a **screen device context**, as an *exemplar*. I guess that’s because early Windows had to support e.g. [16 color displays](https://en.wikipedia.org/wiki/Video_Graphics_Array#Standard_graphics_modes) on rather slowish computers with very limited memory, so that the default was device dependent bitmaps and device contexts that matched the hardware. It doesn't matter now, when one subsequently selects a DIB into the device context, but it did matter in the device dependent bitmap days.
-
-This is again an originally C API that can be generally viewed as a C++ class hierarchy, but one where device contexts created by different functions must be *destroyed by corresponding different functions*, here `ReleaseDC` and `DestroyDC`:
-
-*[part-05/code/.include/winapi/gdi-device-contexts.hpp](part-05/code/.include/winapi/gdi-device-contexts.hpp)*:
-
-```cpp
-#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>                     // cpp::util::(hopefully, fail)
-#include <winapi/gdi-Bitmap.hpp>            // winapi::gdi::*
-#include <wrapped-winapi/windows-h.hpp>
-
-namespace winapi::gdi {
-    namespace cu = cpp::util;
-    using cu::hopefully, cu::No_copying;
-
-    class Dc: No_copying
-    {
-        HDC     m_handle;
-
-    protected:
-        inline virtual ~Dc() = 0;       // Derived-class responsibility.
-
-        Dc( const HDC handle ):
-            m_handle( handle )
-        {
-            hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Device context handle is 0." );
-        }
-
-    public:    
-        auto handle() const -> HDC { return m_handle; }
-    };
-
-    inline Dc::~Dc() {}
-
-
-    class Screen_dc: public Dc
-    {
-        static constexpr auto no_window = HWND( 0 );
-
-    public:        
-        ~Screen_dc() override { ReleaseDC( no_window, handle() ); }
-
-        Screen_dc():
-            Dc( GetDC( no_window ) )
-        {}
-    };
-
-
-    class Memory_dc: public Dc
-    {
-    public:
-        ~Memory_dc() override { DeleteDC( handle() ); }
-
-        Memory_dc():
-            Dc( CreateCompatibleDC( 0 ) )   // Screen DC for main screen specified implicitly.
-        {}
-    };
-
-
-    class Bitmap_dc: public Memory_dc
-    {
-        Bitmap  m_bitmap;
-
-    public:
-        Bitmap_dc( const int width, const int height ):
-            Memory_dc(),
-            m_bitmap( width, height )
-        {
-            SelectObject( handle(), m_bitmap.handle() );
-        }
     };
 }  // namespace winapi::gdi
 ```
