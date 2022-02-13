@@ -379,7 +379,7 @@ Start of *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.i
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
-    using cu::hopefully, cu::No_copying, cu::Std_ref_;
+    using cu::hopefully, cu::No_copying, cu::Explicit_ref_;
 
     inline void make_practical( const HDC dc )
     {
@@ -392,7 +392,7 @@ namespace winapi::gdi {
     class Dc: No_copying
     {
         HDC     m_handle;
-
+       
     protected:
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
 
@@ -434,20 +434,21 @@ namespace winapi::gdi {
         Bitmap* m_p_bitmap;
 
     public:
-        Bitmap_dc( const Std_ref_<Bitmap> bitmap ):
+        Bitmap_dc( const Explicit_ref_<Bitmap> bitmap ):
             Memory_dc(),
             m_p_bitmap( &bitmap.get() )
         {
             SelectObject( handle(), m_p_bitmap->handle() );
         }
-
+        
         auto bitmap() const -> const Bitmap& { return *m_p_bitmap; }
     };
+
 
     ⋮
 ```
 
-&hellip; where, in the `Bitmap_dc` constructor, `Std_ref_` is an alias for `std::reference_wrapper`, used to make clear in using code that the argument bitmap is referenced, not copied.
+&hellip; where, in the `Bitmap_dc` constructor, `Explicit_ref_` is a just tiny helper class that derives from and is initialized with a `std::reference_wrapper`, used to make clear in using code that the argument (e.g. `std::ref(image)`) bitmap is referenced, not copied.
 
 
 
