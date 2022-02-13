@@ -2,13 +2,13 @@
 
 ## Part 5 – Primitive graphics: the GDI.
 
-Last part’s discussion of how to use UTF-8 as the `char` based text encoding in both resource definitions and GUI code established a limited but useful framework for exploratory C++ Windows desktop programming. We’ll now use that to explore basic graphics: drawing shapes, lines and text. For this we’ll use the  [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*.
+We’ll now use the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, to explore basic graphics: drawing shapes, lines and text, and learning how graphics drawing relates to Windows’ GUI mechanisms, such as drawing the background image of a window.
 
 The GDI is simple and C-oriented, which is nice.
 
 On the other hand it’s slow and produces low quality graphics. In particular the GDI doesn’t support [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing), and it doesn’t support [alpha channel transparency](https://en.wikipedia.org/wiki/Alpha_compositing), which are both strong reasons to later move on to the successor technologies [GDI+](https://en.wikipedia.org/wiki/Graphics_Device_Interface#Windows_XP) and [Direct 2D](https://en.wikipedia.org/wiki/Direct2D).
 
-And unfortunately the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4. We’ll work around that by writing our own wrappers over GDI’s wide text drawing functions.
+And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4. UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. We’ll just write our own wrappers over GDI’s wide text drawing functions, i.e. providing the missing support ourselves.
 
 Happily Windows does support conversion between UTF-8 and UTF-16 via API functions such as [`MultiByteToWideChar`](https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar), in addition to, since Windows 10, providing the feature rich C API of the main Unicode library [**ICU**](https://docs.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-).
 
@@ -932,7 +932,6 @@ Building examples were provided earlier; just note, if you don’t look at them,
 ---
 
 asdasd
-
 
 ---
 
