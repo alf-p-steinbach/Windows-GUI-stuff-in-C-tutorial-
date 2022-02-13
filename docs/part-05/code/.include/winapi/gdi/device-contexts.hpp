@@ -6,7 +6,7 @@
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
-    using cu::hopefully, cu::No_copying, cu::Std_ref_;
+    using cu::hopefully, cu::No_copying, cu::Explicit_ref_;
 
     inline void make_practical( const HDC dc )
     {
@@ -61,7 +61,7 @@ namespace winapi::gdi {
         Bitmap* m_p_bitmap;
 
     public:
-        Bitmap_dc( const Std_ref_<Bitmap> bitmap ):
+        Bitmap_dc( const Explicit_ref_<Bitmap> bitmap ):
             Memory_dc(),
             m_p_bitmap( &bitmap.get() )
         {

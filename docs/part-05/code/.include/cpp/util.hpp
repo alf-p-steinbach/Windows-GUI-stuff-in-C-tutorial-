@@ -6,7 +6,7 @@
 #include <random>           // std::(random_device, mt19937, uniform_int_distribution)
 #include <stdexcept>        // std::(exception, runtime_error)
 #include <string>           // std::string
-#include <type_traits>      // std::is_same_v
+#include <type_traits>      // std::(enable_if_t, is_same_v)
 
 #define CPPUTIL_FAIL( s ) ::cpp::util::fail( std::string( __func__ ) + " - " + (s) )
 
@@ -16,7 +16,7 @@ namespace cpp::util {
             std::random_device, std::mt19937, std::uniform_int_distribution,
             std::exception, std::runtime_error,
             std::string,
-            std::is_same_v;
+            std::enable_if_t, std::is_same_v;
 
     constexpr auto utf8_is_the_execution_character_set()
         -> bool
@@ -27,6 +27,14 @@ namespace cpp::util {
 
     constexpr auto hopefully( const bool condition ) -> bool { return condition; }
     inline auto fail( const string& message ) -> bool { throw runtime_error( message ); }
+
+    struct Success{} success;
+    
+    template<
+        class Value,
+        class = enable_if_t< is_same_v< value, bool > >     // Don't want implicit conversions.
+        >
+    inline auto operator>>( Success, const Value v ) -> bool { return v; }
 
     struct No_copying
     {
@@ -78,5 +86,12 @@ namespace cpp::util {
         static constexpr bool contain_ = (... or is_same_v<T, Types>);
     };
 
-    template< class T > using Std_ref_ = reference_wrapper<T>;
+    template< class T >
+    class Explicit_ref_:
+        public reference_wrapper<T>
+    {
+    public:
+        template< class U >
+        Explicit_ref_( reference_wrapper<U>&& ref ): reference_wrapper<T>( ref.get() ) {}
+    };
 }  // namespace cpp::util

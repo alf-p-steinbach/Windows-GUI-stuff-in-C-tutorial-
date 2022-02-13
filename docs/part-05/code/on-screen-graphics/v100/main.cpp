@@ -1,30 +1,37 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi"). v100
 #include <cpp/util.hpp>                     // hopefully, fail
 #include <wrapped-winapi/windows-h.hpp>
+#include <winapi/com/failure-checking.hpp>  // winapi::com::operator>>
+#include <winapi/com/Ptr_.hpp>              // winapi::com::Ptr_
 #include <winapi/encoding-conversions.hpp>  // winapi::to_utf16
 #include <winapi/gdi/Bitmap_32.hpp>         // winapi::gdi::Bitmap_32
+#include <winapi/gdi/bitmap-util.hpp>       // winapi::gdi::save_to
 #include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::(Screen_dc, Memory_dc)
 #include <winapi/gui/util.hpp>              // winapi::gui::std_gui_font
 #include <winapi/ole/B_string.hpp>          // winapi::ole::B_string
 #include <winapi/ole/Library_usage.hpp>     // winapi::ole::Library_usage
+#include <winapi/ole/picture-util.hpp>      // winapi::ole::picture_from
 
-#include <shlwapi.h>        // SHCreateStreamOnFileEx
+// #include <shlwapi.h>        // SHCreateStreamOnFileEx
 #include <stdio.h>          // fprintf
 #include <stdlib.h>         // EXIT_...
-#include <olectl.h>         // OleCreatePictureIndirect
-#include <ocidl.h>          // IPicture
 
 #include <stdexcept>        // std::exception&
 #include <string>           // std::string
 #include <string_view>      // std::(string_view, wstring_view)
+#include <utility>          // std::ref
 
-namespace cu = cpp::util;
+namespace cu  = cpp::util;
+namespace com = winapi::com;
 namespace ole = winapi::ole;
 namespace gdi = winapi::gdi;
-using   cu::hopefully, cu::fail, cu::No_copying, cu::int_size, cu::Const_;
-using   gdi::Bitmap_32;
+using   cu::hopefully, cu::fail, cu::success, cu::No_copying, cu::int_size, cu::Const_;
+using   com::failure_checking::operator>>;
+using   ole::save_to;
+using   gdi::Bitmap_32, gdi::save_to;
 using   std::string,
-        std::string_view, std::wstring_view;
+        std::string_view, std::wstring_view,
+        std::ref;
 
 void display_graphics_on( const HDC canvas )
 {
@@ -42,49 +49,6 @@ void display_graphics_on( const HDC canvas )
     Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 }
 
-
-void save_to( const string_view& file_path, Const_<IPictureDisp*> p_picture )
-{
-    const auto bstr_file_path = ole::B_string( file_path );
-    const HRESULT hr = OleSavePictureFile( p_picture, bstr_file_path );
-    hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleSavePictureFile failed" );
-}
-
-template< class Interface >
-class Com_ptr_: No_copying
-{
-    Interface*  m_ptr;
-    
-public:
-    ~Com_ptr_() { m_ptr->Release(); }
-    Com_ptr_( Const_<Interface*> ptr ): m_ptr( ptr ) {}
-    auto raw() const -> Interface* { return m_ptr; }
-};
-
-auto ole_picture_from( const HBITMAP bitmap )
-    -> Com_ptr_<IPictureDisp>
-{
-    PICTDESC params = { sizeof( PICTDESC ) };
-    params.picType      = PICTYPE_BITMAP;
-    params.bmp.hbitmap  = bitmap;
-
-    IPictureDisp* p_picture_disp;
-    const HRESULT hr = OleCreatePictureIndirect(
-        &params, __uuidof( IPictureDisp ), false, reinterpret_cast<void**>( &p_picture_disp )
-        );
-    hopefully( SUCCEEDED( hr ) ) or CPPUTIL_FAIL( "OleCreatePictureIndirect failed" );
-    return p_picture_disp;
-}
-
-void save_to( const string_view& file_path, const HBITMAP bitmap )
-{
-    save_to( file_path, ole_picture_from( bitmap ).raw() );
-}
-
-// auto bitmap_of( const HDC dc )
-    // -> HBITMAP
-// { return static_cast<HBITMAP>( GetCurrentObject( dc, OBJ_BITMAP ) ); }
-    
 void init( const HDC canvas )
 {
     SelectObject( canvas, GetStockObject( DC_PEN ) );
@@ -98,11 +62,11 @@ void display_graphics()
     const int width     = 400;
     const int height    = 400;
     auto bitmap = Bitmap_32( width, height );
-    const auto dc = winapi::gdi::Bitmap_dc( bitmap );
+    const auto dc = winapi::gdi::Bitmap_dc( ref( bitmap ) );
     init( dc.handle() );
     display_graphics_on( dc.handle() );
     //BitBlt( Screen_dc().handle, 15, 15, width, height, dc.handle(), 0, 0, SRCCOPY );
-    save_to( "generated-image.bmp", bitmap.handle() );
+    save_to( "generated-image.bmp", bitmap );
 }
 
 auto main( int, char** args ) -> int

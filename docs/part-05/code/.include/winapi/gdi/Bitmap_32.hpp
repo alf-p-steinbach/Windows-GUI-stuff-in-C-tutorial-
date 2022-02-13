@@ -1,9 +1,12 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <winapi/gdi/Object_.hpp>       // winapi::gdi::Bitmap
 
+#include <utility>      // std::move
+
 namespace winapi::gdi {
     namespace cu = cpp::util;
     using cu::hopefully, cu::No_copying;
+    using std::move;
 
     namespace bitmap {
         struct Format               // See documentation of `BITMAPINFOHEADER::biBitCount`.
@@ -57,7 +60,7 @@ namespace winapi::gdi {
 
     public:
         Bitmap_32( bitmap::Handle_and_memory&& pieces ):
-            Bitmap( pieces.handle ),
+            Bitmap( move( pieces.handle ) ),
             m_p_bits( pieces.p_bits )
         {}
 
