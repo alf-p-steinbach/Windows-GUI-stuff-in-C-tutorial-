@@ -448,7 +448,7 @@ namespace winapi::gdi {
     ⋮
 ```
 
-&hellip; where, in the `Bitmap_dc` constructor, `Explicit_ref_` is a just tiny helper class that derives from and is initialized with a `std::reference_wrapper`, used to make clear in using code that the argument (e.g. `std::ref(image)`) bitmap is referenced, not copied.
+&hellip; where, in the `Bitmap_dc` constructor, `Explicit_ref_` is a just tiny helper class that derives from and is initialized with a `std::reference_wrapper`, that makes clear in using code that the argument (e.g. `std::ref(image)`) bitmap is referenced, not copied.
 
 
 
