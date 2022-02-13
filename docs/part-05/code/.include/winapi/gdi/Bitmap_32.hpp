@@ -26,10 +26,8 @@ namespace winapi::gdi {
             void*       p_bits;     // Owned by but cannot be obtained from the handle.
         };
 
-        inline auto create_rgb32(
-            const int                   width,
-            const int                   height
-            ) -> Handle_and_memory
+        inline auto create_rgb32( const int width, const int height )
+            -> Handle_and_memory
         {
             BITMAPINFO params  = {};
             BITMAPINFOHEADER& info = params.bmiHeader;
