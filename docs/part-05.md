@@ -18,14 +18,13 @@ Happily Windows does support conversion between UTF-8 and UTF-16 via API functio
 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-*Contents (table generated with [DocToc](https://github.com/thlorenz/doctoc)):*
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
 - [5.2 Use pseudo-mutable `DC_PEN` and `DC_BRUSH` stock objects to reduce verbosity.](#52-use-pseudo-mutable-dc_pen-and-dc_brush-stock-objects-to-reduce-verbosity)
-- [5.3. Draw UTF-8 text by converting to UTF-16 and using the wide text API.](#53-draw-utf-8-text-by-converting-to-utf-16-and-using-the-wide-text-api)
+- [5.3. Automate cleanup for device contexts and GDI objects.](#53-automate-cleanup-for-device-contexts-and-gdi-objects)
 - [5.4. Save the generated graphics to an image file.](#54-save-the-generated-graphics-to-an-image-file)
-  - [asdasd](#asdasd)
-- [5.x. Use C++ RAII to automate GDI object destruction.](#5x-use-c-raii-to-automate-gdi-object-destruction)
+- [5.x. Draw UTF-8 text by converting to UTF-16 and using the wide text API.](#5x-draw-utf-8-text-by-converting-to-utf-16-and-using-the-wide-text-api)
 - [5.3. In passing: support `assert` messages in a GUI program built with Visual C++.](#53-in-passing-support-assert-messages-in-a-gui-program-built-with-visual-c)
 - [5.4. A potpourri of GDI things introduced via a C curve example.](#54-a-potpourri-of-gdi-things-introduced-via-a-c-curve-example)
 
