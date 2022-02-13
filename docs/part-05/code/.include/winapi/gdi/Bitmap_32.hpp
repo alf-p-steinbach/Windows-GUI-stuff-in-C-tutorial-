@@ -26,7 +26,7 @@ namespace winapi::gdi {
             void*       p_bits;     // Owned by but cannot be obtained from the handle.
         };
 
-        auto create_rgb32(
+        inline auto create_rgb32(
             const int                   width,
             const int                   height
             ) -> Handle_and_memory
