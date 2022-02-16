@@ -601,7 +601,21 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
+---
+
+The above is all of the new GDI functionality needed for the saving. Let’s look at the generally non-GDI details of the saving function after the main program. The main new thing is that since the saving can fail with an exception, the previous `main` function body is now the body of a function `cpp_main` that is  called from an exception-handling `main`:
+
+
+
+
+
 asd
+
+
+
+
+
+
 
 ---
 

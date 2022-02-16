@@ -1,6 +1,7 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 #include <cpp/util.hpp>                         // cpp::util::(success, Const_)
 #include <winapi/com/failure-checking.hpp>      // winapi::com::failure_checking::operator>>
+#include <winapi/com/Ptr_.hpp>                  // winpai::com::Ptr_
 #include <winapi/ole/B_string.hpp>              // winapi::ole::B_string
 #include <wrapped-winapi/ocidl-h.hpp>           // IPictureDisp
 #include <wrapped-winapi/olectl-h.hpp>          // OleCreatePictureIndirect

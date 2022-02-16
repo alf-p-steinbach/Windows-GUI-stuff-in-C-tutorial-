@@ -6,7 +6,7 @@
 #include <string_view>      // std::string_view
 #include <utility>          // std::move
 
-namespace winapi {
+namespace winapi::kernel {
     namespace cu = cpp::util;
     using   cu::hopefully, cu::fail, cu::int_size;
     using   std::wstring,
@@ -29,4 +29,4 @@ namespace winapi {
         result_buffer.resize( 1u*n_wide_values );
         return move( result_buffer );
     }
-}  // namespace winapi
+}  // namespace winapi::kernel
