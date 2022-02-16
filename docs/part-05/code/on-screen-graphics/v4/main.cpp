@@ -1,5 +1,5 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::*
+#include <winapi/gdi/device-contexts.hpp>   // winapi::gdi::(Dc, Bitmap_dc, `+`)
 #include <winapi/gdi/Bitmap_32.hpp>         // winapi::gdi::Bitmap_32
 #include <winapi/gdi/bitmap-util.hpp>       // winapi::gdi::save_to
 
@@ -44,7 +44,7 @@ auto main( int, char** args ) -> int
 {
     const auto error_box = []( const string& title, string const& text )
     {
-        const auto as_errorbox  = MB_ICONERROR | MB_SYSTEMMODAL;    // Sys-modal for Windows 11.
+        const auto as_errorbox  = MB_ICONERROR | MB_SYSTEMMODAL;    // Sys-modal for Win 11.
         MessageBox( 0, text.c_str(), title.c_str(), as_errorbox );
     };
 
@@ -54,7 +54,7 @@ auto main( int, char** args ) -> int
         return EXIT_SUCCESS;
     } catch( const exception& x ) {
         fprintf( stderr, "!%s\n", x.what() );
-        error_box( ::s + args[0] + " failed:", s + "Because:\n" + x.what() );
+        error_box( ::s + args[0] + " failed:", ::s + "Because:\n" + x.what() );
     }
     return EXIT_FAILURE;
 }
