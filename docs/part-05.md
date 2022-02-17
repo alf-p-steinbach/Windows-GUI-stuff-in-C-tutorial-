@@ -688,7 +688,7 @@ if( FAILED( hr ) ) {
 This verbose C++ call pattern can be streamlined a bit by defining a class type constant `success` and a `>>` operator that returns `true` (only) if the `HRESULT` denotes success, so that, using the `fail` throwing function defined earlier, the code becomes
 
 ```cpp
-SomeOleFunction( "blah", 42 );
+SomeOleFunction( "blah", 42 )
     >> success or fail( "SomeOleFunction failed!" );
 ```
 
