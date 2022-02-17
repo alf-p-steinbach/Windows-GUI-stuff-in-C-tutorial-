@@ -601,8 +601,6 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
-
-
 The above is all of the new GDI functionality needed for the saving. Let’s look at the generally non-GDI details of the saving function, the mainly OLE stuff, after the main program. The main new thing is that since the saving can ***fail*** with an exception, the previous `main` function body is now the body of a function `cpp_main` that is  called from an exception-handling `main`:
 
 *[part-05/code/on-screen-graphics/v4/main.cpp](part-05/code/on-screen-graphics/v4/main.cpp)*:
@@ -630,7 +628,7 @@ void draw_on( const Dc& canvas, const RECT& area )
     constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
     constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
     constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
-    
+
     FillRect( canvas + CreateSolidBrush( blue ), &area, 0 );
     Ellipse(
         canvas + CreatePen( PS_SOLID, 1, yellow ) + CreateSolidBrush( orange ),
@@ -645,7 +643,7 @@ void cpp_main()
     draw_on( Bitmap_dc( ref( image ) ), RECT{ 0, 0, w, h } );
     const auto filename = string( "image-saving-result.bmp" );
     gdi::save_to( filename, image );
-    
+
     auto cmd = ::s + "start \"\" " + filename + "\"";   // “start” for non-blocking command.
     system( cmd.c_str() );  // Open file in “.bmp”-associated program, e.g. an image viewer.
 }
@@ -668,20 +666,53 @@ auto main( int, char** args ) -> int
     }
     return EXIT_FAILURE;
 }
-
 ```
 
 My default image viewer is a free program called FastStone, so I get this result:
 
 ![Image in FastStone viewer](part-05/images/sshot-3.image-file-in-viewer.png)
 
-asd
+<p align="center">❁ ❁ ❁</p>
+
+A call of the `OleSavePictureFile` function drags in a lot of complexity because it’s strongly coupled to things in the [**OLE library**](https://en.wikipedia.org/wiki/Object_Linking_and_Embedding). Since OLE is now mostly old irrelevant technology (except for `OleSavePictureFile` and few other still useful functions) I only discuss how to use it. OLE sits or sat on top of the [**COM infra-structure**](https://en.wikipedia.org/wiki/Component_Object_Model), the same object/component infra-structure that as of 2022 serves as foundation for the [**Windows Runtime**](https://en.wikipedia.org/wiki/Windows_Runtime) a.k.a. WinRT.
+
+COM and OLE were designed as callable from both C and C++, in the 1990’s. Every function returns a 32-bit structured **result code** of type [**`HRESULT`**](https://en.wikipedia.org/wiki/HRESULT)that tells whether the call failed or succeeded, and roughly how. A great many of these codes have names, like `E_FAIL` (a general failure), `S_OK` and `S_FALSE` (two different success codes, respectively 0 and 1). Essentially such a code denotes failure if the most significant bit, bit 31, the sign bit, is 1. But instead of checking whether a “hr” code is negative one can and should use the macros **`FAILED`** and **`SUCCEEDED`**:
+
+```cpp
+const HRESULT hr = SomeOleFunction( "blah", 42 );
+if( FAILED( hr ) ) {
+    throw std::runtime_error( "SomeOleFunction failed!" );
+}
+```
+
+This verbose C++ call pattern can be streamlined a bit by defining a class type constant `success` and a `>>` operator that returns `true` (only) if the `HRESULT` denotes success, so that, using the `fail` throwing function defined earlier, the code becomes
+
+```cpp
+SomeOleFunction( "blah", 42 );
+    >> success or fail( "SomeOleFunction failed!" );
+```
+
+For completeness, the — or a possible — definition:
+
+
+
+
+
+asdasd
+
+
+
+Before calling most any COM function the COM library must have been initialized via a call to **`CoInitialize`**. Happily a function that needs some COM-based functionality can do that locally, because nested calls of `CoInitialize` can succeed if the parameters are compatible with the original call. Each call of `CoInitialize` must eventually be paired with a corresponding call of **`CoUninitialize`**.
+
+When you use OLE there is correspondingly **`OleInitialize`** and **`OleUninitialize`**, which are used in the same way, and which take care of calling respectively `CoInitialize` and `CoUninitialize`:
 
 
 
 
 
 
+
+The `gdi::save_to` function used in the above main program code is a quite thin wrapper over a function `ole::save_to`, that in turn wraps use of the Windows API function 
 
 ---
 
