@@ -692,7 +692,9 @@ SomeOleFunction( "blah", 42 )
     >> success or fail( "SomeOleFunction failed!" );
 ```
 
-For completeness, the — or a possible — definition:
+Note: since the `or` only evaluates the right argument when the left argument is `true`, the failure handling after `>>` can involve arbitrary complexity such as complex string argument building, without cost for normal successful code execution; the same as with the `if`.
+
+For completeness, here’s the — or a possible — definition:
 
 *[part-05/code/.include/winapi/com/failure-checking.hpp](part-05/code/.include/winapi/com/failure-checking.hpp)*:
 
