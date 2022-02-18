@@ -674,9 +674,15 @@ My default image viewer is a free program called FastStone, so I get this result
 
 <p align="center">❁ ❁ ❁</p>
 
-A call of the `OleSavePictureFile` function drags in a lot of complexity because it’s strongly coupled to things in the [**OLE library**](https://en.wikipedia.org/wiki/Object_Linking_and_Embedding). Since OLE is now mostly old irrelevant technology (except for `OleSavePictureFile` and few other still useful functions) I only discuss how to use it. OLE sits or sat on top of the [**COM infra-structure**](https://en.wikipedia.org/wiki/Component_Object_Model), the same object/component infra-structure that as of 2022 serves as foundation for the [**Windows Runtime**](https://en.wikipedia.org/wiki/Windows_Runtime) a.k.a. WinRT.
+A call of the `OleSavePictureFile` function drags in a lot of complexity because it’s strongly coupled to things in the [**OLE library**](https://en.wikipedia.org/wiki/Object_Linking_and_Embedding).
 
-COM and OLE were designed as callable from both C and C++, in the 1990’s. Every function returns a 32-bit structured **result code** of type [**`HRESULT`**](https://en.wikipedia.org/wiki/HRESULT)that tells whether the call failed or succeeded, and roughly how. A great many of these codes have names, like `E_FAIL` (a general failure), `S_OK` and `S_FALSE` (two different success codes, respectively 0 and 1). Essentially such a code denotes failure if the most significant bit, bit 31, the sign bit, is 1. But instead of checking whether a “hr” code is negative one can and should use the macros **`FAILED`** and **`SUCCEEDED`**:
+Since OLE is now mostly old irrelevant technology (except for `OleSavePictureFile` and a few other still useful functions) I only discuss how to use it, and about that only what’s needed for our use of `OleSavePictureFile`.
+
+OLE sits or sat on top of the [**COM infra-structure**](https://en.wikipedia.org/wiki/Component_Object_Model), the same object/component infra-structure that as of 2022 serves as foundation for the [**Windows Runtime**](https://en.wikipedia.org/wiki/Windows_Runtime) a.k.a. WinRT.
+
+Every COM and therefore also OLE function returns a 32-bit structured **result code** of type [**`HRESULT`**](https://en.wikipedia.org/wiki/HRESULT)that tells whether the call failed or succeeded, and roughly how. C++ exceptions are not used even though most of the COM stuff is in the form of C++ objects. A main reason is that COM is designed to make everything accessible from C, and result codes are very C friendly, very C-ish, accessible.
+
+A great many of the `HRESULT` codes have names, like `E_FAIL` (a general failure, defined as the for most unexpectedly non-simple value 80004005₁₆), and like `S_OK` and `S_FALSE` (two different success codes, defined as respectively 0 and 1). Essentially such a code denotes failure if the most significant bit, bit 31, the sign bit, is 1. But instead of checking whether a “hr” code is negative one can and should use the macros **`FAILED`** and **`SUCCEEDED`**:
 
 ```cpp
 const HRESULT hr = SomeOleFunction( "blah", 42 );
