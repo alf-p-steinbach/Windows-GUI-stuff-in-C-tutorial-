@@ -676,7 +676,7 @@ My default image viewer is a free program called FastStone, so I get this result
 
 A call of the `OleSavePictureFile` function drags in a lot of complexity because it’s strongly coupled to things in the [**OLE library**](https://en.wikipedia.org/wiki/Object_Linking_and_Embedding).
 
-Since OLE is now mostly old irrelevant technology (except for `OleSavePictureFile` and a few other still useful functions) I only discuss how to use it, and about that only what’s needed for our use of `OleSavePictureFile`.
+Since OLE is now mostly old irrelevant technology I only discuss how to use it, and about that only what’s needed for our use of `OleSavePictureFile`.
 
 OLE sits or sat on top of the [**COM infra-structure**](https://en.wikipedia.org/wiki/Component_Object_Model), the same object/component infra-structure that as of 2022 serves as foundation for the [**Windows Runtime**](https://en.wikipedia.org/wiki/Windows_Runtime) a.k.a. WinRT.
 
