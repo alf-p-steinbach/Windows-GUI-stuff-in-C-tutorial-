@@ -768,7 +768,32 @@ namespace winapi::ole {
 
 ```
 
+This is used locally in `gdi::save_to`, relying on the nestability of such call pairs, so that `gdi::save_to` can be used without the calling code having to know about OLE things or at all that OLE is involved:
 
+*[part-05/code/.include/winapi/gdi/bitmap-util.hpp](part-05/code/.include/winapi/gdi/bitmap-util.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+#include <winapi/ole/Library_usage.hpp>     // winapi::ole::Library_usage
+#include <winapi/ole/picture-util.hpp>      // winapi::ole::save_to
+
+#include <string_view>
+
+namespace winapi::gdi {
+    namespace ole = winapi::ole;
+    using std::string_view;
+
+    inline void save_to( const string_view& file_path, const HBITMAP bitmap )
+    {
+        const ole::Library_usage _;     // RAII OleInitialize + OleUninitialize.
+        ole::save_to( file_path, ole::picture_from( bitmap ) );
+    }
+}  // namespace winapi::gdi
+
+```
+
+In contrast the class is *not* used in the OLE library wrappers such as `ole::save_to`. The OLE wrappers just assume — they have as precondition — that the library has been initialized. There would be no point in hiding the use of OLE in the OLE wrappers, and doing library initialization and cleanup in every function, e.g. for convenience to callers, would constitute needless inefficiency and verbosity.
 
 asd
 
