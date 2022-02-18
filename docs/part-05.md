@@ -768,7 +768,7 @@ namespace winapi::ole {
 
 ```
 
-This is used locally in `gdi::save_to`, relying on the nestability of such call pairs, so that `gdi::save_to` can be used without the calling code having to know about OLE things or at all that OLE is involved:
+This is used locally in `gdi::save_to`, relying on the nestability of such call pairs so that `gdi::save_to` can be used without the calling code having to know about OLE things or at all that OLE is involved:
 
 *[part-05/code/.include/winapi/gdi/bitmap-util.hpp](part-05/code/.include/winapi/gdi/bitmap-util.hpp)*:
 
