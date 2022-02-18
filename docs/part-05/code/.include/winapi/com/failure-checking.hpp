@@ -3,8 +3,9 @@
 #include <wrapped-winapi/windows-h.hpp>     // HRESULT, SetLastError, GetLastError
 
 namespace winapi::com {
+    namespace cu = cpp::util;
     inline namespace failure_checking {
-        using cpp::util::Success;
+        using cu::Success, cu::success;
 
         constexpr auto denotes_success( const HRESULT hr )
             -> bool

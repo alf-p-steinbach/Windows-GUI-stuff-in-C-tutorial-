@@ -710,8 +710,9 @@ For completeness, here’s the — or a possible — definition:
 #include <wrapped-winapi/windows-h.hpp>     // HRESULT, SetLastError, GetLastError
 
 namespace winapi::com {
+    namespace cu = cpp::util;
     inline namespace failure_checking {
-        using cpp::util::Success;
+        using cu::Success, cu::success;
 
         constexpr auto denotes_success( const HRESULT hr )
             -> bool
@@ -727,21 +728,49 @@ namespace winapi::com {
     }  // namespace failure_checking
 }  // namespace winapi::com
 
+
+```
+
+<p align="center">❁ ❁ ❁</p>
+
+Before calling most any COM function the COM library must have been initialized via a call to **`CoInitialize`**. Nested calls of `CoInitialize` can succeed if the parameters are compatible with the original call. Each call of `CoInitialize` must eventually be paired with a correspondingly nested call of **`CoUninitialize`**.
+
+When you use OLE there is correspondingly **`OleInitialize`** and **`OleUninitialize`** which are used in the same way. In particular these calls can be nested, and therefore, can be used locally.  `OleInitialize` and `OleUninitialize` take care of calling respectively `CoInitialize` and `CoUninitialize`.
+
+Encapsulating that with exception safe C++ RAII:
+
+*[part-05/code/.include/winapi/ole/Library_usage.hpp](part-05/code/.include/winapi/ole/Library_usage.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <cpp/util.hpp>                     // CPPUTIL_FAIL, cpp::util::hopefully
+#include <winapi/com/failure-checking.hpp>  // winapi::com::failure_checking::(success, >>)
+#include <wrapped-winapi/ole2-h.hpp>        // OleInitialize, OleUninitialize
+
+namespace winapi::ole {
+    using namespace winapi::com::failure_checking;
+    using cpp::util::No_copying;
+
+    struct Library_usage: No_copying
+    {
+        Library_usage()
+        {
+            OleInitialize( {} )
+                >> success or CPPUTIL_FAIL( "OleInitialize failed" );
+        }
+
+        ~Library_usage()
+        {
+            OleUninitialize();  // Failure handling here would be advanced, e.g. logging.
+        }
+    };
+}  // namespace winapi::ole
+
 ```
 
 
 
-asdasd
-
-
-
-Before calling most any COM function the COM library must have been initialized via a call to **`CoInitialize`**. Happily a function that needs some COM-based functionality can do that locally, because nested calls of `CoInitialize` can succeed if the parameters are compatible with the original call. Each call of `CoInitialize` must eventually be paired with a corresponding call of **`CoUninitialize`**.
-
-When you use OLE there is correspondingly **`OleInitialize`** and **`OleUninitialize`**, which are used in the same way, and which take care of calling respectively `CoInitialize` and `CoUninitialize`:
-
-
-
-
+asd
 
 
 
