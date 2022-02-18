@@ -12,13 +12,12 @@ namespace winapi::com {
     class Ptr_: No_copying
     {
         Interface*  m_ptr;
-        
+
     public:
-        ~Ptr_() { if( m_ptr ) { m_ptr->Release(); } }
+        ~Ptr_() { if( m_ptr ) { m_ptr->Release(); } }       // .Release() from IUnknown.
         Ptr_( Const_<Interface*> ptr ): m_ptr( ptr ) {}
 
-        auto released() -> Interface*           { return exchange( m_ptr, nullptr ); }
-        auto operator->() const -> Interface*   { return m_ptr; }
-        operator Interface*() const             { return m_ptr; }
+        auto raw_ptr() const -> Interface*      { return m_ptr; }
+        auto operator->() const -> Interface*   { return raw_ptr(); }
     };
 }  // namespace winapi::com

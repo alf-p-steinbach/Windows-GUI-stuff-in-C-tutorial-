@@ -32,7 +32,7 @@ namespace cpp::util {
     
     template<
         class Value,
-        class = enable_if_t< is_same_v< value, bool > >     // Don't want implicit conversions.
+        class = enable_if_t< is_same_v< Value, bool > >     // Don't want implicit conversions.
         >
     inline auto operator>>( Success, const Value v ) -> bool { return v; }
 

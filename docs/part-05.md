@@ -787,9 +787,10 @@ namespace winapi::gdi {
     inline void save_to( const string_view& file_path, const HBITMAP bitmap )
     {
         const ole::Library_usage _;     // RAII OleInitialize + OleUninitialize.
-        ole::save_to( file_path, ole::picture_from( bitmap ) );
+        ole::save_to( file_path, ole::picture_from( bitmap ).raw_ptr() );
     }
 }  // namespace winapi::gdi
+
 
 ```
 
@@ -797,9 +798,46 @@ The class is *not* used in the OLE library wrappers such as `ole::save_to` and `
 
 <p align="center">❁ ❁ ❁</p>
 
-asd
+COM objects like the OLE `IPictureDisp` object we need for saving and that `ole::picture_from` produces, are reference counted via calls to the **`.AddRef()`** and **`.Release()`** methods inherited from the [**`IUnknown`**](https://en.wikipedia.org/wiki/IUnknown) interface. When the last reference is removed the object self-destroys, just like an object managed by a C++ `shared_ptr`. To ensure correct and exception safe reference counting, in C++ COM objects are usually handled via smart pointers that automate the `.AddRef` and `.Release` calls.
+
+Unfortunately the Windows API headers, while supplying some other C++ specific functionality, do not supply a **COM object smart pointer**. The Visual C++ compiler does supply a COM object smart pointer called [**`_com_ptr_t`**](https://docs.microsoft.com/en-us/cpp/cpp/com-ptr-t-class?view=msvc-170) via the `<comdef.h>` header. The MinGW g++ compiler that I have installed also provides `_com_ptr_t`, but in a brittle way: it requires that one includes `<stdio.h>` before the `<comdef.h>` header.
+
+Rather than relying on such compiler specific functionality I chose to define a minimal COM object smart pointer, one that just ensures a final `.Release()` call, which is all that we need:
+
+*[part-05/code/.include/winapi/com/Ptr_.hpp](part-05/code/.include/winapi/com/Ptr_.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+#include <cpp/util.hpp> // cpp::util::(No_copying, Const_)
+
+#include <utility>      // std::exchange
+
+namespace winapi::com {
+    namespace cu = cpp::util;
+    using   cu::No_copying, cu::Const_;
+    using   std::exchange;
+
+    template< class Interface >
+    class Ptr_: No_copying
+    {
+        Interface*  m_ptr;
+
+    public:
+        ~Ptr_() { if( m_ptr ) { m_ptr->Release(); } }       // .Release() from IUnknown.
+        Ptr_( Const_<Interface*> ptr ): m_ptr( ptr ) {}
+
+        auto raw_ptr() const -> Interface*      { return m_ptr; }
+        auto operator->() const -> Interface*   { return raw_ptr(); }
+    };
+}  // namespace winapi::com
+
+```
+
+Crucial for correctness of the above: that `No_copying` prohibits not only copy construction and copy assignment, but also move construction and move assignment.
 
 
+
+<p align="center">❁ ❁ ❁</p>
 
 The `gdi::save_to` function used in the above main program code is a quite thin wrapper over a function `ole::save_to`, that in turn wraps use of the Windows API function 
 
