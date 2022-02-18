@@ -793,7 +793,7 @@ namespace winapi::gdi {
 
 ```
 
-In contrast the class is *not* used in the OLE library wrappers such as `ole::save_to` and `ole::picture_from`_. The OLE wrappers just assume — they have as precondition — that the library has been initialized. There would be no point in hiding the use of OLE in the OLE wrappers, and doing library initialization and cleanup in every function, e.g. for convenience to callers, would constitute needless inefficiency and verbosity, plus needlessly added failure modes.
+In contrast: the class is *not* used in the OLE library wrappers such as `ole::save_to` and `ole::picture_from`_. The OLE wrappers assume — they have as precondition — that the library has been initialized. There would be no point in hiding the use of OLE in the OLE wrappers, and doing library initialization and cleanup in every function, e.g. for convenience to callers, would constitute needless inefficiency and verbosity, plus needlessly added failure modes.
 
 <p align="center">❁ ❁ ❁</p>
 
