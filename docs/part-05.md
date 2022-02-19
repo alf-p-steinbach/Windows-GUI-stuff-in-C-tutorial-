@@ -839,7 +839,7 @@ Detail: `Const_` is defined as just `template< class T > using Const_ = const T;
 
 <p align="center">❁ ❁ ❁</p>
 
-The `.raw_ptr()` in the call that `gdi::save_to` wraps (shown earlier),
+The `.raw_ptr()` in the call that `gdi::save_to` wraps, shown earlier,
 
 ```cpp
 ole::save_to( file_path, ole::picture_from( bitmap ).raw_ptr() );
