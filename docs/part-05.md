@@ -835,7 +835,7 @@ namespace winapi::com {
 
 Crucial for correctness of the above: that `No_copying` prohibits not only copy construction and copy assignment, but also move construction and move assignment.
 
-
+Detail: `Const_` is defined as just `template< class T > using Const_ = const T;`, which enables uniform “left `const`” a.k.a. “west `const`” syntax. Arguably the `Ptr_` constructor is so ultra-simple that the `const` on the parameter serves no practical purpose. It’s there for uniform rules, namely to *always* declare things that can be `const`, as `const`.
 
 <p align="center">❁ ❁ ❁</p>
 
