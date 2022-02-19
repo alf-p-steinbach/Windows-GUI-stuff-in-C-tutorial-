@@ -10,8 +10,6 @@ On the other hand it’s slow and produces low quality graphics. In particular t
 
 And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4. UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. Unfortunately this part got too long to cover that, but in the next part we’ll just write our own wrappers over GDI’s wide text drawing functions.
 
-
-
 [some figure]
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -23,10 +21,8 @@ And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *dra
 - [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
 - [5.2 Use pseudo-mutable `DC_PEN` and `DC_BRUSH` stock objects to reduce verbosity.](#52-use-pseudo-mutable-dc_pen-and-dc_brush-stock-objects-to-reduce-verbosity)
 - [5.3. Automate cleanup for device contexts and GDI objects.](#53-automate-cleanup-for-device-contexts-and-gdi-objects)
-- [5.4. Save the generated graphics to an image file.](#54-save-the-generated-graphics-to-an-image-file)
-- [5.x. Draw UTF-8 text by converting to UTF-16 and using the wide text API.](#5x-draw-utf-8-text-by-converting-to-utf-16-and-using-the-wide-text-api)
-- [5.3. In passing: support `assert` messages in a GUI program built with Visual C++.](#53-in-passing-support-assert-messages-in-a-gui-program-built-with-visual-c)
-- [5.4. A potpourri of GDI things introduced via a C curve example.](#54-a-potpourri-of-gdi-things-introduced-via-a-c-curve-example)
+- [5.4. GDI + COM/OLE: save graphics to an image file.](#54-gdi--comole-save-graphics-to-an-image-file)
+- [5.x. GDI + GUI: present graphics in a window.](#5x-gdi--gui-present-graphics-in-a-window)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -492,7 +488,7 @@ The temporary GDI object automation via `+` is very closely tied to the `Dc::Sel
 }  // namespace winapi::gdi
 ```
 
-### 5.4. Save the generated graphics to an image file.
+### 5.4. GDI + COM/OLE: save graphics to an image file.
 
 A modern “.jpg” or “.png” image would be perfect for communicating one's result to others, or for using it in other work. However, the only file format supported by the GDI is the archaic [“.wmf”](https://en.wikipedia.org/wiki/Windows_Metafile) and possibly its cousin “.emf”. This is a Windows-specific binary vector graphics format with little to no support today, not even in Windows Explorer.
 
@@ -888,6 +884,6 @@ The `gdi::save_to` function used in the above main program code is a quite thin 
 
 ---
 
-### 5.x. asd.
+### 5.x. GDI + GUI: present graphics in a window.
 
 asdasd
