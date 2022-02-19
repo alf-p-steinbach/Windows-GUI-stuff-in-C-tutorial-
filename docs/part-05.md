@@ -882,7 +882,11 @@ namespace winapi::ole {
     ⋮
 ```
 
+The [**`__uuidof`**](https://docs.microsoft.com/en-us/cpp/cpp/uuidof-operator?view=msvc-170) pseudo-function produces a reference to a 128-bit [**UUID**](https://en.wikipedia.org/wiki/Universally_unique_identifier), a *universally unique id*, for the specified interface. Such interface identifiers are used to make COM and OLE usable from C. If it was all pure C++ then `OleCreatePictureIndirect` would presumably have been a function template, with the desired interface as a template parameter, and access of an interface would have been a `dynamic_cast`.
 
+*Digression (sorry! but worth knowing): the MinGW g++ compiler implements `__uuidof` via standard C++, involving macros and templates, but unfortunately Visual C++ implements it as a **language extension**, in a family of such extensions for COM, so that portable code that defines COM interfaces needs to be carefully designed to be compatible with all the various relevant compilers.*
+
+<p align="center">❁ ❁ ❁</p>
 
 asdasd
 
