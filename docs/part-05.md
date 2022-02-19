@@ -845,7 +845,7 @@ The `.raw_ptr()` in the call that `gdi::save_to` wraps (shown earlier),
 ole::save_to( file_path, ole::picture_from( bitmap ).raw_ptr() );
 ```
 
-… is because `ole::picture_from` returns a safe `Ptr_<IPictureDisp>` instead of an unsafe raw `IPictureDisp*` pointer:
+… is because `ole::picture_from` returns a safe `com::Ptr_<IPictureDisp>` instead of an unsafe raw `IPictureDisp*` pointer:
 
 *Start of [part-05/code/.include/winapi/ole/picture-util.hpp](part-05/code/.include/winapi/ole/picture-util.hpp)*:
 
@@ -883,7 +883,7 @@ namespace winapi::ole {
 
 
 
-
+asdasd
 
 
 
