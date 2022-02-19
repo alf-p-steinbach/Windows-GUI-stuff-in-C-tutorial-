@@ -229,7 +229,7 @@ Oh, the Yoda picture is really about absorbing a great destructive force rather 
 
 For the implementation of GDI object RAII wrappers I found it useful to define a little **type list** class template,
 
-in *[part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
+*in [part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp)*:
 
 ```cpp
     template< class... Types >
@@ -367,7 +367,7 @@ namespace winapi:gui {
 
 The standard GUI font is used in the `Dc` class’ default initialization of a device context:
 
-Start of *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
+*Start of [part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
 
 ```cpp
 #pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
@@ -453,7 +453,7 @@ namespace winapi::gdi {
 
 The temporary GDI object automation via `+` is very closely tied to the `Dc::Selection` class, so I present it all together in one little package. This class is full of subtleties and I’m not sure my design choices here were the best. I’m not even sure that I managed to make it difficult to use incorrectly, but anyway, the complexity is in large part due to that *goal*.
 
-End of *[part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
+*End of [part-05/code/.include/winapi/gui/device-contexts.hpp](part-05/code/.include/winapi/gui/device-contexts.hpp)*:
 
 ```cpp
     ⋮
@@ -838,6 +838,54 @@ Crucial for correctness of the above: that `No_copying` prohibits not only copy 
 Detail: `Const_` is defined as just `template< class T > using Const_ = const T;`, which enables uniform “left `const`” a.k.a. “west `const`” syntax. Arguably the `Ptr_` constructor is so ultra-simple that the `const` on the parameter serves no direct practical purpose. It’s there for uniform rules, namely to *always* declare things that can be `const`, as `const`.
 
 <p align="center">❁ ❁ ❁</p>
+
+The `.raw_ptr()` in the call that `gdi::save_to` wraps (shown earlier),
+
+```cpp
+ole::save_to( file_path, ole::picture_from( bitmap ).raw_ptr() );
+```
+
+… is because `ole::picture_from` returns a safe `Ptr_<IPictureDisp>` instead of an unsafe raw `IPictureDisp*` pointer:
+
+*Start of [part-05/code/.include/winapi/ole/picture-util.hpp](part-05/code/.include/winapi/ole/picture-util.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+#include <cpp/util.hpp>                         // cpp::util::(success, Const_)
+#include <winapi/com/failure-checking.hpp>      // winapi::com::failure_checking::operator>>
+#include <winapi/com/Ptr_.hpp>                  // winpai::com::Ptr_
+#include <winapi/ole/B_string.hpp>              // winapi::ole::B_string
+#include <wrapped-winapi/ocidl-h.hpp>           // IPictureDisp
+#include <wrapped-winapi/olectl-h.hpp>          // OleCreatePictureIndirect
+
+namespace winapi::ole {
+    namespace com   = winapi::com;
+    namespace cu    = cpp::util;
+    using   com::success, com::failure_checking::operator>>;
+    using   cu::Const_;
+
+    inline auto picture_from( const HBITMAP bitmap )
+        -> com::Ptr_<IPictureDisp>
+    {
+        PICTDESC params = { sizeof( PICTDESC ) };
+        params.picType      = PICTYPE_BITMAP;
+        params.bmp.hbitmap  = bitmap;
+
+        IPictureDisp* p_picture_disp;
+        OleCreatePictureIndirect(
+            &params, __uuidof( IPictureDisp ), false, reinterpret_cast<void**>( &p_picture_disp )
+            ) 
+            >> success or CPPUTIL_FAIL( "OleCreatePictureIndirect failed" );
+        return p_picture_disp;
+    }
+
+```
+
+
+
+
+
+
 
 The `gdi::save_to` function used in the above main program code is a quite thin wrapper over a function `ole::save_to`, that in turn wraps use of the Windows API function 
 

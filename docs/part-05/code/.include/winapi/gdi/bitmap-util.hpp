@@ -4,7 +4,6 @@
 #include <winapi/ole/picture-util.hpp>      // winapi::ole::save_to
 
 #include <string_view>
-#include <utility>
 
 namespace winapi::gdi {
     namespace ole = winapi::ole;
@@ -14,9 +13,5 @@ namespace winapi::gdi {
     {
         const ole::Library_usage _;     // RAII OleInitialize + OleUninitialize.
         ole::save_to( file_path, ole::picture_from( bitmap ).raw_ptr() );
-        auto x = ole::picture_from( bitmap );
-        auto y = ole::picture_from( bitmap );
-        y = std::move( x );
-        (void) y;
     }
 }  // namespace winapi::gdi

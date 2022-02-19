@@ -9,8 +9,8 @@
 namespace winapi::ole {
     namespace com   = winapi::com;
     namespace cu    = cpp::util;
-    using   com::failure_checking::operator>>;
-    using   cu::success, cu::Const_;
+    using   com::success, com::failure_checking::operator>>;
+    using   cu::Const_;
 
     inline auto picture_from( const HBITMAP bitmap )
         -> com::Ptr_<IPictureDisp>
