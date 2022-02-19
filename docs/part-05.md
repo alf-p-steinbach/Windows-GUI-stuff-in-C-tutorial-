@@ -874,11 +874,12 @@ namespace winapi::ole {
         IPictureDisp* p_picture_disp;
         OleCreatePictureIndirect(
             &params, __uuidof( IPictureDisp ), false, reinterpret_cast<void**>( &p_picture_disp )
-            ) 
+            )
             >> success or CPPUTIL_FAIL( "OleCreatePictureIndirect failed" );
         return p_picture_disp;
     }
-
+    
+    ⋮
 ```
 
 
