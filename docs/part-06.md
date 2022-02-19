@@ -2,6 +2,8 @@
 
 ## Part 5 – GDI: xxx.
 
+Happily Windows does support conversion between UTF-8 and UTF-16 via API functions such as [`MultiByteToWideChar`](https://docs.microsoft.com/en-us/windows/win32/api/stringapiset/nf-stringapiset-multibytetowidechar), in addition to, since Windows 10, providing the feature rich C API of the main Unicode library [**ICU**](https://docs.microsoft.com/en-us/windows/win32/intl/international-components-for-unicode--icu-).
+
 aswd
 
 And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4. UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. Unfortunately this part got too long to cover that, but in the next part we’ll just write our own wrappers over GDI’s wide text drawing functions.
@@ -25,8 +27,6 @@ Happily Windows does support conversion between UTF-8 and UTF-16 via API functio
 - [5.4. A potpourri of GDI things introduced via a C curve example.](#54-a-potpourri-of-gdi-things-introduced-via-a-c-curve-example)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-
 
 ---
 
