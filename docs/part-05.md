@@ -10,7 +10,7 @@ On the other hand it’s slow and produces low quality graphics. In particular t
 
 And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4.
 
-UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. Unfortunately this part got too long to cover the issues, so text drawing has to be postponed to the next part. Then we’ll just write our own wrappers over GDI’s UTF-16 based wide text drawing functions.
+UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. Unfortunately this part got too long to cover the issues, so international text drawing has to be postponed to the next part. Then we’ll just write our own wrappers over GDI’s UTF-16 based wide text drawing functions.
 
 [some figure]
 
