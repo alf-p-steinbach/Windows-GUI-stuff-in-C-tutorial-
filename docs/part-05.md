@@ -8,7 +8,9 @@ The GDI is simple and C-oriented, which is nice.
 
 On the other hand it’s slow and produces low quality graphics. In particular the GDI doesn’t support [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing), and it doesn’t support [alpha channel transparency](https://en.wikipedia.org/wiki/Alpha_compositing), which are both strong reasons to later move on to the successor technologies [GDI+](https://en.wikipedia.org/wiki/Graphics_Device_Interface#Windows_XP) and [Direct 2D](https://en.wikipedia.org/wiki/Direct2D).
 
-And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4. UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. Unfortunately this part got too long to cover that, but in the next part we’ll just write our own wrappers over GDI’s wide text drawing functions.
+And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4.
+
+UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. Unfortunately this part got too long to cover the issues, so text drawing has to be postponed to the next part. Then we’ll just write our own wrappers over GDI’s UTF-16 based wide text drawing functions.
 
 [some figure]
 
