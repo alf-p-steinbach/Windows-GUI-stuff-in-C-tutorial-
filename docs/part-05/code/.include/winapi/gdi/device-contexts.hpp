@@ -56,19 +56,20 @@ namespace winapi::gdi {
     };
 
 
+    inline auto bitmap_in( const HDC dc )
+        -> HBITMAP
+    { return static_cast<HBITMAP>( GetCurrentObject( dc, OBJ_BITMAP ) ); }
+
     class Bitmap_dc: public Memory_dc
     {
-        Bitmap* m_p_bitmap;
-
     public:
-        Bitmap_dc( const Explicit_ref_<Bitmap> bitmap ):
-            Memory_dc(),
-            m_p_bitmap( &bitmap.get() )
+        Bitmap_dc( const HBITMAP bitmap ):
+            Memory_dc()
         {
-            SelectObject( handle(), m_p_bitmap->handle() );
+            SelectObject( handle(), bitmap );
         }
         
-        auto bitmap() const -> const Bitmap& { return *m_p_bitmap; }
+        auto bitmap() const -> HBITMAP { return bitmap_in( handle() ); }
     };
 
 

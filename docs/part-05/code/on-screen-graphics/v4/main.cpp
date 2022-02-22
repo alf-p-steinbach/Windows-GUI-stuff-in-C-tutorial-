@@ -32,7 +32,7 @@ void cpp_main()
 {
     const auto [w, h] = SIZE{ 400, 400 };
     auto image = Bitmap_32( w, h );
-    draw_on( Bitmap_dc( ref( image ) ), RECT{ 0, 0, w, h } );
+    draw_on( Bitmap_dc( image ), RECT{ 0, 0, w, h } );
     const auto filename = string( "image-saving-result.bmp" );
     gdi::save_to( filename, image );
     

@@ -426,26 +426,27 @@ namespace winapi::gdi {
     };
 
 
+    inline auto bitmap_in( const HDC dc )
+        -> HBITMAP
+    { return static_cast<HBITMAP>( GetCurrentObject( dc, OBJ_BITMAP ) ); }
+
     class Bitmap_dc: public Memory_dc
     {
-        Bitmap* m_p_bitmap;
-
     public:
-        Bitmap_dc( const Explicit_ref_<Bitmap> bitmap ):
-            Memory_dc(),
-            m_p_bitmap( &bitmap.get() )
+        Bitmap_dc( const HBITMAP bitmap ):
+            Memory_dc()
         {
-            SelectObject( handle(), m_p_bitmap->handle() );
+            SelectObject( handle(), bitmap );
         }
-
-        auto bitmap() const -> const Bitmap& { return *m_p_bitmap; }
+        
+        auto bitmap() const -> HBITMAP { return bitmap_in( handle() ); }
     };
 
 
     ⋮
 ```
 
-&hellip; where, in the `Bitmap_dc` constructor, `Explicit_ref_` is a just tiny helper class that derives from and is initialized with a `std::reference_wrapper`, that makes clear in using code that the argument (e.g. `std::ref(image)`) bitmap is referenced, not copied.
+
 
 ---
 
@@ -500,6 +501,8 @@ Well, there are two ways to save a GDI graphics result as a now reasonably [port
 
 * directly [generate the binary contents](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) of such a file (the DIY approach), or
 * use the [**`OleSavePictureFile`**](https://docs.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-olesavepicturefile) function.
+
+A potential third way could have been to use the `CreateDIBSection` function to create a bitmap at the right place in a memory mapped file, namely after the BMP file header. However, that right place is at offset 14 in the file, and when I tried that the function call just failed with no indication why. Offset 16 worked fine though, which indicates an alignment requirement; unfortunately that particular placement is one that can’t be adjusted.
 
 Here we’ll use the API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge, and because this is information that’s difficult to come by nowadays.
 
@@ -638,7 +641,7 @@ void cpp_main()
 {
     const auto [w, h] = SIZE{ 400, 400 };
     auto image = Bitmap_32( w, h );
-    draw_on( Bitmap_dc( ref( image ) ), RECT{ 0, 0, w, h } );
+    draw_on( Bitmap_dc( image ), RECT{ 0, 0, w, h } );
     const auto filename = string( "image-saving-result.bmp" );
     gdi::save_to( filename, image );
 
@@ -825,7 +828,7 @@ namespace winapi::com {
 }  // namespace winapi::com
 ```
 
-Crucial for correctness of the above: that `No_copying` prohibits not only copy construction and copy assignment, but also move construction and move assignment.
+Crucial for correctness of the above: that `No_copying` prohibits also move construction and move assignment.
 
 Detail: `Const_` is defined as just `template< class T > using Const_ = const T;`, which enables uniform “left `const`” a.k.a. “west `const`” syntax. Arguably the `Ptr_` constructor is so ultra-simple that the `const` on the parameter serves no direct practical purpose. It’s there for uniform rules, namely to *always* declare things that can be `const`, as `const`.
 
