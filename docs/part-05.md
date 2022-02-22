@@ -502,9 +502,9 @@ Well, there are two ways to save a GDI graphics result as a now reasonably [port
 * directly [generate the binary contents](https://docs.microsoft.com/en-us/windows/win32/gdi/storing-an-image) of such a file (the DIY approach), or
 * use the [**`OleSavePictureFile`**](https://docs.microsoft.com/en-us/windows/win32/api/olectl/nf-olectl-olesavepicturefile) function.
 
-A potential third way could have been to use the `CreateDIBSection` function to create a bitmap at the right place in a memory mapped file, namely after the BMP file header. However, that right place is at offset 14 in the file, and when I tried that the function call just failed with no indication why. Offset 16 worked fine though, which indicates an alignment requirement; unfortunately that particular placement is one that can’t be adjusted.
+A potential third way could have been to use the `CreateDIBSection` function to create a bitmap at the right place in a memory mapped file, namely after the BMP file header. However, that right place is at offset 14 in the file, and when I tried that the function call just failed with no indication why. Offset 16 worked fine though, which indicated an alignment requirement. Indeed, *then* reading the documentation — like reading the user manual for something after failing — it says that ❝*dwOffset* must be a multiple of the size of a `DWORD`❞. And unfortunately that particular placement is one that can’t be adjusted.
 
-Here we’ll use the API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge, and because this is information that’s difficult to come by nowadays.
+Here we’ll use the `OleSavePictureFile` API function because that involves *learning about how to use such Windows API functions*, which is generally useful knowledge, and because this is information that’s difficult to come by nowadays.
 
 The Microsoft documentation linked to above is one of many sources that show how to generate binary “.bmp” file contents, if you want to go that route.
 
