@@ -10,9 +10,10 @@
 #include <stdexcept>    // std::exception
 #include <string>       // std::string
 
-namespace gdi = winapi::gdi;
+namespace gdi   = winapi::gdi;
 using   gdi::Dc, gdi::Bitmap_32, gdi::Bitmap_dc, gdi::save_to;
-using   std::ref, std::exception, std::string;
+using   std::exception, std::string;
+
 const auto s = string();    // For string concatenation.
 
 void draw_on( const Dc& canvas, const RECT& area )
@@ -36,11 +37,13 @@ void cpp_main()
     const auto filename = string( "image-saving-result.bmp" );
     gdi::save_to( filename, image );
     
-    auto cmd = ::s + "start \"\" " + filename + "\"";   // “start” for non-blocking command.
-    system( cmd.c_str() );  // Open file in “.bmp”-associated program, e.g. an image viewer.
+    #ifndef QUIET_PLEASE
+        auto cmd = ::s + "start \"\" " + filename + "\"";   // “start” for non-blocking command.
+        system( cmd.c_str() );  // Open file in “.bmp”-associated program, e.g. an image viewer.
+    #endif
 }
 
-auto main( int, char** args ) -> int
+auto main( int, char** cmd_line_parts ) -> int
 {
     const auto error_box = []( const string& title, string const& text )
     {
@@ -54,7 +57,7 @@ auto main( int, char** args ) -> int
         return EXIT_SUCCESS;
     } catch( const exception& x ) {
         fprintf( stderr, "!%s\n", x.what() );
-        error_box( ::s + args[0] + " failed:", ::s + "Because:\n" + x.what() );
+        error_box( ::s + cmd_line_parts[0] + " failed:", ::s + "Because:\n" + x.what() );
     }
     return EXIT_FAILURE;
 }
