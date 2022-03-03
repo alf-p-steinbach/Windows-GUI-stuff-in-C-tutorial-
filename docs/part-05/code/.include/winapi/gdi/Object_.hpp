@@ -30,9 +30,11 @@ namespace winapi::gdi {
     public:
         ~Object_()
         {
-            // Deletion may possibly fail if the object is selected in a device context.
-            const bool deleted = ::DeleteObject( m_handle );
-            assert(( "DeleteObject", deleted ));  (void) deleted;
+            if( m_handle ) {
+                // Deletion may possibly fail if the object is selected in a device context.
+                const bool deleted = ::DeleteObject( m_handle );
+                assert(( "DeleteObject", deleted ));  (void) deleted;
+            }
         }
         
         Object_( Handle&& handle ): m_handle( handle )
