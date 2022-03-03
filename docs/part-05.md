@@ -438,15 +438,13 @@ namespace winapi::gdi {
         {
             SelectObject( handle(), bitmap );
         }
-        
+
         auto bitmap() const -> HBITMAP { return bitmap_in( handle() ); }
     };
 
 
     ⋮
 ```
-
-
 
 ---
 
