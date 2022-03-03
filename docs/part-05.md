@@ -251,7 +251,7 @@ The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes below do no
 *[part-05/code/.include/winapi/gdi/Object_.hpp](part-05/code/.include/winapi/gdi/Object_.hpp)*:
 
 ```cpp
-#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#pragma once    // Sxource encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
 #include <cpp/util.hpp>
 
@@ -283,9 +283,11 @@ namespace winapi::gdi {
     public:
         ~Object_()
         {
-            // Deletion may possibly fail if the object is selected in a device context.
-            const bool deleted = ::DeleteObject( m_handle );
-            assert(( "DeleteObject", deleted ));  (void) deleted;
+            if( m_handle ) {
+                // Deletion may possibly fail if the object is selected in a device context.
+                const bool deleted = ::DeleteObject( m_handle );
+                assert(( "DeleteObject", deleted ));  (void) deleted;
+            }
         }
 
         Object_( Handle&& handle ): m_handle( handle )
