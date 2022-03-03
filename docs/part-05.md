@@ -251,7 +251,7 @@ The `Pen`, `Brush`, `Font`, `Bitmap`, `Region` and `Palette` classes below do no
 *[part-05/code/.include/winapi/gdi/Object_.hpp](part-05/code/.include/winapi/gdi/Object_.hpp)*:
 
 ```cpp
-#pragma once    // Sxource encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <wrapped-winapi/windows-h.hpp>
 #include <cpp/util.hpp>
 
