@@ -4,9 +4,6 @@
 #include <type_traits>
 using std::is_same_v;
 
-template< class T, class Arg >
-constexpr is_of_type_( Arg ) -> bool { return is_same_v< T, Arg >; }
-
 static_assert( is_of_type_<COLORREF>( RGB(0,0,0) ) );   // RGB() → COLORREF 
 static_assert( is_same_v<COLORREF, DWORD> );            // COLORREF is 32-bit unsigned.
 namespace color {
