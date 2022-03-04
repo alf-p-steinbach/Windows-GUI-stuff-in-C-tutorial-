@@ -129,25 +129,45 @@ Instead of creating, selecting, using, unselecting and destroying pen and brush 
 
 My experimentation showed that in Windows 11 these are not the default objects in a DC from `GetDC(0)`, so it’s necessary to explicitly select them:
 
+*[part-05/code/.include/winapi/gdi/color_names.hpp](part-05/code/.include/winapi/gdi/color_names.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+
+namespace winapi::gdi {
+
+    // COLORREF is 32-bit unsigned.
+    namespace color {
+        constexpr COLORREF  orange      = RGB( 0xFF, 0x80, 0x20 );
+        constexpr COLORREF  yellow      = RGB( 0xFF, 0xFF, 0x20 );
+        constexpr COLORREF  blue        = RGB( 0x00, 0x00, 0xFF );
+    }  // namespace color
+
+    // Convenience for `using namespace`:
+    namespace color_names { namespace color = winapi::gdi::color; }
+
+}  // namespace winapi::gdi
+
+```
+
 *[part-05/code/on-screen-graphics/v2/main.cpp](part-05/code/on-screen-graphics/v2/main.cpp)*:
 
 ```cpp
 # // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <winapi/gdi/color_names.hpp>
 #include <wrapped-winapi/windows-h.hpp>
+using namespace winapi::gdi::color_names;   // color::*
 
 void draw_on( const HDC canvas, const RECT& area )
 {
-    constexpr auto  orange      = COLORREF( RGB( 0xFF, 0x80, 0x20 ) );
-    constexpr auto  yellow      = COLORREF( RGB( 0xFF, 0xFF, 0x20 ) );
-    constexpr auto  blue        = COLORREF( RGB( 0, 0, 0xFF ) );
-
     // Clear the background to blue.
-    SetDCBrushColor( canvas, blue );
+    SetDCBrushColor( canvas, color::blue );
     FillRect( canvas, &area, 0 );
 
     // Draw a yellow circle filled with orange.
-    SetDCPenColor( canvas, yellow );
-    SetDCBrushColor( canvas, orange );
+    SetDCPenColor( canvas, color::yellow );
+    SetDCBrushColor( canvas, color::orange );
     Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 }
 
@@ -159,7 +179,7 @@ auto main() -> int
     SelectObject( canvas, GetStockObject( DC_PEN ) );
     SelectObject( canvas, GetStockObject( DC_BRUSH ) );
 
-    draw_on( canvas, RECT{ 10, 10, 10 + 400, 10 + 400 } );
+        draw_on( canvas, RECT{ 10, 10, 10 + 400, 10 + 400 } );
 
     ReleaseDC( no_window, canvas );
 }
@@ -183,11 +203,13 @@ The RAII idea of leveraging C++ construction and destruction can also be applied
 
 For exception safety — to be able to use exceptions freely — even the `SelectObject` call pairs can/should be automated via C++ construction and destruction, e.g. a class `Dc::Selection` whose instances retain the requisite information to undo the selection.
 
-Finally, most of these objects will ordinarily be very short lived ones, created for single calls of graphics primitives such as `FillRect` and `Ellipse`.
+xxx
 
 
 
 ### 5.4 Automate creation of temporary GDI objects.
+
+xxx Finally, most of these objects will ordinarily be very short lived ones, created for single calls of graphics primitives such as `FillRect` and `Ellipse`.
 
 To reduce or eliminate a phletora of named short lived variables one can support *implicit creation* of the objects via operators such `+` or `->`, using the same return-reference-to-self *call chaining* idea as with iostream `<<` expressions.
 
