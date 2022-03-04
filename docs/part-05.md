@@ -144,10 +144,8 @@ namespace winapi::gdi {
         constexpr COLORREF  blue        = RGB( 0x00, 0x00, 0xFF );
     }  // namespace color
 
-    // Convenience for `using namespace`:
-    namespace color_names { namespace color = winapi::gdi::color; }
-
 }  // namespace winapi::gdi
+
 
 ```
 
@@ -157,7 +155,7 @@ namespace winapi::gdi {
 # // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <winapi/gdi/color_names.hpp>
 #include <wrapped-winapi/windows-h.hpp>
-using namespace winapi::gdi::color_names;   // color::*
+namespace color = winapi::gdi::color;
 
 void draw_on( const HDC canvas, const RECT& area )
 {

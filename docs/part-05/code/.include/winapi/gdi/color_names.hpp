@@ -10,7 +10,4 @@ namespace winapi::gdi {
         constexpr COLORREF  blue        = RGB( 0x00, 0x00, 0xFF );
     }  // namespace color
 
-    // Convenience for `using namespace`:
-    namespace color_names { namespace color = winapi::gdi::color; }
-
 }  // namespace winapi::gdi
