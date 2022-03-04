@@ -56,7 +56,7 @@ By default a device context typically has a black pen and a white brush. To draw
 namespace color {
     constexpr COLORREF  orange      = RGB( 0xFF, 0x80, 0x20 );
     constexpr COLORREF  yellow      = RGB( 0xFF, 0xFF, 0x20 );
-    constexpr COLORREF  blue        = RGB( 0, 0, 0xFF );
+    constexpr COLORREF  blue        = RGB( 0x00, 0x00, 0xFF );
 }  // namespace color
 
 auto main() -> int
