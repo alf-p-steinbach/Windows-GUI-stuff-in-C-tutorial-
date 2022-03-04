@@ -86,6 +86,12 @@ namespace cpp::util {
         static constexpr bool contain_ = (... or is_same_v<T, Types>);
     };
 
+    template< class T, class Arg >
+    constexpr is_of_type_( Arg ) -> bool { return is_same_v< T, Arg >; }
+
+    template< class T, class U >
+    constexpr bool is_same_type_ = is_same_v< T, U >;
+
     template< class T >
     class Explicit_ref_:
         public reference_wrapper<T>
