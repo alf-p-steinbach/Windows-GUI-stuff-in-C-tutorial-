@@ -64,11 +64,11 @@ namespace winapi::gdi {
                 : successor_if_not_negative( First_rect_< More_args... >::index )
             };
         };
+
+        template< class... Args >
+        constexpr int first_rect_ = First_rect_< Args... >::index;
     }  // namespace impl
     
-    template< class... Args >
-    constexpr int first_rect_ = impl::First_rect_< Args... >::index;
-
     class Dc: No_copying
     {
         HDC     m_handle;
@@ -127,7 +127,7 @@ namespace winapi::gdi {
         auto draw( const Api_func api_func, const Args&... args ) const
             -> const Dc&
         {
-            const int i_first_rect = first_rect_< Args... >;
+            const int i_first_rect = impl::first_rect_< Args... >;
             if constexpr( i_first_rect < 0 ) {
                 api_func( m_handle, args... );
             } else {

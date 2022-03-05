@@ -63,7 +63,7 @@ auto main() -> int
 {
     constexpr auto  no_window   = HWND( 0 );
     constexpr auto  area        = RECT{ 10, 10, 10 + 400, 10 + 400 };
-    
+
     const HDC canvas = GetDC( no_window );
         // Fill the background with blue.
         const HBRUSH blue_brush = CreateSolidBrush( color::blue );
@@ -123,39 +123,19 @@ Ditto, building and running with the MinGW toolchain, g++:
 > a_
 ```
 
-### 5.2 Use pseudo-mutable `DC_PEN` and `DC_BRUSH` stock objects to reduce verbosity.
+### 5.2 Use “DC colors” to reduce verbosity.
 
 Instead of creating, selecting, using, unselecting and destroying pen and brush objects, as long as you don’t need fancy effects such as line patterns you can just change the device context’s **DC pen color** and **DC brush color**, via respectively `SetDCPenColor` and `SetDCBrushColor`. These colors are only *used* when the **stock objects** you get from respectively `GetStockObject(DC_PEN)` and `GetStockObject(DC_BRUSH)` are selected in the device context.
 
 My experimentation showed that in Windows 11 these are not the default objects in a DC from `GetDC(0)`, so it’s necessary to explicitly select them:
 
-*[part-05/code/.include/winapi/gdi/color_names.hpp](part-05/code/.include/winapi/gdi/color_names.hpp)*:
-
-```cpp
-#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <wrapped-winapi/windows-h.hpp>
-
-namespace winapi::gdi {
-
-    // COLORREF is 32-bit unsigned.
-    namespace color {
-        constexpr COLORREF  orange      = RGB( 0xFF, 0x80, 0x20 );
-        constexpr COLORREF  yellow      = RGB( 0xFF, 0xFF, 0x20 );
-        constexpr COLORREF  blue        = RGB( 0x00, 0x00, 0xFF );
-    }  // namespace color
-
-}  // namespace winapi::gdi
-
-
-```
-
 *[part-05/code/on-screen-graphics/v2/main.cpp](part-05/code/on-screen-graphics/v2/main.cpp)*:
 
 ```cpp
 # // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <winapi/gdi/color-names.hpp>
+#include <winapi/gdi/color_names.hpp>
 #include <wrapped-winapi/windows-h.hpp>
-namespace color = winapi::gdi::color;
+namespace color = winapi::gdi::color_names;
 
 void draw_on( const HDC canvas, const RECT& area )
 {
@@ -183,6 +163,26 @@ auto main() -> int
 }
 ```
 
+… where
+
+*[part-05/code/.include/winapi/gdi/color_names.hpp](part-05/code/.include/winapi/gdi/color_names.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+
+namespace winapi::gdi {
+
+    // COLORREF is 32-bit unsigned.
+    namespace color_names {
+        constexpr COLORREF  orange      = RGB( 0xFF, 0x80, 0x20 );
+        constexpr COLORREF  yellow      = RGB( 0xFF, 0xFF, 0x20 );
+        constexpr COLORREF  blue        = RGB( 0x00, 0x00, 0xFF );
+    }  // namespace color_names
+
+}  // namespace winapi::gdi
+```
+
 The [current documentation of `SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject) states that the object one selects “must have been created” by one of the functions listed in a table there, which does not include `GetStockObject`. But of course that’s just the usual Microsoft documentation SNAFU. The stock objects would not be useful for anything if they couldn’t be used.
 
 However, the stock objects are special in that they don’t need to and shouldn’t be destroyed via `DeleteObject` (or any other way).
@@ -191,9 +191,19 @@ Result: same as before, just with shorter & more clear code.
 
 ---
 
-### 5.3. Automate cleanup for device contexts and GDI objects.
+### 5.3. A C++ fluent style wrapper for “DC color” usage.
 
 <img title="" src="part-05/images/yoda.png" alt="">
+
+sdf
+
+xxx
+
+Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
+
+### 5.4 Automate creation of temporary GDI objects.
+
+xxx
 
 To unleash the full power of the GDI, such as using pattern pens and brushes, it's necessary to deal with dynamic creation and destruction of GDI objects. Doing it in C style, as in the first example, is however fragile and verbose. But you can automate the `DeleteObject` object destruction calls via C++ destructors, the C++ [RAII](https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization) technique, to make such code shorter and safer. Essentially it means defining small handle ownership classes such as `Brush` and `Pen`. For simplicity and efficiency these classes can be made non-copyable.
 
@@ -203,13 +213,7 @@ For exception safety — to be able to use exceptions freely — even the `Selec
 
 xxx
 
-Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
-
-
-
-### 5.4 Automate creation of temporary GDI objects.
-
-xxx Finally, most of these objects will ordinarily be very short lived ones, created for single calls of graphics primitives such as `FillRect` and `Ellipse`.
+ Finally, most of these objects will ordinarily be very short lived ones, created for single calls of graphics primitives such as `FillRect` and `Ellipse`.
 
 To reduce or eliminate a phletora of named short lived variables one can support *implicit creation* of the objects via operators such `+` or `->`, using the same return-reference-to-self *call chaining* idea as with iostream `<<` expressions.
 
