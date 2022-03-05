@@ -4,21 +4,98 @@
 #include <winapi/gui/std_font.hpp>          // winapi::gui::std_font
 #include <wrapped-winapi/windows-h.hpp>
 
+#include <stddef.h>         // size_t
+#include <type_traits>      // std::is_same_v
+#include <utility>          // std::(index_sequence, 
+
 namespace winapi::gdi {
     namespace cu = cpp::util;
     using cu::hopefully, cu::No_copying, cu::Explicit_ref_;
+
+    struct Color{ COLORREF value; Color( const COLORREF c ): value( c ) {} };
+
+    struct Brush_color: Color
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
+    };
+
+    struct Pen_color: Color
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const { SetDCPenColor( canvas, value ); }
+    };
+
+    struct Gap_color: Color     // Gaps in pattern lines, and bg in text presentation.
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const
+        {
+            SetBkColor( canvas, value );  SetBkMode( canvas, OPAQUE );
+        }
+    };
+
+    struct Transparent_gaps
+    {
+        void set_in( const HDC canvas ) const { SetBkMode( canvas, TRANSPARENT ); }
+    };
 
     inline void make_practical( const HDC dc )
     {
         SelectObject( dc, GetStockObject( DC_PEN ) );
         SelectObject( dc, GetStockObject( DC_BRUSH ) );
-        SetBkMode( dc, TRANSPARENT );       // Don't fill in the background of text, please.
+        SetBkMode( dc, TRANSPARENT );   // Don't fill in background of text, please.
         SelectObject( dc, gui::std_font );
     }
+
+    namespace impl {
+        constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
+
+        template< class... Args > struct First_rect_;
+        
+        template<> struct First_rect_<> { enum{ index = -1 }; };
+
+        template< class First, class... More_args >
+        struct First_rect_< First, More_args... >
+        {
+            enum
+            { index = std::is_same_v<First, RECT>
+                ? 0
+                : successor_if_not_negative( First_rect_< More_args... >::index )
+            };
+        };
+    }  // namespace impl
+    
+    template< class... Args >
+    constexpr int first_rect_ = impl::First_rect_< Args... >::index;
 
     class Dc: No_copying
     {
         HDC     m_handle;
+
+        // Expands a specified RECT argument into its four member values as arguments.
+        template<
+            size_t      rect_index,
+            class       Api_func,
+            class...    Args,
+            size_t...   indices_before_rect,
+            size_t...   indices_after_rect       // 0-based, i.e. minus offset
+            >
+        void draw_(
+            const Api_func                              api_func,
+            const std::tuple<const Args&...>&           args_tuple,
+            std::index_sequence<indices_before_rect...> ,
+            std::index_sequence<indices_after_rect...>
+            ) const
+        {
+            const RECT& r = std::get<rect_index>( args_tuple );
+            draw(
+                api_func,
+                std::get<indices_before_rect>( args_tuple )...,     // Can be empty, works.
+                r.left, r.top, r.right, r.bottom,
+                std::get< rect_index + 1 + indices_after_rect >( args_tuple )...
+                );
+        }
        
     protected:
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
@@ -31,10 +108,43 @@ namespace winapi::gdi {
         }
 
     public:
-        class Selection;                                    // RAII for SelectObject, separate.
+        template< class... Args >
+        auto use( const Args&... colors ) const
+            -> const Dc&
+        {
+            (colors.set_in( m_handle ), ...);
+            return *this;
+        }
+        
+        auto fill( const RECT& area ) const
+            -> const Dc&
+        {
+            FillRect( m_handle, &area, 0 );
+            return *this;
+        }
+        
+        template< class Api_func, class... Args >
+        auto draw( const Api_func api_func, const Args&... args ) const
+            -> const Dc&
+        {
+            const int i_first_rect = first_rect_< Args... >;
+            if constexpr( i_first_rect < 0 ) {
+                api_func( m_handle, args... );
+            } else {
+                draw_<i_first_rect>(
+                    api_func,
+                    std::tie( args... ),
+                    std::make_index_sequence<i_first_rect>(),
+                    std::make_index_sequence<sizeof...( Args ) - (i_first_rect + 1)>()
+                    );
+            }
+            return *this;
+        }
 
         auto handle() const -> HDC { return m_handle; }
         operator HDC() const { return handle(); }
+
+        class Selection;                                    // RAII for SelectObject, separate.
     };
 
     inline Dc::~Dc() {}
@@ -81,14 +191,14 @@ namespace winapi::gdi {
     public:
         ~Selection() { SelectObject( m_dc, m_original_object ); }
 
-        struct From_api_handle {};  // Intentionally explicit, verbose & ugly interface.
-        Selection( From_api_handle, const HGDIOBJ object_handle, const Dc& dc ):
-            m_dc( dc ),  m_original_object( SelectObject( dc, object_handle ) )
-        {}
-
         template< class Handle >    // Easy to use interface.
         Selection( const Dc& dc, const Object_<Handle>& object ):
             Selection( From_api_handle(), object.handle(), dc )
+        {}
+
+        struct From_api_handle {};  // Intentionally explicit, verbose & ugly interface.
+        Selection( From_api_handle, const HGDIOBJ object_handle, const Dc& dc ):
+            m_dc( dc ),  m_original_object( SelectObject( dc, object_handle ) )
         {}
 
         auto dc() const -> const Dc& { return m_dc; }

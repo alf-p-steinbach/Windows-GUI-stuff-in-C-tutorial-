@@ -153,7 +153,7 @@ namespace winapi::gdi {
 
 ```cpp
 # // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <winapi/gdi/color_names.hpp>
+#include <winapi/gdi/color-names.hpp>
 #include <wrapped-winapi/windows-h.hpp>
 namespace color = winapi::gdi::color;
 
@@ -203,6 +203,8 @@ For exception safety — to be able to use exceptions freely — even the `Selec
 
 xxx
 
+Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
+
 
 
 ### 5.4 Automate creation of temporary GDI objects.
@@ -214,6 +216,8 @@ To reduce or eliminate a phletora of named short lived variables one can support
 For example, “adding” a device context and e.g. a temporary GDI pen object handle with `+` can result in a temporary `Pen` object (ensuring `DeleteObject`) and a `Dc::Selection` instance that converts implicitly to `HDC`, so that such an expression can be used where an `HDC` is required, and where further addition can be chained on the first one. The key C++ language support for this is that a temporary object is destroyed at the end of the full-expression, not immediately after the function call it appears as argument to. So the temporary objects created by `+` arguments persist until the full expression, e.g. with the outermost level a call of `FillRect` or `Ellipse`, has been evaluated.
 
 Using such machinery the example with dynamic creation of brushes and pens can be rewritten as much shorter and now exception safe C++ level code:
+
+asdasd
 
 *[part-05/code/on-screen-graphics/v3/main.cpp](part-05/code/on-screen-graphics/v3/main.cpp)*:
 
@@ -246,8 +250,6 @@ auto main() -> int
 <img title="" src="part-05/images/sshot-2.cpp-graphics-on-screen.cropped.png" alt="">
 
 This program does exactly the same as the first and second C style examples, in order to make it easy to compare the three programs.
-
-Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
 ---
 

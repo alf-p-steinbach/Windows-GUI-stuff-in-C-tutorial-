@@ -10,6 +10,9 @@
 
 #define CPPUTIL_FAIL( s ) ::cpp::util::fail( std::string( __func__ ) + " - " + (s) )
 
+#define CPPUTIL_WITH( name, initializer ) \
+    if( auto&& name = initializer; ((void) name, true) )
+
 namespace cpp::util {
     using   std::reference_wrapper,
             std::size,
@@ -87,7 +90,7 @@ namespace cpp::util {
     };
 
     template< class T, class Arg >
-    constexpr is_of_type_( Arg ) -> bool { return is_same_v< T, Arg >; }
+    constexpr auto is_of_type_( Arg ) -> bool { return is_same_v< T, Arg >; }
 
     template< class T, class U >
     constexpr bool is_same_type_ = is_same_v< T, U >;
