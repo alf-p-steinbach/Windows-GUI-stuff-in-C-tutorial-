@@ -195,11 +195,33 @@ Result: same as before, just with shorter & more clear code.
 
 <img title="" src="part-05/images/yoda.png" alt="">
 
-sdf
+The drawing code
 
-xxx
+```cpp
+// Clear the background to blue.
+SetDCBrushColor( canvas, color::blue );
+FillRect( canvas, &area, 0 );
+
+// Draw a yellow circle filled with orange.
+SetDCPenColor( canvas, color::yellow );
+SetDCBrushColor( canvas, color::orange );
+Ellipse( canvas, area.left, area.top, area.right, area.bottom );
+```
+
+… is a definite improvement on the first example’s ultra-verbose general GDI code, but ideally it should look more like this:
+
+```cpp
+    using namespace winapi::gdi::color_names;
+    canvas.use( Brush_color( blue ) ).fill( area );
+    canvas.use( Brush_color( orange ), Pen_color( yellow ) ).draw( Ellipse, area );
+
+```
+
+Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.use` member function returns a reference to the instance, so that one call e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called **fluent style**.
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
+
+xxx
 
 ### 5.4 Automate creation of temporary GDI objects.
 
