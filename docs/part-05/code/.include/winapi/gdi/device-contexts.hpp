@@ -1,6 +1,6 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <cpp/util.hpp>                         // cpp::util::(hopefully, fail)
-#include <winapi/gdi/color-helper-classes.hpp>  // winapi::gdi::(Brush_color, Pen_color, Gap_color)
+#include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
 #include <winapi/gdi/Object_.hpp>               // winapi::gdi::(Brush, Pen, Bitmap)
 #include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
 #include <wrapped-winapi/windows-h.hpp>
