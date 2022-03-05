@@ -198,13 +198,15 @@ Result: same as before, just with shorter & more clear code.
 The drawing code
 
 ```cpp
+using namespace winapi::gdi::color_names;
+
 // Clear the background to blue.
-SetDCBrushColor( canvas, color::blue );
+SetDCBrushColor( canvas, blue );
 FillRect( canvas, &area, 0 );
 
 // Draw a yellow circle filled with orange.
-SetDCPenColor( canvas, color::yellow );
-SetDCBrushColor( canvas, color::orange );
+SetDCPenColor( canvas, yellow );
+SetDCBrushColor( canvas, orange );
 Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 ```
 
