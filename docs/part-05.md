@@ -222,7 +222,7 @@ Oh, the Yoda picture is really about absorbing a great destructive force rather 
 
 ---
 
-The device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. What kind of colorization a given argument is used for — e.g. pen or brush — is determined by the argument type via a little bit of static polymorphism where `.use` just calls each argument’s `.set_in` (set this color in the specified device context) member function. Relevant `.use` argument types:
+The device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. What kind of colorization a given argument is used for — e.g. pen or brush — is determined by the argument type’s `.set_in` member function (examples below). Relevant `.use` argument types:
 
 *[part-05/code/.include/winapi/gdi/color-usage-classes.hpp](part-05/code/.include/winapi/gdi/color-usage-classes.hpp)*:
 
