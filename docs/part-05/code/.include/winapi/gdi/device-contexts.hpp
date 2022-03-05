@@ -1,7 +1,8 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>                     // cpp::util::(hopefully, fail)
-#include <winapi/gdi/Object_.hpp>           // winapi::gdi::(Brush, Pen, Bitmap)
-#include <winapi/gui/std_font.hpp>          // winapi::gui::std_font
+#include <cpp/util.hpp>                         // cpp::util::(hopefully, fail)
+#include <winapi/gdi/color-helper-classes.hpp>  // winapi::gdi::(Brush_color, Pen_color, Gap_color)
+#include <winapi/gdi/Object_.hpp>               // winapi::gdi::(Brush, Pen, Bitmap)
+#include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
 #include <wrapped-winapi/windows-h.hpp>
 
 #include <stddef.h>         // size_t
@@ -12,43 +13,9 @@ namespace winapi::gdi {
     namespace cu = cpp::util;
     using cu::hopefully, cu::No_copying, cu::Explicit_ref_;
 
-    struct Color{ COLORREF value; Color( const COLORREF c ): value( c ) {} };
-
-    struct Brush_color: Color
-    {
-        using Color::Color;
-        void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
-    };
-
-    struct Pen_color: Color
-    {
-        using Color::Color;
-        void set_in( const HDC canvas ) const { SetDCPenColor( canvas, value ); }
-    };
-
-    struct Gap_color: Color     // Gaps in pattern lines, and bg in text presentation.
-    {
-        using Color::Color;
-        void set_in( const HDC canvas ) const
-        {
-            SetBkColor( canvas, value );  SetBkMode( canvas, OPAQUE );
-        }
-    };
-
-    struct Transparent_gaps
-    {
-        void set_in( const HDC canvas ) const { SetBkMode( canvas, TRANSPARENT ); }
-    };
-
-    inline void make_practical( const HDC dc )
-    {
-        SelectObject( dc, GetStockObject( DC_PEN ) );
-        SelectObject( dc, GetStockObject( DC_BRUSH ) );
-        SetBkMode( dc, TRANSPARENT );   // Don't fill in background of text, please.
-        SelectObject( dc, gui::std_font );
-    }
-
     namespace impl {
+        // Logic to find the index of the first RECT in a list of types, or -1 if none.
+
         constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
 
         template< class... Args > struct First_rect_;
@@ -69,6 +36,14 @@ namespace winapi::gdi {
         constexpr int first_rect_ = First_rect_< Args... >::index;
     }  // namespace impl
     
+    inline void make_practical( const HDC dc )
+    {
+        SelectObject( dc, GetStockObject( DC_PEN ) );
+        SelectObject( dc, GetStockObject( DC_BRUSH ) );
+        SetBkMode( dc, TRANSPARENT );   // Don't fill in background of text, please.
+        SelectObject( dc, gui::std_font );
+    }
+
     class Dc: No_copying
     {
         HDC     m_handle;
@@ -96,7 +71,7 @@ namespace winapi::gdi {
                 std::get< rect_index + 1 + indices_after_rect >( args_tuple )...
                 );
         }
-       
+
     protected:
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
 

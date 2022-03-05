@@ -220,7 +220,47 @@ Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.use` 
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
-xxx
+---
+
+The device context class’  `.use` member function takes an arbitrary number of arguments, of arbitrary types, that represent colors to set in the device context. The types tell it which colorization (brush, pen or pattern gap / text background) it should use a color for, and for that purpose it assumes that all arguments have a `.set_in` member function that sets that color in a specified device context. Relevant support types can go like:
+
+*[part-05/code/.include/winapi/gdi/color-helper-classes.hpp](part-05/code/.include/winapi/gdi/color-helper-classes.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <wrapped-winapi/windows-h.hpp>
+
+namespace winapi::gdi {
+    struct Color{ COLORREF value; Color( const COLORREF c ): value( c ) {} };
+
+    struct Brush_color: Color
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
+    };
+
+    struct Pen_color: Color
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const { SetDCPenColor( canvas, value ); }
+    };
+
+    struct Gap_color: Color     // Gaps in pattern lines, and bg in text presentation.
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const
+        {
+            SetBkColor( canvas, value );  SetBkMode( canvas, OPAQUE );
+        }
+    };
+
+    struct Transparent_gaps
+    {
+        void set_in( const HDC canvas ) const { SetBkMode( canvas, TRANSPARENT ); }
+    };
+}  // namespace winapi::gdi
+
+```
 
 ### 5.4 Automate creation of temporary GDI objects.
 
