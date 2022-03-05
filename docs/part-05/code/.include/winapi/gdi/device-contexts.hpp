@@ -1,5 +1,5 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>                         // cpp::util::(hopefully, fail)
+#include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
 #include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
 #include <winapi/gdi/Object_.hpp>               // winapi::gdi::(Brush, Pen, Bitmap)
 #include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
@@ -11,31 +11,8 @@
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
-    using cu::hopefully, cu::No_copying, cu::Explicit_ref_;
+    using cu::hopefully, cu::No_copying, cu::Types_;
 
-    namespace impl {
-        // Logic to find the index of the first RECT in a list of types, or -1 if none.
-
-        constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
-
-        template< class... Args > struct First_rect_;
-        
-        template<> struct First_rect_<> { enum{ index = -1 }; };
-
-        template< class First, class... More_args >
-        struct First_rect_< First, More_args... >
-        {
-            enum
-            { index = std::is_same_v<First, RECT>
-                ? 0
-                : successor_if_not_negative( First_rect_< More_args... >::index )
-            };
-        };
-
-        template< class... Args >
-        constexpr int first_rect_ = First_rect_< Args... >::index;
-    }  // namespace impl
-    
     inline void make_practical( const HDC dc )
     {
         SelectObject( dc, GetStockObject( DC_PEN ) );
@@ -99,10 +76,18 @@ namespace winapi::gdi {
         }
         
         template< class Api_func, class... Args >
+        auto simple_draw( const Api_func api_func, const Args&... args ) const
+            -> const Dc&
+        {
+            api_func( m_handle, args... );
+            return *this;
+        }
+
+        template< class Api_func, class... Args >
         auto draw( const Api_func api_func, const Args&... args ) const
             -> const Dc&
         {
-            const int i_first_rect = impl::first_rect_< Args... >;
+            const int i_first_rect = Types_< Args... >::template index_of_first_< RECT >;
             if constexpr( i_first_rect < 0 ) {
                 api_func( m_handle, args... );
             } else {

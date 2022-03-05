@@ -80,6 +80,29 @@ namespace cpp::util {
     template< class T >
     using Const_ = const T;
     
+    namespace impl::types {
+        // Logic to find the index of the first T in a list of types, or -1 if none.
+
+        constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
+
+        template< class T, class... Args > struct First_T_;
+        
+        template< class T > struct First_T_< T > { enum{ index = -1 }; };
+
+        template< class T, class First, class... More_args >
+        struct First_T_< T, First, More_args... >
+        {
+            enum
+            { index = is_same_v< First, T >
+                ? 0
+                : successor_if_not_negative( First_T_< T, More_args... >::index )
+            };
+        };
+
+        template< class T, class... Args >
+        constexpr int index_of_first_ = First_T_< T, Args... >::index;
+    }  // namespace impl::types
+
     template< class... Types >
     struct Types_
     {
@@ -87,6 +110,9 @@ namespace cpp::util {
 
         template< class T >
         static constexpr bool contain_ = (... or is_same_v<T, Types>);
+
+        template< class T >
+        static constexpr int index_of_first_ = impl::types::index_of_first_<T, Types...>;
     };
 
     template< class T, class Arg >

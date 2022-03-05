@@ -264,6 +264,12 @@ namespace winapi::gdi {
 
 ```
 
+---
+
+asdasd
+
+
+
 ### 5.4 Automate creation of temporary GDI objects.
 
 xxx
