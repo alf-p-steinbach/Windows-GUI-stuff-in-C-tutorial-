@@ -2,7 +2,7 @@
 #include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
 #include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
 #include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
-#include <wrapped-winapi/windows-h.hpp>
+#include <wrapped-winapi/windows-h.hpp>         // General Windows API.
 
 #include <stddef.h>         // size_t
 
@@ -125,11 +125,21 @@ namespace winapi::gdi {
         return *this;
     }
 
-    class Screen_dc: public Dc
+
+    class Window_dc: public Dc
+    {
+        HWND    m_window;
+
+    public:        
+        ~Window_dc() override { ReleaseDC( m_window, handle() ); }
+        Window_dc( const HWND window ): Dc( GetDC( window ) ), m_window( window ) {}
+    };
+
+
+    class Screen_dc: public Window_dc
     {
     public:        
-        ~Screen_dc() override { ReleaseDC( 0, handle() ); }
-        Screen_dc(): Dc( GetDC( 0 ) ) {}                    // Main screen specified implicitly.
+        Screen_dc(): Window_dc( 0 ) {}                      // Main screen specified implicitly.
     };
 
 

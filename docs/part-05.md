@@ -218,7 +218,7 @@ canvas.use( Brush_color( blue ) ).fill( area );
 canvas.use( Brush_color( orange ), Pen_color( yellow ) ).draw( Ellipse, area );
 ```
 
-Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.use` member function returns a reference to the instance so that one can call e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called **fluent style**.
+Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.use` member function returns a reference to the instance so that one can call e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called [**fluent style**](https://en.wikipedia.org/wiki/Fluent_interface).
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
@@ -261,12 +261,129 @@ namespace winapi::gdi {
         void set_in( const HDC canvas ) const { SetBkMode( canvas, TRANSPARENT ); }
     };
 }  // namespace winapi::gdi
-
 ```
+
+The device context class' `.use` member function that uses the above:
+
+```cpp
+template< class... Args >
+auto use( const Args&... colors ) const
+    -> const Dc&
+{
+    (colors.set_in( m_handle ), ...);
+    return *this;
+}
+```
+
+The first statement is a C++17 [**fold expression**](https://en.cppreference.com/w/cpp/language/fold), which expands to one *c*`.set_in(m_handle)` call for each actual argument *c*.
 
 ---
 
-asdasd
+There are several kinds of device context so I chose to define the common features in an abstract base class `Dc`:
+
+*Start of [part-05/code/.include/winapi/gdi/device-contexts.hpp](part-05/code/.include/winapi/gdi/device-contexts.hpp)*:
+
+```cpp
+#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
+#include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
+#include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
+#include <wrapped-winapi/windows-h.hpp>         // Geneal Windows API.
+
+#include <stddef.h>         // size_t
+
+#include <tuple>            // std::(get, tie, tuple)
+#include <type_traits>      // std::is_same_v
+#include <utility>          // std::(index_sequence, 
+
+namespace winapi::gdi {
+    namespace cu = cpp::util;
+    using   cu::hopefully, cu::No_copying, cu::Types_;
+    using   std::get, std::tie, std::tuple,
+            std::index_sequence,
+            std::make_index_sequence;
+
+    inline void make_practical( const HDC dc )
+    {
+        SelectObject( dc, GetStockObject( DC_PEN ) );
+        SelectObject( dc, GetStockObject( DC_BRUSH ) );
+        SetBkMode( dc, TRANSPARENT );   // Don't fill in background of text, please.
+        SelectObject( dc, gui::std_font );
+    }
+
+    class Dc: No_copying
+    {
+        HDC     m_handle;
+
+        ⋮ // An internal helper function here.
+
+    protected:
+        inline virtual ~Dc() = 0;                           // Derived-class responsibility.
+
+        Dc( HDC&& handle, const bool do_extended_init = true ):
+            m_handle( handle )
+        {
+            hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Device context handle is 0." );
+            if( do_extended_init ) { make_practical( m_handle ); }
+        }
+
+    public:
+        template< class... Args >
+        auto use( const Args&... colors ) const
+            -> const Dc&
+        {
+            (colors.set_in( m_handle ), ...);
+            return *this;
+        }
+
+        auto fill( const RECT& area ) const
+            -> const Dc&
+        {
+            FillRect( m_handle, &area, 0 );
+            return *this;
+        }
+
+        template< class Api_func, class... Args >
+        auto simple_draw( const Api_func api_func, const Args&... args ) const
+            -> const Dc&
+        {
+            api_func( m_handle, args... );
+            return *this;
+        }
+
+        ⋮ // Some more advanced functionality here.
+    };
+
+    inline Dc::~Dc() {}
+
+    ⋮
+```
+
+For the last source code line: the fully abstract destructor is implemented and needs to be implemented because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual function because it indicated that the function has no body, which is usually true, just not for the case of pure virtual destructors.
+
+The `simple_draw` function,
+
+```cpp
+template< class Api_func, class... Args >
+auto simple_draw( const Api_func api_func, const Args&... args ) const
+    -> const Dc&
+{
+    api_func( m_handle, args... );
+    return *this;
+}
+```
+
+… shows how simple the basic fluid style support can be. It just takes the API function to call (e.g. `Ellipse`) and the call arguments; calls that function with the specified arguments; and returns a reference to self so that one can fluidly tack on more calls. With the relevant API function as argument one avoids having to define a separate wrapper for each API function.
+
+However, since the Windows API always supports C the the position and size of the ellipse must be specified as the individual member values of a `RECT`, for our example like this:
+
+```cpp
+canvas.use( Brush_color( orange ), Pen_color( yellow ) ).draw(
+    Ellipse, area.left, area.top, area.right, area.bottom
+    );
+```
+
+asd
 
 
 
