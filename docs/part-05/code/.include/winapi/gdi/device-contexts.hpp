@@ -1,4 +1,5 @@
-﻿#include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
+﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
+#include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
 #include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
 #include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
 #include <wrapped-winapi/windows-h.hpp>
@@ -28,6 +29,7 @@ namespace winapi::gdi {
     {
         HDC     m_handle;
 
+        // Internal helper for expanding a RECT argument into its 4 member values as arguments.
         template< size_t, class Api_func, class... Args, size_t... i_before, size_t... i_after>
         inline void call_draw_with_rect_arg_expanded_(
             const Api_func                          api_func,
@@ -70,6 +72,7 @@ namespace winapi::gdi {
             return *this;
         }
 
+        // Like `simple_draw` but expands any RECT argument into its 4 member values as args.
         template< class Api_func, class... Args >
         inline auto draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
 
