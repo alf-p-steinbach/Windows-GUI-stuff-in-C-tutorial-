@@ -383,6 +383,10 @@ canvas.use( Brush_color( orange ), Pen_color( yellow ) ).simple_draw(
     );
 ```
 
+And that’s needlessly verbose, counter to the ideals of a fluid interface.
+
+One solution could be to require the caller to add a macro invocation that would expand a `RECT` into its 4 member values. However, it adds a macro (generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and adds some verbosity (namely the macro call) at each and every call site, whereas doing this expansion via template obscure template magic, doesn’t. Summing up that: macro = simple but Evil™ and verbosity at each call site, template magic = complex but goodness and centralized.
+
 asd
 
 
