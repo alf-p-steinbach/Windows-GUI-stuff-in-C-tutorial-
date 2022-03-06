@@ -378,7 +378,7 @@ auto simple_draw( const Api_func api_func, const Args&... args ) const
 However, since the Windows API is designed to alway be usable from C, with `simple_draw` the position and size of the ellipse must be specified as the individual member values of a `RECT`, like this:
 
 ```cpp
-canvas.use( Brush_color( orange ), Pen_color( yellow ) ).draw(
+canvas.use( Brush_color( orange ), Pen_color( yellow ) ).simple_draw(
     Ellipse, area.left, area.top, area.right, area.bottom
     );
 ```
