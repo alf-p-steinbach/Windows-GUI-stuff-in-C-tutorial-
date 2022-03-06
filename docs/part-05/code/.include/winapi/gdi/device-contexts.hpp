@@ -1,11 +1,10 @@
-﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
+﻿#include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
 #include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
-#include <winapi/gdi/Object_.hpp>               // winapi::gdi::(Brush, Pen, Bitmap)
 #include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
 #include <wrapped-winapi/windows-h.hpp>
 
 #include <stddef.h>         // size_t
+
 #include <type_traits>      // std::is_same_v
 #include <utility>          // std::(index_sequence, 
 
@@ -27,25 +26,25 @@ namespace winapi::gdi {
 
         // Expands a specified RECT argument into its four member values as arguments.
         template<
-            size_t      rect_index,
+            size_t      rect_arg_index,
             class       Api_func,
             class...    Args,
             size_t...   indices_before_rect,
             size_t...   indices_after_rect       // 0-based, i.e. minus offset
             >
-        void draw_(
+        void call_draw_with_rect_arg_expanded_(
             const Api_func                              api_func,
             const std::tuple<const Args&...>&           args_tuple,
             std::index_sequence<indices_before_rect...> ,
             std::index_sequence<indices_after_rect...>
             ) const
         {
-            const RECT& r = std::get<rect_index>( args_tuple );
+            const RECT& r = std::get<rect_arg_index>( args_tuple );
             draw(
                 api_func,
                 std::get<indices_before_rect>( args_tuple )...,     // Can be empty, works.
                 r.left, r.top, r.right, r.bottom,
-                std::get< rect_index + 1 + indices_after_rect >( args_tuple )...
+                std::get< rect_arg_index + 1 + indices_after_rect >( args_tuple )...
                 );
         }
 
@@ -91,7 +90,7 @@ namespace winapi::gdi {
             if constexpr( i_first_rect < 0 ) {
                 api_func( m_handle, args... );
             } else {
-                draw_<i_first_rect>(
+                call_draw_with_rect_arg_expanded_<i_first_rect>(
                     api_func,
                     std::tie( args... ),
                     std::make_index_sequence<i_first_rect>(),
@@ -141,37 +140,4 @@ namespace winapi::gdi {
         
         auto bitmap() const -> HBITMAP { return bitmap_in( handle() ); }
     };
-
-
-    class Dc::Selection: No_copying
-    {
-        const Dc&   m_dc;
-        HGDIOBJ     m_original_object;
-        
-    public:
-        ~Selection() { SelectObject( m_dc, m_original_object ); }
-
-        template< class Handle >    // Easy to use interface.
-        Selection( const Dc& dc, const Object_<Handle>& object ):
-            Selection( From_api_handle(), object.handle(), dc )
-        {}
-
-        struct From_api_handle {};  // Intentionally explicit, verbose & ugly interface.
-        Selection( From_api_handle, const HGDIOBJ object_handle, const Dc& dc ):
-            m_dc( dc ),  m_original_object( SelectObject( dc, object_handle ) )
-        {}
-
-        auto dc() const -> const Dc& { return m_dc; }
-
-        operator const Dc&() const { return dc(); }     // Supports `+` operator.
-        operator HDC() const { return m_dc.handle(); }  // Supports using Selection as DC.
-    };
-
-    inline auto operator+( const Dc& dc, const Brush& object )
-        -> Dc::Selection
-    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
-
-    inline auto operator+( const Dc& dc, const Pen& object )
-        -> Dc::Selection
-    { return { Dc::Selection::From_api_handle(), object.handle(), dc }; }
 }  // namespace winapi::gdi
