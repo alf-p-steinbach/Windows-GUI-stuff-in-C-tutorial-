@@ -373,7 +373,7 @@ auto simple_draw( const Api_func api_func, const Args&... args ) const
 }
 ```
 
-… shows how simple the basic fluid style support can be. It just takes the API function to call (e.g. `Ellipse`) and the call arguments; calls that function with the specified arguments; and returns a reference to self so that one can fluidly tack on more calls. With the relevant API function as argument one avoids having to define a separate wrapper for each API function.
+… shows how simple the basic fluid style support can be. It just takes the API function to call (e.g. `Ellipse`) and the call arguments; calls that function with the specified arguments; and returns a reference to self so that one can fluidly tack on more calls. With the relevant API function as argument one avoids having to define a separate such wrapper for each API function.
 
 However, since the Windows API always supports C the the position and size of the ellipse must be specified as the individual member values of a `RECT`, for our example like this:
 
