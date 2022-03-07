@@ -263,7 +263,7 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
-The device context class' `.use` member function that uses the above:
+Corresponding implementation of the device context class' `.use` member function:
 
 ```cpp
 template< class... Args >
@@ -285,23 +285,10 @@ There are several kinds of device context so I chose to define the common featur
 
 ```cpp
 #pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
-#include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
-#include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
-#include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
-#include <wrapped-winapi/windows-h.hpp>         // Geneal Windows API.
-
-#include <stddef.h>         // size_t
-
-#include <tuple>            // std::(get, tie, tuple)
-#include <type_traits>      // std::is_same_v
-#include <utility>          // std::(index_sequence, 
+    ⋮ // `#include` directives.
 
 namespace winapi::gdi {
-    namespace cu = cpp::util;
-    using   cu::hopefully, cu::No_copying, cu::Types_;
-    using   std::get, std::tie, std::tuple,
-            std::index_sequence,
-            std::make_index_sequence;
+    ⋮ // `using` declarations.
 
     inline void make_practical( const HDC dc )
     {
@@ -329,29 +316,20 @@ namespace winapi::gdi {
 
     public:
         template< class... Args >
-        auto use( const Args&... colors ) const
-            -> const Dc&
-        {
-            (colors.set_in( m_handle ), ...);
-            return *this;
-        }
-
-        auto fill( const RECT& area ) const
-            -> const Dc&
-        {
-            FillRect( m_handle, &area, 0 );
-            return *this;
-        }
+        auto use( const Args&... colors ) const -> const Dc&;
+        
+        auto fill( const RECT& area ) const -> const Dc&;
+        
+        template< class Api_func, class... Args >
+        auto simple_draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
 
         template< class Api_func, class... Args >
-        auto simple_draw( const Api_func api_func, const Args&... args ) const
-            -> const Dc&
-        {
-            api_func( m_handle, args... );
-            return *this;
-        }
+        inline auto draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
 
-        ⋮ // Some more advanced functionality here.
+        auto handle() const -> HDC  { return m_handle; }
+        operator HDC() const        { return handle(); }
+
+        class Selection;                                    // RAII for SelectObject, separate.
     };
 
     inline Dc::~Dc() {}
@@ -359,9 +337,9 @@ namespace winapi::gdi {
     ⋮
 ```
 
-For the last source code line: the fully abstract destructor is implemented — and needs to be implemented — because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual function because it indicated that the function has no body, which is usually true, just not for the case of pure virtual destructors.
+For the last source code line: the fully abstract destructor is implemented — and needs to be implemented — because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual function because it indicated that the function has no body, which is usually true, but just not the case for pure virtual destructors.
 
-Instead of a separate fluid style wrapper for each API function such as `Ellipse`, I chose to pass the relevant API function as a first argument. The `simple_draw` function above,
+Instead of a separate fluid style wrapper for each API function such as `Ellipse` I chose to *pass the relevant API function as a first argument to a single general wrapper template*. Both `draw` and `simple_draw` use this idea of taking the API function as argument. The general `draw` function uses complex template meta-programming, [**TMP**](https://en.wikipedia.org/wiki/Template_metaprogramming), to replace each `RECT` argument with the corresponding four `int` values, as required by e.g. the `Ellipse` function. That makes it convenient to use but hard to understand. In contrast, `simple_draw` just passes arguments on directly to the API function, and is therefore simple enough that the basic fluent programming support is clear, un-obscured. And that's the ~only reason for the existence of `simple_draw`, namely to serve as a relatively simple code example:
 
 ```cpp
 template< class Api_func, class... Args >
@@ -373,9 +351,7 @@ auto simple_draw( const Api_func api_func, const Args&... args ) const
 }
 ```
 
-… shows how simple the basic fluid style support can then be in modern C++ (in C++03 this was the realm of macros). It just calls the specified function with the specified arguments, and returns a reference to self so that one can fluidly tack on more calls.
-
-However, since the Windows API is designed to alway be usable from C, with `simple_draw` the position and size of the ellipse must be specified as individual `int` values, like this:
+The cost of the implementation simplicity is verbosity at every call site, where e.g. the position and size of an ellipse must be specified as individual `int` values like this:
 
 ```cpp
 canvas.use( Brush_color( orange ), Pen_color( yellow ) ).simple_draw(
@@ -383,10 +359,10 @@ canvas.use( Brush_color( orange ), Pen_color( yellow ) ).simple_draw(
     );
 ```
 
-And that’s needlessly verbose.
+A C style solution could be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, decidedly non-trivial, but centralized and transparent to the caller, with natural-for-C++ usage as already shown,
 
-One solution could be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and adds some verbosity at each and every call site. In contrast, doing this expansion via obscure template magic is complex, decidedly non-trivial, but goodness and centralized.
-
-
+```cpp
+canvas.use( Brush_color( orange ), Pen_color( yellow ) ).draw( Ellipse, area );
+```
 
 asdasd
