@@ -339,7 +339,9 @@ namespace winapi::gdi {
 
 For the last source code line: the fully abstract destructor is implemented — and needs to be implemented — because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual function because it indicated that the function has no body, which is usually true, but just not the case for pure virtual destructors.
 
-Instead of a separate fluid style wrapper for each API function such as `Ellipse` I chose to *pass the relevant API function as a first argument to a single general wrapper template*. Both `draw` and `simple_draw` use this idea of taking the API function as argument. The general `draw` function uses complex template meta-programming, [**TMP**](https://en.wikipedia.org/wiki/Template_metaprogramming), to replace each `RECT` argument with the corresponding four `int` values, as required by e.g. the `Ellipse` function. That makes it convenient to use but hard to understand. In contrast, `simple_draw` just passes arguments on directly to the API function, and is therefore simple enough that the basic fluent programming support is clear, un-obscured. And that's the ~only reason for the existence of `simple_draw`, namely to serve as a relatively simple code example:
+Instead of a separate fluid style wrapper for each API drawing function, e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
+
+Both `draw` and `simple_draw` use this idea of taking the API function as argument. The general `draw` function uses complex template meta-programming, [**TMP**](https://en.wikipedia.org/wiki/Template_metaprogramming), to replace each `RECT` argument with the corresponding four `int` values, as required by e.g. the `Ellipse` function. That makes it convenient to use but hard to understand. In contrast, `simple_draw` just passes arguments on directly to the API function, and is therefore simple enough that the basic fluent programming support is clear, un-obscured. And that's the ~only reason for the existence of `simple_draw`, namely to serve as a relatively simple code example:
 
 ```cpp
 template< class Api_func, class... Args >
@@ -351,7 +353,7 @@ auto Dc::simple_draw( const Api_func api_func, const Args&... args ) const
 }
 ```
 
-The cost of the implementation simplicity is verbosity at every call site, where e.g. the position and size of an ellipse must be specified as individual `int` values like this:
+The cost of the `simple_draw` implementation simplicity is verbosity at every call site, where e.g. the position and size of an ellipse must be specified as individual `int` values like this:
 
 ```cpp
 canvas.use( Brush_color( orange ), Pen_color( yellow ) ).simple_draw(
