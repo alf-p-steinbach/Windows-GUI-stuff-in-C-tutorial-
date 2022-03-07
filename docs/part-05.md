@@ -337,7 +337,7 @@ namespace winapi::gdi {
     ⋮
 ```
 
-For the last source code line: the fully abstract destructor is implemented — and needs to be implemented — because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual function because it indicated that the function has no body, which is usually true, but just not the case for pure virtual destructors.
+For the last source code line: the pure `virtual` destructor is implemented — and needs to be implemented — because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual functions because it indicated that the function has no body, which is usually true, but just not the case for pure virtual destructors.
 
 Instead of a separate fluid style wrapper for each API drawing function, e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
 
