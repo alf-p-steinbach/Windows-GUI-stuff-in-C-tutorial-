@@ -267,7 +267,7 @@ Corresponding implementation of the device context class' `.use` member function
 
 ```cpp
 template< class... Args >
-auto use( const Args&... colors ) const
+auto Dc::use( const Args&... colors ) const
     -> const Dc&
 {
     (colors.set_in( m_handle ), ...);
@@ -343,7 +343,7 @@ Instead of a separate fluid style wrapper for each API function such as `Ellipse
 
 ```cpp
 template< class Api_func, class... Args >
-auto simple_draw( const Api_func api_func, const Args&... args ) const
+auto Dc::simple_draw( const Api_func api_func, const Args&... args ) const
     -> const Dc&
 {
     api_func( m_handle, args... );
