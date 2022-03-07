@@ -50,39 +50,46 @@ namespace winapi::gdi {
 
     public:
         template< class... Args >
-        auto use( const Args&... colors ) const
-            -> const Dc&
-        {
-            (colors.set_in( m_handle ), ...);
-            return *this;
-        }
+        auto use( const Args&... colors ) const -> const Dc&;
         
-        auto fill( const RECT& area ) const
-            -> const Dc&
-        {
-            FillRect( m_handle, &area, 0 );
-            return *this;
-        }
+        auto fill( const RECT& area ) const -> const Dc&;
         
         template< class Api_func, class... Args >
-        auto simple_draw( const Api_func api_func, const Args&... args ) const
-            -> const Dc&
-        {
-            api_func( m_handle, args... );
-            return *this;
-        }
+        auto simple_draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
 
-        // Like `simple_draw` but expands any RECT argument into its 4 member values as args.
         template< class Api_func, class... Args >
         inline auto draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
 
-        auto handle() const -> HDC { return m_handle; }
-        operator HDC() const { return handle(); }
+        auto handle() const -> HDC  { return m_handle; }
+        operator HDC() const        { return handle(); }
 
         class Selection;                                    // RAII for SelectObject, separate.
     };
 
     inline Dc::~Dc() {}
+
+    template< class... Args >
+    auto Dc::use( const Args&... colors ) const
+        -> const Dc&
+    {
+        (colors.set_in( m_handle ), ...);
+        return *this;
+    }
+    
+    auto Dc::fill( const RECT& area ) const
+        -> const Dc&
+    {
+        FillRect( m_handle, &area, 0 );
+        return *this;
+    }
+    
+    template< class Api_func, class... Args >
+    auto Dc::simple_draw( const Api_func api_func, const Args&... args ) const
+        -> const Dc&
+    {
+        api_func( m_handle, args... );
+        return *this;
+    }
 
     template<
         size_t      rect_arg_index,
