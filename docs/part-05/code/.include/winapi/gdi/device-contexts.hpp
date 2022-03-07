@@ -30,8 +30,8 @@ namespace winapi::gdi {
         HDC     m_handle;
 
         // Internal helper for expanding a RECT argument into its 4 member values as arguments.
-        template< size_t, class Api_func, class... Args, size_t... i_before, size_t... i_after>
-        inline void call_draw_with_rect_arg_expanded_(
+        template< class Api_func, class... Args, size_t... i_before, size_t... i_after>
+        inline void call_draw_with_rect_arg_expanded(
             const Api_func                          api_func,
             const tuple<const Args&...>&            args_tuple,
             index_sequence<i_before...>  ,
@@ -92,19 +92,19 @@ namespace winapi::gdi {
     }
 
     template<
-        size_t      rect_arg_index,
         class       Api_func,
         class...    Args,
         size_t...   indices_before_rect,
         size_t...   indices_after_rect       // 0-based, i.e. minus offset
         >
-    inline void Dc::call_draw_with_rect_arg_expanded_(
+    inline void Dc::call_draw_with_rect_arg_expanded(
         const Api_func                          api_func,
         const tuple<const Args&...>&            args_tuple,
         index_sequence<indices_before_rect...>  ,
         index_sequence<indices_after_rect...>
         ) const
     {
+        constexpr int rect_arg_index = sizeof...( indices_before_rect );
         const RECT& r = get<rect_arg_index>( args_tuple );
         draw(
             api_func,
@@ -122,7 +122,7 @@ namespace winapi::gdi {
         if constexpr( i_first_rect < 0 ) {
             api_func( m_handle, args... );
         } else {
-            call_draw_with_rect_arg_expanded_<i_first_rect>(
+            call_draw_with_rect_arg_expanded(
                 api_func,
                 tie( args... ),
                 make_index_sequence<i_first_rect>(),
