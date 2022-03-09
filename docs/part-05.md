@@ -14,7 +14,7 @@ However, the GDI’s simplicity is much like the simplicity of individual assemb
 
 Also, the GDI is generally slow and produces low quality graphics. In particular the GDI doesn’t support [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing), and it doesn’t support [alpha channel transparency](https://en.wikipedia.org/wiki/Alpha_compositing), which are both strong reasons to later move on to the successor technologies [GDI+](https://en.wikipedia.org/wiki/Graphics_Device_Interface#Windows_XP) and [Direct 2D](https://en.wikipedia.org/wiki/Direct2D).
 
-And unfortunately, also, the GDI doesn’t (yet) support UTF-8 encoded Unicode text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4, and it doesn’t support saving an image other than as an archaic non-portable ".wmf" file. These shortcomings are remedied in later parts. Just be adviced that in particular saving an image to a file, without using successor technologies, can be non-trivial.
+And unfortunately, also, the GDI doesn’t (yet) support UTF-8 encoded Unicode text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4, and it doesn’t support saving an image other than as an archaic non-portable ".wmf" file. These shortcomings are remedied in later parts of this tutorial. Just be adviced that in particular saving an image to a file, without using successor technologies, can be non-trivial.
 
 [some figure]
 
