@@ -4,7 +4,7 @@
 
 In this and some more parts we’ll use the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, to explore basic graphics: drawing shapes, lines and text, and learning how graphics drawing relates to Windows’ GUI mechanisms, such as drawing the background image of a window.
 
-The GDI is a good starting point for graphics in Windows, because
+The GDI is a good starting point for C++ graphics in Windows, because
 
 * it’s the graphics API that the windowing functionality assumes and is designed for,
 * the GDI itself is simple and C-oriented, which is nice, and
