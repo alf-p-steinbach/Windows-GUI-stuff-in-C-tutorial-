@@ -7,9 +7,7 @@ In this part and some more we’ll use the [**GDI**](https://en.wikipedia.org/wi
 The GDI is a good starting point for graphics in Windows, because
 
 * it’s the graphics API that the windowing functionality assumes and is designed for,
-
 * the GDI itself is simple and C-oriented, which is nice, and
-
 * you can explore GDI graphics directly on the screen, without complex windowing.
 
 However, the GDI’s simplicity is much like the simplicity of individual assembly language instructions. You need a lot of them to accomplish anything. General GDI code gets very verbose, which is why this part focuses on providing a C++ “fluent style” wrapper.
