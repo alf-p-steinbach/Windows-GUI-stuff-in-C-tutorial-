@@ -283,7 +283,7 @@ auto Dc::use( const Args&... colors ) const
 
 Here the first statement is a C++17 [**fold expression**](https://en.cppreference.com/w/cpp/language/fold), which expands to one *c*`.set_in(m_handle)` call for each actual argument *c*.
 
----
+#### 5.3.2. asd lkj
 
 There are several kinds of device context so I chose to define the common features in an abstract base class `Dc`:
 
