@@ -230,7 +230,7 @@ The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respe
 
 Anyway this means that with the GDI there are three possible colorizations to specify the color for: drawing (pen color), general figure fill (brush color), and gap filling (`BK`-color, whatever *bk* is short for).
 
-The C++ fluent device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. The colorization to use a color for is indicated by the argument type, e.g. one of the classes shown below. Specifically the `.use` function delegates the color setting to the argument type’s `.set_in` member function, as shown below (where all but the common `Color` base class are argument types):
+The C++ fluent device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. The colorization to use a color for is indicated by the argument type. Specifically the `.use` function delegates the color setting to the argument type’s `.set_in` member function, as shown below, where all but the common `Color` base class are argument types:
 
 *[part-05/code/.include/winapi/gdi/color-usage-classes.hpp](part-05/code/.include/winapi/gdi/color-usage-classes.hpp)*:
 
