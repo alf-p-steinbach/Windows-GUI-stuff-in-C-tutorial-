@@ -2,7 +2,7 @@
 
 ## Part 5 – GDI graphics: basics with a C++ fluent wrapper.
 
-In this part and some more we’ll use the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, to explore basic graphics: drawing shapes, lines and text, and learning how graphics drawing relates to Windows’ GUI mechanisms, such as drawing the background image of a window.
+In this some more parts we’ll use the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, to explore basic graphics: drawing shapes, lines and text, and learning how graphics drawing relates to Windows’ GUI mechanisms, such as drawing the background image of a window.
 
 The GDI is a good starting point for graphics in Windows, because
 
