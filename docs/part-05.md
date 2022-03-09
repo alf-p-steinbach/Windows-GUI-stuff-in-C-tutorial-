@@ -26,7 +26,7 @@ And unfortunately, also, the GDI doesn’t (yet) support UTF-8 encoded Unicode t
 
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
+- [5.1. Draw directly on the screen.](#51-draw-directly-on-the-screen)
 - [5.2 Use “DC colors” to reduce verbosity.](#52-use-dc-colors-to-reduce-verbosity)
 - [5.3. A C++ fluent style wrapper for “DC color” usage.](#53-a-c-fluent-style-wrapper-for-dc-color-usage)
 
@@ -34,7 +34,7 @@ And unfortunately, also, the GDI doesn’t (yet) support UTF-8 encoded Unicode t
 
 ---
 
-### 5.1. Draw directly on the screen to learn GDI basics.
+### 5.1. Draw directly on the screen.
 
 With the GDI you can draw more or less directly on the screen.
 
