@@ -1,16 +1,22 @@
 # Windows GUI-stuff in C++: a tutorial.
 
-## Part 5 – GDI: drawing, saving & presenting.
+## Part 5 – GDI graphics: basics with a C++ fluent wrapper.
 
-We’ll now use the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, to explore basic graphics: drawing shapes, lines and text, and learning how graphics drawing relates to Windows’ GUI mechanisms, such as drawing the background image of a window.
+In this part and some more we’ll use the [**GDI**](https://en.wikipedia.org/wiki/Graphics_Device_Interface), Windows’ original *graphics device interface*, to explore basic graphics: drawing shapes, lines and text, and learning how graphics drawing relates to Windows’ GUI mechanisms, such as drawing the background image of a window.
 
-The GDI is simple and C-oriented, which is nice.
+The GDI is a good starting point for graphics in Windows, because
 
-On the other hand it’s slow and produces low quality graphics. In particular the GDI doesn’t support [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing), and it doesn’t support [alpha channel transparency](https://en.wikipedia.org/wiki/Alpha_compositing), which are both strong reasons to later move on to the successor technologies [GDI+](https://en.wikipedia.org/wiki/Graphics_Device_Interface#Windows_XP) and [Direct 2D](https://en.wikipedia.org/wiki/Direct2D).
+* it’s the graphics API that the windowing functionality assumes and is designed for,
 
-And unfortunately, also, the GDI doesn’t yet support UTF-8 based text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4.
+* the GDI itself is simple and C-oriented, which is nice, and
 
-UTF-8 based text drawing is a must for leveraging the previous part’s discussion of how to use UTF-8 as the `char` based text encoding. Unfortunately this part got too long to cover the issues, so international text drawing has to be postponed to the next part. Then we’ll just write our own wrappers over GDI’s UTF-16 based wide text drawing functions.
+* you can explore GDI graphics directly on the screen, without complex windowing.
+
+However, the GDI’s simplicity is much like the simplicity of individual assembly language instructions. You need a lot of them to accomplish anything. General GDI code gets very verbose, which is why this part focuses on providing a C++ “fluent style” wrapper.
+
+Also, the GDI is generally slow and produces low quality graphics. In particular the GDI doesn’t support [anti-aliasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing), and it doesn’t support [alpha channel transparency](https://en.wikipedia.org/wiki/Alpha_compositing), which are both strong reasons to later move on to the successor technologies [GDI+](https://en.wikipedia.org/wiki/Graphics_Device_Interface#Windows_XP) and [Direct 2D](https://en.wikipedia.org/wiki/Direct2D).
+
+And unfortunately, also, the GDI doesn’t (yet) support UTF-8 encoded Unicode text for *drawing* text as graphics, as opposed to using controls to present text as we did in part 4, and it doesn’t support saving an image other than as an archaic non-portable ".wmf" file. These shortcomings are remedied in later parts. Just be adviced that in particular saving an image to a file, without using successor technologies, can be non-trivial.
 
 [some figure]
 
@@ -21,10 +27,8 @@ UTF-8 based text drawing is a must for leveraging the previous part’s discussi
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [5.1. Draw directly on the screen to learn GDI basics.](#51-draw-directly-on-the-screen-to-learn-gdi-basics)
-- [5.2 Use pseudo-mutable `DC_PEN` and `DC_BRUSH` stock objects to reduce verbosity.](#52-use-pseudo-mutable-dc_pen-and-dc_brush-stock-objects-to-reduce-verbosity)
-- [5.3. Automate cleanup for device contexts and GDI objects.](#53-automate-cleanup-for-device-contexts-and-gdi-objects)
-- [5.4. GDI + COM/OLE: save graphics to an image file.](#54-gdi--comole-save-graphics-to-an-image-file)
-- [5.x. GDI + GUI: present graphics in a window.](#5x-gdi--gui-present-graphics-in-a-window)
+- [5.2 Use “DC colors” to reduce verbosity.](#52-use-dc-colors-to-reduce-verbosity)
+- [5.3. A C++ fluent style wrapper for “DC color” usage.](#53-a-c-fluent-style-wrapper-for-dc-color-usage)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -317,9 +321,9 @@ namespace winapi::gdi {
     public:
         template< class... Args >
         auto use( const Args&... colors ) const -> const Dc&;
-        
+
         auto fill( const RECT& area ) const -> const Dc&;
-        
+
         template< class Api_func, class... Args >
         auto simple_draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
 
