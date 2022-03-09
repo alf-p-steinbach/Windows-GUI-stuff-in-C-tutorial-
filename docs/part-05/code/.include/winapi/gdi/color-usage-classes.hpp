@@ -4,16 +4,16 @@
 namespace winapi::gdi {
     struct Color{ COLORREF value; Color( const COLORREF c ): value( c ) {} };
 
-    struct Brush_color: Color
-    {
-        using Color::Color;
-        void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
-    };
-
     struct Pen_color: Color
     {
         using Color::Color;
         void set_in( const HDC canvas ) const { SetDCPenColor( canvas, value ); }
+    };
+
+    struct Brush_color: Color
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
     };
 
     struct Gap_color: Color     // Gaps in pattern lines, and bg in text presentation.

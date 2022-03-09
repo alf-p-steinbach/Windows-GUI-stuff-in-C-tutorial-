@@ -224,9 +224,13 @@ Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.use` 
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
----
+#### 5.3.1. A single color setter function, for draw, fill and gap.
 
-The device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. What kind of colorization a given argument is used for — e.g. pen or brush — is determined by the argument type’s `.set_in` member function (examples below). All but the `Color` base class are such argument types:
+The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general fill color. But for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function; the default is unfortunately `OPAQUE`.
+
+Anyway this means that with the GDI there are three possible colorizations to specify the color for: draw (pen color),fill (brush color), and gap (`BK`-color, whatever *bk* is short for).
+
+The C++ fluent device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. The colorization to use a color for is indicated by the argument type, e.g. one of the classes shown below. Specifically the `.use` function delegates the color setting to the argument type’s `.set_in` member function, as shown below (all but the common `Color` base class are argument types):
 
 *[part-05/code/.include/winapi/gdi/color-usage-classes.hpp](part-05/code/.include/winapi/gdi/color-usage-classes.hpp)*:
 
@@ -237,16 +241,16 @@ The device context class’  `.use` member function takes an arbitrary number of
 namespace winapi::gdi {
     struct Color{ COLORREF value; Color( const COLORREF c ): value( c ) {} };
 
-    struct Brush_color: Color
-    {
-        using Color::Color;
-        void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
-    };
-
     struct Pen_color: Color
     {
         using Color::Color;
         void set_in( const HDC canvas ) const { SetDCPenColor( canvas, value ); }
+    };
+
+    struct Brush_color: Color
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
     };
 
     struct Gap_color: Color     // Gaps in pattern lines, and bg in text presentation.
@@ -277,7 +281,7 @@ auto Dc::use( const Args&... colors ) const
 }
 ```
 
-The first statement is a C++17 [**fold expression**](https://en.cppreference.com/w/cpp/language/fold), which expands to one *c*`.set_in(m_handle)` call for each actual argument *c*.
+Here the first statement is a C++17 [**fold expression**](https://en.cppreference.com/w/cpp/language/fold), which expands to one *c*`.set_in(m_handle)` call for each actual argument *c*.
 
 ---
 
