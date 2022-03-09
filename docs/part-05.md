@@ -226,9 +226,9 @@ Oh, the Yoda picture is really about absorbing a great destructive force rather 
 
 #### 5.3.1. A single color setter function, for draw, fill and gap.
 
-The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general fill color. But for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function; the default is unfortunately `OPAQUE`.
+The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general figure fill color. But for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function; the default is unfortunately `OPAQUE`.
 
-Anyway this means that with the GDI there are three possible colorizations to specify the color for: draw (pen color),fill (brush color), and gap (`BK`-color, whatever *bk* is short for).
+Anyway this means that with the GDI there are three possible colorizations to specify the color for: drawing (pen color), general figure fill (brush color), and gap filling (`BK`-color, whatever *bk* is short for).
 
 The C++ fluent device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. The colorization to use a color for is indicated by the argument type, e.g. one of the classes shown below. Specifically the `.use` function delegates the color setting to the argument type’s `.set_in` member function, as shown below (all but the common `Color` base class are argument types):
 
