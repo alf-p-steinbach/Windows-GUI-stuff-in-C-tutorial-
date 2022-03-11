@@ -185,11 +185,14 @@ namespace winapi::gdi {
 }  // namespace winapi::gdi
 ```
 
+Result: same as before, just with shorter & more clear code,
+
+![A filled ellips drawn directly on the screen](part-05/images/sshot-2.graphics-on-screen.cropped.png)
+
 The [current documentation of `SelectObject`](https://docs.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-selectobject) states that the object one selects “must have been created” by one of the functions listed in a table there, which does not include `GetStockObject`. But of course that’s just the usual Microsoft documentation SNAFU. The stock objects would not be useful for anything if they couldn’t be used.
 
 However, the stock objects are special in that they don’t need to and shouldn’t be destroyed via `DeleteObject` (or any other way).
 
-Result: same as before, just with shorter & more clear code.
 
 ---
 
