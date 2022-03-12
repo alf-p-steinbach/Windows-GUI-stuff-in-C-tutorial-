@@ -193,7 +193,6 @@ The [current documentation of `SelectObject`](https://docs.microsoft.com/en-us/w
 
 However, the stock objects are special in that they don’t need to and shouldn’t be destroyed via `DeleteObject` (or any other way).
 
-
 ---
 
 ### 5.3. A C++ fluent style wrapper for “DC color” usage.
@@ -227,7 +226,9 @@ Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.use` 
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
-#### 5.3.1. A single color setter function, for draw, fill and gap.
+---
+
+#### 5.3.1. A single color setter function for draw, fill and gap.
 
 The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general figure fill color. But for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function; the default is unfortunately `OPAQUE`.
 
@@ -286,9 +287,11 @@ auto Dc::use( const Args&... colors ) const
 
 Here the first statement is a C++17 [**fold expression**](https://en.cppreference.com/w/cpp/language/fold), which expands to one *c*`.set_in(m_handle)` call for each actual argument *c*.
 
-#### 5.3.2. asd lkj
+---
 
-There are several kinds of device context so I chose to define the common features in an abstract base class `Dc`:
+#### 5.3.2. A single abstract DC class for screen, window and bitmap drawing.
+
+There are several kinds of device context, with kind-specific destruction!, so I chose to define the common features in an abstract base class `Dc`:
 
 *Start of [part-05/code/.include/winapi/gdi/device-contexts.hpp](part-05/code/.include/winapi/gdi/device-contexts.hpp)*:
 
