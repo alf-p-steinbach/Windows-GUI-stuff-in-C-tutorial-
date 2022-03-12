@@ -137,7 +137,8 @@ namespace winapi::gdi {
     {
         HWND    m_window;
 
-    public:        
+    public:
+        // Cleanup is intentionally also done for a zero handle, which represents the screen.
         ~Window_dc() override { ReleaseDC( m_window, handle() ); }
         Window_dc( const HWND window ): Dc( GetDC( window ) ), m_window( window ) {}
     };

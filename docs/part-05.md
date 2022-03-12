@@ -351,6 +351,51 @@ namespace winapi::gdi {
 
 For the last source code line: the pure `virtual` destructor is implemented — and needs to be implemented — because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual functions because it indicated that the function has no body, which is usually true, but just not the case for pure virtual destructors.
 
+From a Windows API point of view a device context can be created by a number of different functions, and then needs to be destroyed by corresponding destruction functions:
+
+|| Used for: | Term: | Creation: | Destruction |
+|-|-----------|-----------|-------------|-----------|
+|| Updating or repairing window contents. | – | `BeginPaint` | `EndPaint` |
+| ▷ | Drawing in a window or on the screen. | “Window DC”. | `GetDC` | `ReleaseDC` |
+|| Drawing to a screen or printer. | – | `CreateDC` | `DeleteDC` |
+|| Drawing to an image (bitmap or WMF) | “Memory DC”. | `CreateCompatibleDC` | `DeleteDC` |
+|| Obtaining device information. | “Information DC”. | `CreateIC` | `DeleteDC` |
+ 
+I guess the difference between `GetDC` and `CreateDC` is that `GetC` obtains a device context for the desktop background window, so that drawing there is effectively to draw on the screen, while `CreateDC` obtains a device context for the actual physical screen.
+
+Anyway, for the draw-on-screen example program the only concrete derived class we need is one that captures the concept of a “window DC”, but for clarity and ease of use I define both a general such class, `Window_dc`, and a specialization `Screen_dc`:
+
+*Middle of [part-05/code/.include/winapi/gdi/device-contexts.hpp](part-05/code/.include/winapi/gdi/device-contexts.hpp)*:
+
+```
+    ⋮
+
+    class Window_dc: public Dc
+    {
+        HWND    m_window;
+
+    public:
+        // Cleanup is intentionally also done for a zero handle, which represents the screen.
+        ~Window_dc() override { ReleaseDC( m_window, handle() ); }
+        Window_dc( const HWND window ): Dc( GetDC( window ) ), m_window( window ) {}
+    };
+
+
+    class Screen_dc: public Window_dc
+    {
+    public:        
+        Screen_dc(): Window_dc( 0 ) {}                      // Main screen specified implicitly.
+    };
+
+    ⋮
+```
+
+asdasd
+
+---
+
+#### 5.3.3. aqswd
+
 Instead of a separate fluid style wrapper for each API drawing function, e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
 
 Both `draw` and `simple_draw` use this idea of taking the API function as argument. The general `draw` function uses complex template meta-programming, [**TMP**](https://en.wikipedia.org/wiki/Template_metaprogramming), to replace each `RECT` argument with the corresponding four `int` values, as required by e.g. the `Ellipse` function. That makes it convenient to use but hard to understand. In contrast, `simple_draw` just passes the arguments on directly to the API function, except that it adds a device context handle as first argument, and is therefore simple enough that the basic fluent programming support is clear and un-obscured. And that's the ~only reason for the existence of `simple_draw`, namely to serve as a minimal, relatively simple code example:
