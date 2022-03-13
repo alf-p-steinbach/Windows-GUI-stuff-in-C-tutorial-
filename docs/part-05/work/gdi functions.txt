@@ -1,0 +1,36 @@
+﻿> Line and arc drawing functions:
+
+| `AngleArc` | Draws a line segment and an arc. |
+| `Arc` | Draws an elliptical arc. |
+| `ArcTo` | Draws an elliptical arc. |
+| `LineDDAProc` | An application-defined callback function used with the LineDDA function. |
+| `LineTo` | Draws a line from the current position up to, but not including, the specified point. |
+| `MoveToEx` | Updates the current position to the specified point and optionally returns the previous position. |
+| `PolyBezier` | Draws one or more Bézier curves. |
+| `PolyBezierTo` | Draws one or more Bézier curves. |
+| `PolyDraw` | Draws a set of line segments and Bézier curves. |
+| `Polyline` | Draws a series of line segments by connecting the points in the specified array. |
+| `PolylineTo` | Draws one or more straight lines. |
+| `PolyPolyline` | Draws multiple series of connected line segments. |
+
+
+> Line and arc support functions:
+
+| `GetArcDirection` | Retrieves the current arc direction for the specified device context. |
+| `LineDDA` | Determines which pixels should be highlighted for a line defined by the specified starting and ending points. |
+| `SetArcDirection` | Sets the drawing direction to be used for arc and rectangle functions. |
+
+
+> Filled shape functions:
+
+| `Chord` | Draws an area bounded by an ellipse and a line segment. |
+| `Ellipse` | Draws an ellipse. |
+| `FillRect` | Fills a rectangle using a brush. |
+| `FrameRect` | Draws a border around a rectangle using a brush. |
+| `InvertRect` | Inverts the color values of the pixels in a rectangle. |
+| `Pie` | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
+| `Polygon` | Draws a polygon. |
+| `PolyPolygon` | draws a series of closed polygons. |
+| `Rectangle` | Draws a rectangle. |
+| `RoundRect` | Draws a rectangle with rounded corners. |
+

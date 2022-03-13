@@ -333,9 +333,11 @@ Anyway, for the draw-on-screen example program the only concrete derived class w
 
 #### 5.3.2. A single color setter function for draw, fill and gap.
 
-The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general figure fill color. But for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function; the default is unfortunately `OPAQUE`.
+The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general figure fill color. But there is also a text color, set with `SetTextColor`. ANd for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function. The default is unfortunately `OPAQUE`.
 
-Anyway this means that with the GDI there are three possible colorizations to specify the color for: drawing (pen color), general figure fill (brush color), and gap filling (`BK`-color, whatever *bk* is short for).
+And unfortunately the gap color + transparent mode cannot be naturally captured as a single 32-bit `COLORREF` value, because the convention in later API’s and file formats is that upper byte zero (the usual in GDI work) means fully *transparent* instead of fully opaque. So, setting that byte to e.g. FF₁₆ to indicate transparent would clash with the later convention. And s
+
+Anyway this means that with the GDI there are four possible colorizations to specify the color for: drawing (pen color), general figure fill (brush color), text, and gap filling (`BK`-color, whatever *bk* is short for).
 
 The C++ fluent device context class’  `.use` member function takes an arbitrary number of arguments that represent colors to set in the device context. The colorization to use a color for is indicated by the argument type. Specifically the `.use` function delegates the color setting to the argument type’s `.set_in` member function, as shown below, where all but the common `Color` base class are argument types:
 
@@ -352,12 +354,14 @@ namespace winapi::gdi {
     {
         using Color::Color;
         void set_in( const HDC canvas ) const { SetDCPenColor( canvas, value ); }
+        static auto in( const HDC canvas ) -> Pen_color { return GetDCPenColor( canvas ); }
     };
 
     struct Brush_color: Color
     {
         using Color::Color;
         void set_in( const HDC canvas ) const { SetDCBrushColor( canvas, value ); }
+        static auto in( const HDC canvas ) -> Brush_color { return GetDCBrushColor( canvas ); }
     };
 
     struct Gap_color: Color     // Gaps in pattern lines, and bg in text presentation.
@@ -367,11 +371,23 @@ namespace winapi::gdi {
         {
             SetBkColor( canvas, value );  SetBkMode( canvas, OPAQUE );
         }
+        static auto in( const HDC canvas ) -> Pen_color { return GetBkColor( canvas ); }
     };
 
     struct Transparent_gaps
     {
         void set_in( const HDC canvas ) const { SetBkMode( canvas, TRANSPARENT ); }
+        
+        static auto in( const HDC canvas )
+            -> bool
+        { return (GetBkMode( canvas ) == TRANSPARENT); }
+    };
+
+    struct Text_color: Color
+    {
+        using Color::Color;
+        void set_in( const HDC canvas ) const { SetTextColor( canvas, value ); }
+        static auto in( const HDC canvas ) -> Text_color { return GetTextColor( canvas ); }
     };
 }  // namespace winapi::gdi
 ```
