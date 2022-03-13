@@ -331,7 +331,7 @@ Anyway, for the draw-on-screen example program the only concrete derived class w
 
 ---
 
-#### 5.3.2. A single color setter function for draw, fill and gap.
+#### 5.3.2. A single color setter function for draw, fill, text and gap.
 
 The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general figure fill color. But there is also a text color, set with `SetTextColor`. ANd for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function. The default is unfortunately `OPAQUE`.
 
