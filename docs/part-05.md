@@ -394,11 +394,13 @@ asdasd
 
 ---
 
-#### 5.3.3. aqswd
+Both `draw` and `simple_draw` use this idea of taking the API function as argument. The general `draw` function uses complex template meta-programming, [**TMP**](https://en.wikipedia.org/wiki/Template_metaprogramming), to replace each `RECT` argument with the corresponding four `int` values, as required by e.g. the `Ellipse` function. That makes it convenient to use but hard to understand. In contrast, `simple_draw` just passes the arguments on directly to the API function, except that it adds a device context handle as first argument, and is therefore simple enough that the basic fluent programming support is clear and un-obscured. 
 
-Instead of a separate fluid style wrapper for each API drawing function, e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
+#### 5.3.3. A single fluid wrapper for all the GDI drawing functions.
 
-Both `draw` and `simple_draw` use this idea of taking the API function as argument. The general `draw` function uses complex template meta-programming, [**TMP**](https://en.wikipedia.org/wiki/Template_metaprogramming), to replace each `RECT` argument with the corresponding four `int` values, as required by e.g. the `Ellipse` function. That makes it convenient to use but hard to understand. In contrast, `simple_draw` just passes the arguments on directly to the API function, except that it adds a device context handle as first argument, and is therefore simple enough that the basic fluent programming support is clear and un-obscured. And that's the ~only reason for the existence of `simple_draw`, namely to serve as a minimal, relatively simple code example:
+Instead of e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, and so on for each GDI drawing function, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
+
+This approach is best illustrated by `.simple_draw`, whose ~only reason for existence is to serve as a minimal, relatively simple code example:
 
 ```cpp
 template< class Api_func, class... Args >
@@ -410,18 +412,21 @@ auto Dc::simple_draw( const Api_func api_func, const Args&... args ) const
 }
 ```
 
-The cost of the `simple_draw` implementation simplicity is verbosity at every call site, where e.g. the position and size of an ellipse must be specified as individual `int` values like this:
+A call can look like the follow, here using the `Ellipse` function:
 
 ```cpp
-canvas.use( Brush_color( orange ), Pen_color( yellow ) ).simple_draw(
-    Ellipse, area.left, area.top, area.right, area.bottom
-    );
+canvas.simple_draw( Ellipse, area.left, area.top, area.right, area.bottom );
 ```
 
-A C style solution could be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, decidedly non-trivial, but centralized and transparent to the caller, with natural-for-C++ usage as already shown,
+But ideally a call should be like just
 
 ```cpp
-canvas.use( Brush_color( orange ), Pen_color( yellow ) ).draw( Ellipse, area );
+canvas.draw( Ellipse, area );
 ```
+
+And the `.draw` function enables that, by replacing every `RECT` in the argument list with the 4 `int` values that it carries. However, this *usage simplification* yields far more intricate implementation code, so I chose to also define `simple_draw` and present that first.
+
+A C style solution could instead be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex and decidedly non-trivial, but centralized and transparent to the caller, with natural-for-C++ usage as shown.
+
 
 asdasd
