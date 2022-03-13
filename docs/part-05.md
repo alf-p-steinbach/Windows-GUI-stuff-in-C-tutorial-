@@ -414,6 +414,10 @@ Both `draw` and `simple_draw` use this idea of taking the API function as argume
 
 #### 5.3.3. A single fluid wrapper for all the GDI drawing functions.
 
+The GDI offers a great many drawing functions:
+
+asdasd
+
 Instead of e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, and so on for each GDI drawing function, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
 
 This approach is best illustrated by `.simple_draw`, whose ~only reason for existence is to serve as a minimal, relatively simple code example:
