@@ -333,7 +333,7 @@ Anyway, for the draw-on-screen example program the only concrete derived class w
 
 #### 5.3.2. A single color setter function for draw, fill, text and gap.
 
-The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general figure fill color. But there is also a text color, set with `SetTextColor`. ANd for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function. The default is unfortunately `OPAQUE`.
+The `SetDCPenColor` and `SetDCBrushColor` functions that we’ve used sets respectively drawing color and general figure fill color. But there is also a text color, set with `SetTextColor`. And for the gaps in patterned lines and brushes, as well as for the background of text, the GDI will either use the existing image background, called **`TRANSPARENT`** mode, or the color set with the `SetBkColor` function, called **`OPAQUE`** mode. You set the mode with the `SetBkMode` function. The default is unfortunately `OPAQUE`.
 
 And unfortunately the gap color + transparent mode cannot be naturally captured as a single 32-bit `COLORREF` value, because the convention in later API’s and file formats is that upper byte zero (the usual in GDI work) means fully *transparent* instead of fully opaque. So, setting that byte to e.g. FF₁₆ to indicate transparent would clash with the later convention. And s
 
