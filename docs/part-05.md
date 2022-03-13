@@ -406,11 +406,7 @@ auto Dc::use( const Args&... colors ) const
 
 Here the first statement is a C++17 [**fold expression**](https://en.cppreference.com/w/cpp/language/fold), which expands to one *c*`.set_in(m_handle)` call for each actual argument *c*.
 
-asdasd
-
 ---
-
-Both `draw` and `simple_draw` use this idea of taking the API function as argument. The general `draw` function uses complex template meta-programming, [**TMP**](https://en.wikipedia.org/wiki/Template_metaprogramming), to replace each `RECT` argument with the corresponding four `int` values, as required by e.g. the `Ellipse` function. That makes it convenient to use but hard to understand. In contrast, `simple_draw` just passes the arguments on directly to the API function, except that it adds a device context handle as first argument, and is therefore simple enough that the basic fluent programming support is clear and un-obscured. 
 
 #### 5.3.3. A single fluid wrapper for all the GDI drawing functions.
 
