@@ -417,7 +417,7 @@ The GDI offers a great many line drawing functions:
 | `AngleArc`     | Draws a line segment and an arc.                                                                  |
 | `Arc`          | Draws an elliptical arc.                                                                          |
 | `ArcTo`        | Draws an elliptical arc.                                                                          |
-|                |                                                                                                   |
+| ---            | ---                                                                                               |
 | `MoveToEx`     | Updates the current position to the specified point and optionally returns the previous position. |
 | `LineTo`       | Draws a line from the current position up to, but not including, the specified point.             |
 | `Polyline`     | Draws a series of line segments by connecting the points in the specified array.                  |
