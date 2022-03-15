@@ -420,7 +420,7 @@ The GDI offers a great many line drawing functions:
 | `Polyline`           | Draws a series of line segments by connecting the points in the specified array.                  |
 | `PolylineTo`         | Draws one or more straight lines.                                                                 |
 | `PolyPolyline`       | Draws multiple series of connected line segments.                                                 |
-| &nbsp;&nbsp;&nbsp; ≈ | &                                                                                                 |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
 | `PolyBezier`         | Draws one or more Bézier curves.                                                                  |
 | `PolyBezierTo`       | Draws one or more Bézier curves.                                                                  |
 | `PolyDraw`           | Draws a set of line segments and Bézier curves.                                                   |
