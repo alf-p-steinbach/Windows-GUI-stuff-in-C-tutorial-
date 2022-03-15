@@ -490,4 +490,103 @@ And the slightly “smarter” `.draw` function enables that by replacing every 
 
 A C style solution could instead be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, but it’s transparent to the caller, with natural-for-C++ usage as shown.
 
-asdasd
+First, a `private` helper function `call_draw_with_rect_arg_expanded`:
+
+```cpp
+template<
+    class       Api_func,
+    class...    Args,
+    size_t...   indices_before_rect,
+    size_t...   indices_after_rect       // 0-based, i.e. minus offset
+    >
+inline void Dc::call_draw_with_rect_arg_expanded(
+    const Api_func                          api_func,
+    const tuple<const Args&...>&            args_tuple,
+    index_sequence<indices_before_rect...>  ,
+    index_sequence<indices_after_rect...>
+    ) const
+{
+    constexpr int rect_arg_index = sizeof...( indices_before_rect );
+    const RECT& r = get<rect_arg_index>( args_tuple );
+    draw(
+        api_func,
+        get<indices_before_rect>( args_tuple )...,     // Can be empty, works.
+        r.left, r.top, r.right, r.bottom,
+        get< rect_arg_index + 1 + indices_after_rect >( args_tuple )...
+        );
+}
+
+```
+
+It uses two `std::index_sequence` arguments to make the compiler infer two `size_t` value sequences template argument packs, which are used to specify the parts of the argument tuple that comes before a `RECT` argument, and the parts that come after.
+
+The main `draw` function finds the position of the first `RECT`  argument (if any) and calls the helper, which calls it back recursively to expand any remaining `RECT` arguments:
+
+```cpp
+template< class Api_func, class... Args >
+inline auto Dc::draw( const Api_func api_func, const Args&... args ) const
+    -> const Dc&
+{
+    const int i_first_rect = Types_< Args... >::template index_of_first_< RECT >;
+    if constexpr( i_first_rect < 0 ) {
+        api_func( m_handle, args... );
+    } else {
+        call_draw_with_rect_arg_expanded(
+            api_func,
+            tie( args... ),
+            make_index_sequence<i_first_rect>(),
+            make_index_sequence<sizeof...( Args ) - (i_first_rect + 1)>()
+            );
+    }
+    return *this;
+}
+
+```
+
+The `Types_` template is a simple list of types that defines `index_of_first_` as follows:
+
+*In x:* 
+
+```cpp
+namespace cpp::util {
+    ⋮
+    namespace impl::types {
+        // Logic to find the index of the first T in a list of types, or -1 if none.
+
+        constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
+
+        template< class T, class... Args > struct First_T_;
+        
+        template< class T > struct First_T_< T > { enum{ index = -1 }; };
+
+        template< class T, class First, class... More_args >
+        struct First_T_< T, First, More_args... >
+        {
+            enum
+            { index = is_same_v< First, T >
+                ? 0
+                : successor_if_not_negative( First_T_< T, More_args... >::index )
+            };
+        };
+
+        template< class T, class... Args >
+        constexpr int index_of_first_ = First_T_< T, Args... >::index;
+    }  // namespace impl::types
+
+    template< class... Types >
+    struct Types_
+    {
+        static constexpr int count = static_cast<int>( sizeof...( Types ) );
+
+        template< class T >
+        static constexpr bool contain_ = (... or is_same_v<T, Types>);
+
+        template< class T >
+        static constexpr int index_of_first_ = impl::types::index_of_first_<T, Types...>;
+    };
+
+    ⋮
+}  // namespace cpp::util
+```
+
+Here the `contain_` member function name reflects that a concrete `Types_` specialization usually refers to a collection of multiple types, with a plural name. For example, `using Number_types = Types_<int, double>;` with usage like `if constexpr( Number_types::contain_<char>)`. Alternatively one could just as naturally write `Number_types_list::contains_`, but that introduces a little extra verbosity.
