@@ -413,7 +413,7 @@ Here the first statement is a C++17 [**fold expression**](https://en.cppreferenc
 The GDI offers a great many line drawing functions:
 
 | *Function:*    | *Microsoft’s description:*                                                                        |
-| -------------- | ------------------------------------------------------------------------------------------------- |
+|:-------------- |:------------------------------------------------------------------------------------------------- |
 | `AngleArc`     | Draws a line segment and an arc.                                                                  |
 | `Arc`          | Draws an elliptical arc.                                                                          |
 | `ArcTo`        | Draws an elliptical arc.                                                                          |
