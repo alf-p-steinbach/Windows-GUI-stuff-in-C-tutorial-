@@ -429,11 +429,34 @@ The GDI offers a great many line drawing functions:
 | `Arc`                | Draws an elliptical arc.                                                                          |
 | `ArcTo`              | Draws an elliptical arc.                                                                          |
 
-In addition there’s a great number of filled shape functions:
+In addition there’s a great number of filled shape functions (these include our beloved `Ellipse` function):
 
-asdasd
+| *Function:*          | *Microsoft’s description:*                                      |
+|:-------------------- |:--------------------------------------------------------------- |
+| `Chord`              | Draws an area bounded by an ellipse and a line segment.         |
+| `Ellipse`            | Draws an ellipse.                                               |
+| `Pie`                | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
+| `FillRect`           | Fills a rectangle using a brush.                                |
+| `FrameRect`          | Draws a border around a rectangle using a brush.                |
+| `InvertRect`         | Inverts the color values of the pixels in a rectangle.          |
+| `Rectangle`          | Draws a rectangle.                                              |
+| `RoundRect`          | Draws a rectangle with rounded corners.                         |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
+| `Polygon`            | Draws a polygon.                                                |
+| `PolyPolygon`        | draws a series of closed polygons.                              |
 
-Instead of e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, and so on for each GDI drawing function, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
+And, of course, a number of text drawing functions:
+
+| *Function:*     | *Microsoft’s description:*                                                   |
+|:--------------- |:---------------------------------------------------------------------------- |
+| `DrawText`      | Draws formatted text in a rectangle.                                         |
+| `DrawTextEx`    | Draws formatted text in rectangle.                                           |
+| `PolyTextOut`   | Draws several strings using the font and text colors in a device context.    |
+| `TabbedTextOut` | Writes a character string at a location, expanding tabs to specified values. |
+| `TextOut`       | Writes a character string at a location.                                     |
+
+One fluent wrapper design approach is to have one individual wrapper function for each API function above, plus maybe for some of these functions’ support functions. But that would be a whole lot of functions to define, and a whole lot of function names to memorize or look up. And so instead of e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, and so on for each GDI drawing function, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
 
 This approach is best illustrated by `.simple_draw`, whose ~only reason for existence is to serve as a minimal, relatively simple code example:
 

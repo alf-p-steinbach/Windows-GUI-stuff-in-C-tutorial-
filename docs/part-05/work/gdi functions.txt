@@ -3,13 +3,13 @@
 | `AngleArc` | Draws a line segment and an arc. |
 | `Arc` | Draws an elliptical arc. |
 | `ArcTo` | Draws an elliptical arc. |
-
+|||
 | `MoveToEx` | Updates the current position to the specified point and optionally returns the previous position. |
 | `LineTo` | Draws a line from the current position up to, but not including, the specified point. |
 | `Polyline` | Draws a series of line segments by connecting the points in the specified array. |
 | `PolylineTo` | Draws one or more straight lines. |
 | `PolyPolyline` | Draws multiple series of connected line segments. |
-
+|||
 | `PolyBezier` | Draws one or more Bézier curves. |
 | `PolyBezierTo` | Draws one or more Bézier curves. |
 | `PolyDraw` | Draws a set of line segments and Bézier curves. |
@@ -28,13 +28,13 @@
 | `Chord` | Draws an area bounded by an ellipse and a line segment. |
 | `Ellipse` | Draws an ellipse. |
 | `Pie` | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
-
+|||
 | `FillRect` | Fills a rectangle using a brush. |
 | `FrameRect` | Draws a border around a rectangle using a brush. |
 | `InvertRect` | Inverts the color values of the pixels in a rectangle. |
 | `Rectangle` | Draws a rectangle. |
 | `RoundRect` | Draws a rectangle with rounded corners. |
-
+|||
 | `Polygon` | Draws a polygon. |
 | `PolyPolygon` | draws a series of closed polygons. |
 
@@ -45,9 +45,14 @@ PaintRgn	Paints the specified region by using the brush currently selected into 
 
 > Text drawing functions:
 
-DrawText	Draws formatted text in a rectangle.
-DrawTextEx	Draws formatted text in rectangle.
-PolyTextOut	Draws several strings using the font and text colors in a device context.
+| `DrawText` | Draws formatted text in a rectangle. |
+| `DrawTextEx` | Draws formatted text in rectangle. |
+| `PolyTextOut` | Draws several strings using the font and text colors in a device context. |
+| `TabbedTextOut` | Writes a character string at a location, expanding tabs to specified values. |
+| `TextOut` | Writes a character string at a location. |
+
+> Text drawing support functions:
+
 GetTextAlign	Gets the text-alignment setting for a device context.
 GetTextCharacterExtra	Gets the current intercharacter spacing for a device context.
 GetTextColor	Gets the text color for a device context.
@@ -55,10 +60,6 @@ SetTextAlign	Sets the text-alignment flags for a device context.
 SetTextCharacterExtra	Sets the intercharacter spacing.
 SetTextColor	Sets the text color for a device context.
 SetTextJustification	Specifies the amount of space the system should add to the break characters in a string.
-TabbedTextOut	Writes a character string at a location, expanding tabs to specified values.
-TextOut	Writes a character string at a location.
-
-> Text drawing support functions:
 
 AddFontMemResourceEx	Adds an embedded font to the system font table.
 AddFontResource	Adds a font resource to the system font table.
