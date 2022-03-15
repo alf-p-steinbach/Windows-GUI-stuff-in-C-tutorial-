@@ -1,23 +1,25 @@
-﻿> Line and arc drawing functions:
+﻿> Line and curve drawing functions:
 
 | `AngleArc` | Draws a line segment and an arc. |
 | `Arc` | Draws an elliptical arc. |
 | `ArcTo` | Draws an elliptical arc. |
-| `LineDDAProc` | An application-defined callback function used with the LineDDA function. |
-| `LineTo` | Draws a line from the current position up to, but not including, the specified point. |
+
 | `MoveToEx` | Updates the current position to the specified point and optionally returns the previous position. |
-| `PolyBezier` | Draws one or more Bézier curves. |
-| `PolyBezierTo` | Draws one or more Bézier curves. |
-| `PolyDraw` | Draws a set of line segments and Bézier curves. |
+| `LineTo` | Draws a line from the current position up to, but not including, the specified point. |
 | `Polyline` | Draws a series of line segments by connecting the points in the specified array. |
 | `PolylineTo` | Draws one or more straight lines. |
 | `PolyPolyline` | Draws multiple series of connected line segments. |
+
+| `PolyBezier` | Draws one or more Bézier curves. |
+| `PolyBezierTo` | Draws one or more Bézier curves. |
+| `PolyDraw` | Draws a set of line segments and Bézier curves. |
 
 
 > Line and arc support functions:
 
 | `GetArcDirection` | Retrieves the current arc direction for the specified device context. |
 | `LineDDA` | Determines which pixels should be highlighted for a line defined by the specified starting and ending points. |
+| `LineDDAProc` | An application-defined callback function used with the LineDDA function. |
 | `SetArcDirection` | Sets the drawing direction to be used for arc and rectangle functions. |
 
 
@@ -25,12 +27,72 @@
 
 | `Chord` | Draws an area bounded by an ellipse and a line segment. |
 | `Ellipse` | Draws an ellipse. |
+| `Pie` | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
+
 | `FillRect` | Fills a rectangle using a brush. |
 | `FrameRect` | Draws a border around a rectangle using a brush. |
 | `InvertRect` | Inverts the color values of the pixels in a rectangle. |
-| `Pie` | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
-| `Polygon` | Draws a polygon. |
-| `PolyPolygon` | draws a series of closed polygons. |
 | `Rectangle` | Draws a rectangle. |
 | `RoundRect` | Draws a rectangle with rounded corners. |
 
+| `Polygon` | Draws a polygon. |
+| `PolyPolygon` | draws a series of closed polygons. |
+
+FillRgn	Fills a region by using the specified brush.
+FrameRgn	Draws a border around the specified region by using the specified brush.
+PaintRgn	Paints the specified region by using the brush currently selected into the device context.
+
+
+> Text drawing functions:
+
+DrawText	Draws formatted text in a rectangle.
+DrawTextEx	Draws formatted text in rectangle.
+PolyTextOut	Draws several strings using the font and text colors in a device context.
+GetTextAlign	Gets the text-alignment setting for a device context.
+GetTextCharacterExtra	Gets the current intercharacter spacing for a device context.
+GetTextColor	Gets the text color for a device context.
+SetTextAlign	Sets the text-alignment flags for a device context.
+SetTextCharacterExtra	Sets the intercharacter spacing.
+SetTextColor	Sets the text color for a device context.
+SetTextJustification	Specifies the amount of space the system should add to the break characters in a string.
+TabbedTextOut	Writes a character string at a location, expanding tabs to specified values.
+TextOut	Writes a character string at a location.
+
+> Text drawing support functions:
+
+AddFontMemResourceEx	Adds an embedded font to the system font table.
+AddFontResource	Adds a font resource to the system font table.
+AddFontResourceEx	Adds a private or non-enumerable font to the system font table.
+CreateFont	Creates a logical font.
+CreateFontIndirect	Creates a logical font from a structure.
+CreateFontIndirectEx	Creates a logical font from a structure.
+EnumFontFamExProc	An application definedcallback function used with EnumFontFamiliesEx to process fonts.
+EnumFontFamiliesEx	Enumerates all fonts in the system with certain characteristics.
+ExtTextOut	Draws a character string.
+GetAspectRatioFilterEx	Gets the setting for the aspect-ratio filter.
+GetCharABCWidths	Gets the widths of consecutive characters from the TrueType font.
+GetCharABCWidthsFloat	Gets the widths of consecutive characters from the current font.
+GetCharABCWidthsI	Gets the widths of consecutive glyph indices or from an array of glyph indices from the TrueType font.
+GetCharacterPlacement	Gets information about a character string.
+GetCharWidth32	Gets the widths of consecutive characters from the current font.
+GetCharWidthFloat	Gets the fractional widths of consecutive characters from the current font.
+GetCharWidthI	Gets the widths of consecutive glyph indices or an array of glyph indices from the current font.
+GetFontData	Gets metric data for a TrueType font.
+GetFontLanguageInfo	Returns information about the selected font for a display context.
+GetFontUnicodeRanges	Tells which Unicode characters are supported by a font.
+GetGlyphIndices	Translates a string into an array of glyph indices.
+GetGlyphOutline	Gets the outline or bitmap for a character in the TrueType font.
+GetKerningPairs	Gets the character-kerning pairs for a font.
+GetOutlineTextMetrics	Gets text metrics for TrueType fonts.
+GetRasterizerCaps	Tells whether TrueType fonts are installed.
+GetTabbedTextExtent	Computes the width and height of a character string, including tabs.
+GetTextExtentExPoint	Gets the number of characters in a string that will fit within a space.
+GetTextExtentExPointI	Gets the number of glyph indices that will fit within a space.
+GetTextExtentPoint32	Computes the width and height of a string of text.
+GetTextExtentPointI	Computes the width and height of an array of glyph indices.
+GetTextFace	Gets the name of the font that is selected into a device context.
+GetTextMetrics	Fills a buffer with the metrics for a font.
+RemoveFontMemResourceEx	Removes a font whose source was embedded in a document from the system font table.
+RemoveFontResource	Removes the fonts in a file from the system font table.
+RemoveFontResourceEx	Removes a private or non-enumerable font from the system font table.
+SetMapperFlags	Alters the algorithm used to map logical fonts to physical fonts.

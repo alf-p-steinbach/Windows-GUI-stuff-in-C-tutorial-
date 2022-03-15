@@ -1,7 +1,6 @@
 ﻿# // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi"). v3
 #include <winapi/gdi/color_names.hpp>
 #include <winapi/gdi/device-contexts.hpp>
-#include <wrapped-winapi/windows-h.hpp>
 namespace gdi = winapi::gdi;
 using gdi::Dc, gdi::Screen_dc, gdi::Pen_color, gdi::Brush_color;
 

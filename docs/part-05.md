@@ -292,14 +292,14 @@ For the last source code line: the pure `virtual` destructor is implemented — 
 
 From a Windows API point of view a device context can be created by a number of different functions, and then needs to be destroyed by corresponding destruction functions:
 
-|| Used for: | Term: | Creation: | Destruction |
-|-|-----------|-----------|-------------|-----------|
-|| Updating or repairing window contents. | – | `BeginPaint` | `EndPaint` |
-| ▷ | Drawing in a window or on the screen. | “Window DC”. | `GetDC` | `ReleaseDC` |
-|| Drawing to a screen or printer. | – | `CreateDC` | `DeleteDC` |
-|| Drawing to an image (bitmap or WMF) | “Memory DC”. | `CreateCompatibleDC` | `DeleteDC` |
-|| Obtaining device information. | “Information DC”. | `CreateIC` | `DeleteDC` |
- 
+|     | Used for:                              | Term:             | Creation:            | Destruction |
+| --- | -------------------------------------- | ----------------- | -------------------- | ----------- |
+|     | Updating or repairing window contents. | –                 | `BeginPaint`         | `EndPaint`  |
+| ▷   | Drawing in a window or on the screen.  | “Window DC”.      | `GetDC`              | `ReleaseDC` |
+|     | Drawing to a screen or printer.        | –                 | `CreateDC`           | `DeleteDC`  |
+|     | Drawing to an image (bitmap or WMF)    | “Memory DC”.      | `CreateCompatibleDC` | `DeleteDC`  |
+|     | Obtaining device information.          | “Information DC”. | `CreateIC`           | `DeleteDC`  |
+
 I guess the difference between `GetDC` and `CreateDC` is that `GetC` obtains a device context for the desktop background window, so that drawing there is effectively to draw on the screen, while `CreateDC` obtains a device context for the actual physical screen.
 
 Anyway, for the draw-on-screen example program the only concrete derived class we need is one that captures the concept of a “window DC”, but for clarity and ease of use I define both a general such class, `Window_dc`, and a specialization `Screen_dc`:
@@ -377,7 +377,7 @@ namespace winapi::gdi {
     struct Transparent_gaps
     {
         void set_in( const HDC canvas ) const { SetBkMode( canvas, TRANSPARENT ); }
-        
+
         static auto in( const HDC canvas )
             -> bool
         { return (GetBkMode( canvas ) == TRANSPARENT); }
@@ -410,7 +410,26 @@ Here the first statement is a C++17 [**fold expression**](https://en.cppreferenc
 
 #### 5.3.3. A single fluid wrapper for all the GDI drawing functions.
 
-The GDI offers a great many drawing functions:
+The GDI offers a great many line drawing functions:
+
+| Function:      | *Microsoft’s Description:*                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| `AngleArc`     | Draws a line segment and an arc.                                                                  |
+| `Arc`          | Draws an elliptical arc.                                                                          |
+| `ArcTo`        | Draws an elliptical arc.                                                                          |
+|                |                                                                                                   |
+| `MoveToEx`     | Updates the current position to the specified point and optionally returns the previous position. |
+| `LineTo`       | Draws a line from the current position up to, but not including, the specified point.             |
+| `Polyline`     | Draws a series of line segments by connecting the points in the specified array.                  |
+| `PolylineTo`   | Draws one or more straight lines.                                                                 |
+| `PolyPolyline` | Draws multiple series of connected line segments.                                                 |
+|                |                                                                                                   |
+| `PolyBezier`   | Draws one or more Bézier curves.                                                                  |
+| `PolyBezierTo` | Draws one or more Bézier curves.                                                                  |
+| `PolyDraw`     | Draws a set of line segments and Bézier curves.                                                   |
+
+In addition there’s a great number of filled shape functions:
+
 
 asdasd
 
@@ -443,6 +462,5 @@ canvas.draw( Ellipse, area );
 And the `.draw` function enables that, by replacing every `RECT` in the argument list with the 4 `int` values that it carries. However, this *usage simplification* yields far more intricate implementation code, so I chose to also define `simple_draw` and present that first.
 
 A C style solution could instead be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex and decidedly non-trivial, but centralized and transparent to the caller, with natural-for-C++ usage as shown.
-
 
 asdasd
