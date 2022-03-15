@@ -300,7 +300,7 @@ From a Windows API point of view a device context can be created by a number of 
 |     | Drawing to an image (bitmap or WMF)    | “Memory DC”.      | `CreateCompatibleDC` | `DeleteDC`  |
 |     | Obtaining device information.          | “Information DC”. | `CreateIC`           | `DeleteDC`  |
 
-I guess the difference between `GetDC(0)` and `CreateDC` used for the screen, is that `GetDC(0)` probably obtains a device context for the desktop background window, so that drawing there is effectively to draw on the screen, while `CreateDC` obtains a device context for the actual physical screen.
+I guess the difference between `GetDC(0)` and `CreateDC` used for the display, is that `GetDC(0)` probably obtains a device context for the desktop background window, so that drawing there is effectively to draw on the screen, while `CreateDC` obtains a device context for the actual physical screen.
 
 Anyway, for the draw-on-screen example program the only concrete derived class we need is one that captures the concept of a “window DC”, but for clarity and ease of use I define both a general such class, `Window_dc`, and a specialization `Screen_dc`:
 
@@ -431,24 +431,24 @@ The GDI offers a great many line drawing functions:
 
 In addition there’s a great number of filled shape functions (these include our beloved `Ellipse` function):
 
-| *Function:*          | *Microsoft’s description:*                                      |
-|:-------------------- |:--------------------------------------------------------------- |
-| `FillRect`           | Fills a rectangle using a brush.                                |
-| `FrameRect`          | Draws a border around a rectangle using a brush.                |
-| `InvertRect`         | Inverts the color values of the pixels in a rectangle.          |
-| `Rectangle`          | Draws a rectangle.                                              |
-| `RoundRect`          | Draws a rectangle with rounded corners.                         |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
-| `Polygon`            | Draws a polygon.                                                |
-| `PolyPolygon`        | draws a series of closed polygons.                              |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
-| `Chord`              | Draws an area bounded by an ellipse and a line segment.         |
-| `Ellipse`            | Draws an ellipse.                                               |
-| `Pie`                | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
-| `FillRgn` | Fills a region by using the specified brush. |
-| `FrameRgn` | Draws a border around the specified region by using the specified brush. |
-| `PaintRgn` | Paints the specified region by using the brush currently selected into the device context. |
+| *Function:*          | *Microsoft’s description:*                                                                 |
+|:-------------------- |:------------------------------------------------------------------------------------------ |
+| `FillRect`           | Fills a rectangle using a brush.                                                           |
+| `FrameRect`          | Draws a border around a rectangle using a brush.                                           |
+| `InvertRect`         | Inverts the color values of the pixels in a rectangle.                                     |
+| `Rectangle`          | Draws a rectangle.                                                                         |
+| `RoundRect`          | Draws a rectangle with rounded corners.                                                    |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                                            |
+| `Polygon`            | Draws a polygon.                                                                           |
+| `PolyPolygon`        | draws a series of closed polygons.                                                         |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                                            |
+| `Chord`              | Draws an area bounded by an ellipse and a line segment.                                    |
+| `Ellipse`            | Draws an ellipse.                                                                          |
+| `Pie`                | Draws a pie-shaped wedge bounded by an ellipse and two radials.                            |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                                            |
+| `FillRgn`            | Fills a region by using the specified brush.                                               |
+| `FrameRgn`           | Draws a border around the specified region by using the specified brush.                   |
+| `PaintRgn`           | Paints the specified region by using the brush currently selected into the device context. |
 
 And of course there’s a number of text drawing functions:
 
@@ -474,7 +474,7 @@ auto Dc::simple_draw( const Api_func api_func, const Args&... args ) const
 }
 ```
 
-A call can look like the follow, here using the `Ellipse` function:
+A call can look like the following, here using the `Ellipse` function:
 
 ```cpp
 canvas.simple_draw( Ellipse, area.left, area.top, area.right, area.bottom );
