@@ -486,7 +486,7 @@ But ideally a call should be like just
 canvas.draw( Ellipse, area );
 ```
 
-And the `.draw` function enables that, by replacing every `RECT` in the argument list with the 4 `int` values that it carries. However, this *usage simplification* yields far more intricate implementation code, so I chose to also define `simple_draw` and present that first.
+And the slightly “smarter” `.draw` function enables that by replacing every `RECT` in the argument list with the 4 `int` values that it carries. However, this *usage simplification* yields far more intricate implementation code. That’s why I chose to also define `simple_draw` and to present that function first.
 
 A C style solution could instead be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex and decidedly non-trivial, but centralized and transparent to the caller, with natural-for-C++ usage as shown.
 
