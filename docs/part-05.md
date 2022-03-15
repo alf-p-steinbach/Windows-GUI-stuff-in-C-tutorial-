@@ -412,25 +412,24 @@ Here the first statement is a C++17 [**fold expression**](https://en.cppreferenc
 
 The GDI offers a great many line drawing functions:
 
-| *Function:*    | *Microsoft’s description:*                                                                        |
-|:-------------- |:------------------------------------------------------------------------------------------------- |
-| `MoveToEx`     | Updates the current position to the specified point and optionally returns the previous position. |
-| &nbsp;&nbsp;≈  | &nbsp;&nbsp;≈                                                                                     |
-| `LineTo`       | Draws a line from the current position up to, but not including, the specified point.             |
-| `Polyline`     | Draws a series of line segments by connecting the points in the specified array.                  |
-| `PolylineTo`   | Draws one or more straight lines.                                                                 |
-| `PolyPolyline` | Draws multiple series of connected line segments.                                                 |
-| &nbsp;&nbsp;≈  | &nbsp;&nbsp;≈                                                                                     |
-| `PolyBezier`   | Draws one or more Bézier curves.                                                                  |
-| `PolyBezierTo` | Draws one or more Bézier curves.                                                                  |
-| `PolyDraw`     | Draws a set of line segments and Bézier curves.                                                   |
-| &nbsp;&nbsp;≈  |                                                                                                   |
-| `AngleArc`     | Draws a line segment and an arc.                                                                  |
-| `Arc`          | Draws an elliptical arc.                                                                          |
-| `ArcTo`        | Draws an elliptical arc.                                                                          |
+| *Function:*          | *Microsoft’s description:*                                                                        |
+|:-------------------- |:------------------------------------------------------------------------------------------------- |
+| `MoveToEx`           | Updates the current position to the specified point and optionally returns the previous position. |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
+| `LineTo`             | Draws a line from the current position up to, but not including, the specified point.             |
+| `Polyline`           | Draws a series of line segments by connecting the points in the specified array.                  |
+| `PolylineTo`         | Draws one or more straight lines.                                                                 |
+| `PolyPolyline`       | Draws multiple series of connected line segments.                                                 |
+| &nbsp;&nbsp;&nbsp; ≈ | &                                                                                                 |
+| `PolyBezier`         | Draws one or more Bézier curves.                                                                  |
+| `PolyBezierTo`       | Draws one or more Bézier curves.                                                                  |
+| `PolyDraw`           | Draws a set of line segments and Bézier curves.                                                   |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
+| `AngleArc`           | Draws a line segment and an arc.                                                                  |
+| `Arc`                | Draws an elliptical arc.                                                                          |
+| `ArcTo`              | Draws an elliptical arc.                                                                          |
 
 In addition there’s a great number of filled shape functions:
-
 
 asdasd
 
