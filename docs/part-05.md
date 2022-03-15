@@ -589,4 +589,4 @@ namespace cpp::util {
 }  // namespace cpp::util
 ```
 
-Here the `contain_` member function name reflects that a concrete `Types_` specialization usually refers to a collection of multiple types, with a plural name. For example, `using Number_types = Types_<int, double>;` with usage like `if constexpr( Number_types::contain_<char>)`. Alternatively one could just as naturally write `Number_types_list::contains_`, but that introduces a little extra verbosity.
+Here the `contain_` member function name reflects that a concrete `Types_` specialization usually refers to a collection of multiple types, with a plural name. For example, `using Number_types = Types_<int, double>;` with usage like `if constexpr( Number_types::contain_<char>)`. Alternatively one could just as naturally write `Number_type_list::contains_`, but that introduces a little extra verbosity.
