@@ -433,10 +433,6 @@ In addition there’s a great number of filled shape functions (these include ou
 
 | *Function:*          | *Microsoft’s description:*                                      |
 |:-------------------- |:--------------------------------------------------------------- |
-| `Chord`              | Draws an area bounded by an ellipse and a line segment.         |
-| `Ellipse`            | Draws an ellipse.                                               |
-| `Pie`                | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
 | `FillRect`           | Fills a rectangle using a brush.                                |
 | `FrameRect`          | Draws a border around a rectangle using a brush.                |
 | `InvertRect`         | Inverts the color values of the pixels in a rectangle.          |
@@ -445,8 +441,16 @@ In addition there’s a great number of filled shape functions (these include ou
 | &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
 | `Polygon`            | Draws a polygon.                                                |
 | `PolyPolygon`        | draws a series of closed polygons.                              |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
+| `Chord`              | Draws an area bounded by an ellipse and a line segment.         |
+| `Ellipse`            | Draws an ellipse.                                               |
+| `Pie`                | Draws a pie-shaped wedge bounded by an ellipse and two radials. |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                 |
+| `FillRgn` | Fills a region by using the specified brush. |
+| `FrameRgn` | Draws a border around the specified region by using the specified brush. |
+| `PaintRgn` | Paints the specified region by using the brush currently selected into the device context. |
 
-And, of course, a number of text drawing functions:
+And of course there’s a number of text drawing functions:
 
 | *Function:*     | *Microsoft’s description:*                                                   |
 |:--------------- |:---------------------------------------------------------------------------- |

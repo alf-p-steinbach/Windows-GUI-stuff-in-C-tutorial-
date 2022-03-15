@@ -38,9 +38,9 @@
 | `Polygon` | Draws a polygon. |
 | `PolyPolygon` | draws a series of closed polygons. |
 
-FillRgn	Fills a region by using the specified brush.
-FrameRgn	Draws a border around the specified region by using the specified brush.
-PaintRgn	Paints the specified region by using the brush currently selected into the device context.
+| `FillRgn` | Fills a region by using the specified brush. |
+| `FrameRgn` | Draws a border around the specified region by using the specified brush. |
+| `PaintRgn` | Paints the specified region by using the brush currently selected into the device context. |
 
 
 > Text drawing functions:
