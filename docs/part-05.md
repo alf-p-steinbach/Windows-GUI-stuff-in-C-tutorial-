@@ -222,7 +222,7 @@ canvas.bg( blue ).fill( area );
 canvas.bg( orange ).fg( yellow ).draw( Ellipse, area );
 ```
 
-Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.bg` and `.fg` member functions returns a reference to the instance so that one can tack on a call to e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called [**fluent style**](https://en.wikipedia.org/wiki/Fluent_interface).
+Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.bg` and `.fg` member functions return a reference to the instance so that one can tack on a call to e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called [**fluent style**](https://en.wikipedia.org/wiki/Fluent_interface).
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
