@@ -27,7 +27,7 @@ namespace winapi::gdi {
 
     class Dc: No_copying
     {
-        HDC     m_handle;
+        const HDC   m_handle;
 
         // Internal helper for expanding a RECT argument into its 4 member values as arguments.
         template< class Api_func, class... Args, size_t... i_before, size_t... i_after>
@@ -36,7 +36,7 @@ namespace winapi::gdi {
             const tuple<const Args&...>&            args_tuple,
             index_sequence<i_before...>  ,
             index_sequence<i_after...>
-            ) const;
+            );
 
     protected:
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
@@ -50,15 +50,19 @@ namespace winapi::gdi {
 
     public:
         template< class... Args >
-        auto use( const Args&... colors ) const -> const Dc&;
+        inline auto use( const Args&... colors ) -> Dc&;
+     
+        // Convenience special cases.
+        auto bg( const Brush_color color ) -> Dc& { return use( color ); }
+        auto fg( const Pen_color color ) -> Dc& { return use( color ); }
         
-        auto fill( const RECT& area ) const -> const Dc&;
+        inline auto fill( const RECT& area ) -> Dc&;
         
         template< class Api_func, class... Args >
-        auto simple_draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
+        inline auto simple_draw( const Api_func f, const Args&... args ) -> Dc&;
 
         template< class Api_func, class... Args >
-        inline auto draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
+        inline auto draw( const Api_func f, const Args&... args ) -> Dc&;
 
         auto handle() const -> HDC  { return m_handle; }
         operator HDC() const        { return handle(); }
@@ -69,23 +73,23 @@ namespace winapi::gdi {
     inline Dc::~Dc() {}
 
     template< class... Args >
-    auto Dc::use( const Args&... colors ) const
-        -> const Dc&
+    inline auto Dc::use( const Args&... colors )
+        -> Dc&
     {
         (colors.set_in( m_handle ), ...);
         return *this;
     }
     
-    auto Dc::fill( const RECT& area ) const
-        -> const Dc&
+    inline auto Dc::fill( const RECT& area )
+        -> Dc&
     {
         FillRect( m_handle, &area, 0 );
         return *this;
     }
     
     template< class Api_func, class... Args >
-    auto Dc::simple_draw( const Api_func api_func, const Args&... args ) const
-        -> const Dc&
+    inline auto Dc::simple_draw( const Api_func api_func, const Args&... args )
+        -> Dc&
     {
         api_func( m_handle, args... );
         return *this;
@@ -102,7 +106,7 @@ namespace winapi::gdi {
         const tuple<const Args&...>&            args_tuple,
         index_sequence<indices_before_rect...>  ,
         index_sequence<indices_after_rect...>
-        ) const
+        )
     {
         constexpr int rect_arg_index = sizeof...( indices_before_rect );
         const RECT& r = get<rect_arg_index>( args_tuple );
@@ -115,8 +119,8 @@ namespace winapi::gdi {
     }
 
     template< class Api_func, class... Args >
-    inline auto Dc::draw( const Api_func api_func, const Args&... args ) const
-        -> const Dc&
+    inline auto Dc::draw( const Api_func api_func, const Args&... args )
+        -> Dc&
     {
         const int i_first_rect = Types_< Args... >::template index_of_first_< RECT >;
         if constexpr( i_first_rect < 0 ) {

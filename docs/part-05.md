@@ -218,11 +218,11 @@ Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 
 ```cpp
 using namespace winapi::gdi::color_names;
-canvas.use( Brush_color( blue ) ).fill( area );
-canvas.use( Brush_color( orange ), Pen_color( yellow ) ).draw( Ellipse, area );
+canvas.bg( blue ).fill( area );
+canvas.bg( orange ).fg( yellow ).draw( Ellipse, area );
 ```
 
-Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.use` member function returns a reference to the instance so that one can tack on a call to e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called [**fluent style**](https://en.wikipedia.org/wiki/Fluent_interface).
+Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.bg` and `.fg` member functions returns a reference to the instance so that one can tack on a call to e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called [**fluent style**](https://en.wikipedia.org/wiki/Fluent_interface).
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
@@ -251,9 +251,9 @@ namespace winapi::gdi {
 
     class Dc: No_copying
     {
-        HDC     m_handle;
+        const HDC   m_handle;
 
-        ⋮ // An internal helper function here.
+        ⋮ // An internal helper function here
 
     protected:
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
@@ -267,15 +267,19 @@ namespace winapi::gdi {
 
     public:
         template< class... Args >
-        auto use( const Args&... colors ) const -> const Dc&;
+        inline auto use( const Args&... colors ) -> Dc&;
 
-        auto fill( const RECT& area ) const -> const Dc&;
+        // Convenience special cases.
+        auto bg( const Brush_color color ) -> Dc& { return use( color ); }
+        auto fg( const Pen_color color ) -> Dc& { return use( color ); }
+
+        inline auto fill( const RECT& area ) -> Dc&;
 
         template< class Api_func, class... Args >
-        auto simple_draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
+        inline auto simple_draw( const Api_func f, const Args&... args ) -> Dc&;
 
         template< class Api_func, class... Args >
-        inline auto draw( const Api_func api_func, const Args&... args ) const -> const Dc&;
+        inline auto draw( const Api_func f, const Args&... args ) -> Dc&;
 
         auto handle() const -> HDC  { return m_handle; }
         operator HDC() const        { return handle(); }
@@ -406,6 +410,16 @@ auto Dc::use( const Args&... colors ) const
 
 Here the first statement is a C++17 [**fold expression**](https://en.cppreference.com/w/cpp/language/fold), which expands to one *c*`.set_in(m_handle)` call for each actual argument *c*.
 
+The two functions used in the fluent drawing code example, `.bg` and `.fg`, are simple one liner wrappers over the general `.use` function:
+
+```cpp
+// Convenience special cases.
+auto bg( const Brush_color color ) -> Dc& { return use( color ); }
+auto fg( const Pen_color color ) -> Dc& { return use( color ); }
+```
+
+
+
 ---
 
 #### 5.3.3. A single fluid wrapper function for all the GDI drawing functions.
@@ -466,8 +480,8 @@ This approach is best illustrated by `.simple_draw`, whose ~only reason for exis
 
 ```cpp
 template< class Api_func, class... Args >
-auto Dc::simple_draw( const Api_func api_func, const Args&... args ) const
-    -> const Dc&
+inline auto Dc::simple_draw( const Api_func api_func, const Args&... args )
+    -> Dc&
 {
     api_func( m_handle, args... );
     return *this;
@@ -490,6 +504,8 @@ And the slightly “smarter” `.draw` function enables that by replacing every 
 
 A C style solution could instead be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, but it’s transparent to the caller, with natural-for-C++ usage as shown.
 
+#### 5.3.4. A fluid drawing wrapper that expands `RECT` arguments.
+
 First, a `private` helper function `call_draw_with_rect_arg_expanded`:
 
 ```cpp
@@ -504,7 +520,7 @@ inline void Dc::call_draw_with_rect_arg_expanded(
     const tuple<const Args&...>&            args_tuple,
     index_sequence<indices_before_rect...>  ,
     index_sequence<indices_after_rect...>
-    ) const
+    )
 {
     constexpr int rect_arg_index = sizeof...( indices_before_rect );
     const RECT& r = get<rect_arg_index>( args_tuple );
@@ -515,7 +531,6 @@ inline void Dc::call_draw_with_rect_arg_expanded(
         get< rect_arg_index + 1 + indices_after_rect >( args_tuple )...
         );
 }
-
 ```
 
 It uses two `std::index_sequence` arguments to make the compiler infer two `size_t` value sequences template argument packs, which are used to specify the parts of the argument tuple that comes before a `RECT` argument, and the parts that come after.
@@ -524,8 +539,8 @@ The main `draw` function finds the position of the first `RECT`  argument (if an
 
 ```cpp
 template< class Api_func, class... Args >
-inline auto Dc::draw( const Api_func api_func, const Args&... args ) const
-    -> const Dc&
+inline auto Dc::draw( const Api_func api_func, const Args&... args )
+    -> Dc&
 {
     const int i_first_rect = Types_< Args... >::template index_of_first_< RECT >;
     if constexpr( i_first_rect < 0 ) {
@@ -540,12 +555,11 @@ inline auto Dc::draw( const Api_func api_func, const Args&... args ) const
     }
     return *this;
 }
-
 ```
 
 The `Types_` template is a simple list of types that defines `index_of_first_` as follows:
 
-*In x:* 
+*In [part-05/code/.include/cpp/util.hpp](part-05/code/.include/cpp/util.hpp):* 
 
 ```cpp
 namespace cpp::util {
@@ -556,7 +570,7 @@ namespace cpp::util {
         constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
 
         template< class T, class... Args > struct First_T_;
-        
+
         template< class T > struct First_T_< T > { enum{ index = -1 }; };
 
         template< class T, class First, class... More_args >
@@ -589,4 +603,4 @@ namespace cpp::util {
 }  // namespace cpp::util
 ```
 
-Here the `contain_` member function name reflects that a concrete `Types_` specialization usually refers to a collection of multiple types, with a plural name. For example, `using Number_types = Types_<int, double>;` with usage like `if constexpr( Number_types::contain_<char>)`. Alternatively one could just as naturally write `Number_type_list::contains_`, but that introduces a little extra verbosity.
+Here the `contain_` member function name, without “s”, reflects that a concrete `Types_` specialization usually refers to a collection of multiple types, with a plural name. For example, `using Number_types = Types_<int, double>;` with usage like `if constexpr( Number_types::contain_<char>)`. Alternatively one could just as naturally write `Number_type_list::contains_`, but that introduces a little extra verbosity.
