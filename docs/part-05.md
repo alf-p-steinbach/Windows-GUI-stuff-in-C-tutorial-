@@ -408,7 +408,7 @@ Here the first statement is a C++17 [**fold expression**](https://en.cppreferenc
 
 ---
 
-#### 5.3.3. A single fluid wrapper for all the GDI drawing functions.
+#### 5.3.3. A single fluid wrapper fcuntion for all the GDI drawing functions.
 
 The GDI offers a great many line drawing functions:
 
