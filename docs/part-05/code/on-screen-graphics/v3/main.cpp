@@ -6,7 +6,7 @@ using gdi::Dc, gdi::Screen_dc, gdi::Pen_color, gdi::Brush_color;
 
 void draw_on( Dc& canvas, const RECT& area )
 {
-    using namespace winapi::gdi::color_names;
+    using namespace gdi::color_names;
     canvas.bg( blue ).fill( area );
     canvas.bg( orange ).fg( yellow ).draw( Ellipse, area );
 }
