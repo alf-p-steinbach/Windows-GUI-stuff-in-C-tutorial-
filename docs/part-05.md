@@ -306,7 +306,7 @@ From a Windows API point of view a device context can be created by a number of 
 |     | Drawing to an image (bitmap or WMF)    | “Memory DC”.      | `CreateCompatibleDC` | `DeleteDC`  |
 |     | Obtaining device information.          | “Information DC”. | `CreateIC`           | `DeleteDC`  |
 
-I guess the difference between `GetDC(0)` and `CreateDC` used for the display, is that `GetDC(0)` probably obtains a device context for the desktop background window, so that drawing there is effectively to draw on the screen, while `CreateDC` obtains a device context for the actual physical screen.
+I guess the difference between `GetDC(0)` and `CreateDC` used for the display, is that `GetDC(0)` probably obtains a device context for the desktop background window, so that drawing there is effectively to draw on the screen, while `CreateDC` obtains a device context for the actual physical screen (the [documentation of `GetDC`](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getdc) just states that ❝If [the argument] is `NULL`, `GetDC` retrieves the DC for the entire screen❞).
 
 Anyway, for the draw-on-screen example program the only concrete derived class we need is one that captures the concept of a “window DC”, but for clarity and ease of use I define both a general such class, `Window_dc`, and a specialization `Screen_dc`:
 
