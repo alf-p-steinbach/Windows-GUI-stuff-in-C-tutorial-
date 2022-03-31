@@ -199,7 +199,17 @@ However, the stock objects are special in that they don’t need to and shouldn�
 
 <img title="" src="part-05/images/yoda.png" alt="">
 
-The drawing code
+Ideally the drawing code should look more like this:
+
+```cpp
+using namespace winapi::gdi::color_names;
+canvas.bg( blue ).fill( area );
+canvas.bg( orange ).fg( yellow ).draw( Ellipse, area );
+```
+
+Here `canvas` is an instance of a C++ class that wraps an `HDC` handle, and its `.bg` and `.fg` member functions return a reference to the instance so that one can tack on a call to e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called [**fluent style**](https://en.wikipedia.org/wiki/Fluent_interface).
+
+Compare that to the previous section’s drawing code
 
 ```cpp
 using namespace winapi::gdi::color_names;
@@ -214,15 +224,27 @@ SetDCBrushColor( canvas, orange );
 Ellipse( canvas, area.left, area.top, area.right, area.bottom );
 ```
 
-… is a definite improvement on the first example’s ultra-verbose general GDI code, but ideally it should look more like this:
+… which itself was a definite improvement on the first section’s ultra-verbose general GDI code:
 
 ```cpp
-using namespace winapi::gdi::color_names;
-canvas.bg( blue ).fill( area );
-canvas.bg( orange ).fg( yellow ).draw( Ellipse, area );
-```
+const HDC canvas = GetDC( no_window );
+    // Fill the background with blue.
+    const HBRUSH blue_brush = CreateSolidBrush( color::blue );
+        FillRect( canvas, &area, blue_brush );
+    DeleteObject( blue_brush );
 
-Here `canvas` is an instance of a C++ class that wraps an `HDC`, and its `.bg` and `.fg` member functions return a reference to the instance so that one can tack on a call to e.g. `.fill` or `.draw`. This is the same principle as with the iostreams `<<` operator. It's called [**fluent style**](https://en.wikipedia.org/wiki/Fluent_interface).
+    // Draw a yellow circle filled with orange.
+    const HBRUSH    orange_brush                = CreateSolidBrush( color::orange );
+        const HGDIOBJ   original_brush          = SelectObject( canvas, orange_brush );
+            const HPEN      yellow_pen          = CreatePen( PS_SOLID, 1, color::yellow );
+                const HGDIOBJ   original_pen    = SelectObject( canvas, yellow_pen );
+                    Ellipse( canvas, area.left, area.top, area.right, area.bottom );
+                SelectObject( canvas, original_pen );
+            DeleteObject( yellow_pen );
+        SelectObject( canvas, original_brush );
+    DeleteObject( orange_brush );
+ReleaseDC( no_window, canvas );
+```
 
 Oh, the Yoda picture is really about absorbing a great destructive force rather than generating a constructive force. But it looks forceful. And I like Yoda. ☺
 
