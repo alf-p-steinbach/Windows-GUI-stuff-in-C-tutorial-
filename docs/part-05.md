@@ -314,7 +314,7 @@ namespace winapi::gdi {
     ⋮
 ```
 
-Technically all the member functions could have been `const`, because they don’t affect the device context handle which is the only state for a `Dc` instance. But `Dc` is `const`-designed as if it directly contained the state that’s modified (e.g. a bitmap), much the same as `std::vector` is `const`-designed as if an instance directly contained its buffer. My first impulse and choice was to design `Dc` as a reference class, with `const` for most everything, but on reflection I realized that it would be more clear with a design like `std::vector`.
+My first impulse and choice was to design `Dc` as a reference class, with `const` for most everything. Technically all the member functions could have been `const` because they don’t affect the directly contained state for a `Dc` instance — they only affect the referred to device context. But I ended up with `const`-ness as if a `Dc` instance directly contained the device context state that’s modified. This is the same way as `std::vector` is `const`-designed as if an instance directly contained its buffer. It’s a **logical constness**, `const` and non-`const` that supports the interface rather than the implementation.
 
 For the last source code line: the pure `virtual` destructor is implemented — and needs to be implemented — because it’s called non-virtually by the destructors of derived classes. Unfortunately there’s no syntax for defining it inline in the class definition. Bjarne Stroustrup chose the `= 0` syntax for pure virtual functions because it indicated that the function has no body, which is usually true, but just not the case for pure virtual destructors.
 
