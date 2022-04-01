@@ -446,26 +446,26 @@ auto fg( const Pen_color color ) -> Dc& { return use( color ); }
 
 #### 5.3.3. A single fluid wrapper function for all the GDI drawing functions.
 
-The GDI offers a great many line drawing functions:
+The GDI offers a number of straight and curved line drawing functions:
 
 | *Function:*          | *Microsoft’s description:*                                                                        |
 |:-------------------- |:------------------------------------------------------------------------------------------------- |
-| `MoveToEx`           | Updates the current position to the specified point and optionally returns the previous position. |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
-| `LineTo`             | Draws a line from the current position up to, but not including, the specified point.             |
 | `Polyline`           | Draws a series of line segments by connecting the points in the specified array.                  |
-| `PolylineTo`         | Draws one or more straight lines.                                                                 |
 | `PolyPolyline`       | Draws multiple series of connected line segments.                                                 |
 | &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
 | `PolyBezier`         | Draws one or more Bézier curves.                                                                  |
-| `PolyBezierTo`       | Draws one or more Bézier curves.                                                                  |
 | `PolyDraw`           | Draws a set of line segments and Bézier curves.                                                   |
 | &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
 | `AngleArc`           | Draws a line segment and an arc.                                                                  |
 | `Arc`                | Draws an elliptical arc.                                                                          |
+| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
+| `MoveToEx`           | Updates the current position to the specified point and optionally returns the previous position. |
+| `LineTo`             | Draws a line from the current position up to, but not including, the specified point.             |
+| `PolylineTo`         | Draws one or more straight lines.                                                                 |
+| `PolyBezierTo`       | Draws one or more Bézier curves.                                                                  |
 | `ArcTo`              | Draws an elliptical arc.                                                                          |
 
-In addition there’s a great number of filled shape functions (these include our beloved `Ellipse` function):
+In addition there’s a number of filled shape functions (these include our beloved `Ellipse` function):
 
 | *Function:*          | *Microsoft’s description:*                                                                 |
 |:-------------------- |:------------------------------------------------------------------------------------------ |
@@ -486,7 +486,7 @@ In addition there’s a great number of filled shape functions (these include ou
 | `FrameRgn`           | Draws a border around the specified region by using the specified brush.                   |
 | `PaintRgn`           | Paints the specified region by using the brush currently selected into the device context. |
 
-And of course there’s a number of text drawing functions:
+And of course there are text drawing functions:
 
 | *Function:*     | *Microsoft’s description:*                                                   |
 |:--------------- |:---------------------------------------------------------------------------- |
@@ -496,7 +496,7 @@ And of course there’s a number of text drawing functions:
 | `TabbedTextOut` | Writes a character string at a location, expanding tabs to specified values. |
 | `TextOut`       | Writes a character string at a location.                                     |
 
-One fluent wrapper design approach is to have one individual wrapper function for each API function above, plus maybe for some of these functions’ support functions. But that would be a whole lot of functions to define, and a whole lot of function names to memorize or look up. And so instead of e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, and so on for each GDI drawing function, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
+One fluent wrapper design approach is to have one individual wrapper function for each API function above, plus maybe for some of these functions’ support functions. But that would be a whole lot of functions to define, and a whole lot of unfamiliar function names to memorize or look up. And so instead of e.g. a `.draw_ellipse` function that would call GDI’s `Ellipse`, and so on for each GDI drawing function, I chose to *pass the relevant API function as a first argument to a single general wrapper template*.
 
 This approach is best illustrated by `.simple_draw`, whose ~only reason for existence is to serve as a minimal, relatively simple code example:
 
