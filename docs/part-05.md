@@ -578,7 +578,8 @@ inline void Dc::call_draw_with_replacable_arg_expanded(
             get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
             );
     } else {
-        static_assert( false, "Unsupported type for argument expansion." );
+        arg = (void*)0;
+        //static_assert( false, "Unsupported type for argument expansion." );   // g++ problem.
     }
 }
 ```
