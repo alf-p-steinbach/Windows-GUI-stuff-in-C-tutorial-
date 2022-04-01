@@ -524,7 +524,7 @@ canvas.draw( Ellipse, area );
 
 And the slightly “smarter” `.draw` function enables that by replacing every `RECT` in the argument list with the 4 `int` values that it carries. It also replaces any `POINT`, `SIZE`, `string` or `string_view` argument with corresponding part arguments. However, this *usage simplification* yields far more intricate and verbose implementation code, which is why I chose to also define `simple_draw` and to present that function first.
 
-A C style solution could instead be to require the caller to add a macro invocation that e.g. would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) for each typem and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, but it’s transparent to the caller, with natural-for-C++ usage as shown.
+A C style solution could instead be to require the caller to add a macro invocation that e.g. would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) for each type, and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, but it’s transparent to the caller, with natural-for-C++ usage as shown.
 
 #### 5.3.4. A fluid drawing wrapper that expands `RECT` arguments.
 
