@@ -2,7 +2,7 @@
 #include <winapi/gdi/color_names.hpp>
 #include <winapi/gdi/device-contexts.hpp>
 namespace gdi = winapi::gdi;
-using gdi::Dc, gdi::Screen_dc, gdi::Pen_color, gdi::Brush_color;
+using gdi::Dc, gdi::Screen_dc;
 
 void draw_on( Dc& canvas, const RECT& area )
 {

@@ -27,6 +27,11 @@ And unfortunately, also, the GDI doesn’t (yet) support UTF-8 encoded Unicode t
 - [5.1. Draw directly on the screen.](#51-draw-directly-on-the-screen)
 - [5.2 Use “DC colors” to reduce verbosity.](#52-use-dc-colors-to-reduce-verbosity)
 - [5.3. A C++ fluent style wrapper for “DC color” usage.](#53-a-c-fluent-style-wrapper-for-dc-color-usage)
+  - [5.3.1. A single abstract DC class for screen, window and bitmap drawing.](#531-a-single-abstract-dc-class-for-screen-window-and-bitmap-drawing)
+  - [5.3.2. A single color setter function for draw, fill, text and gap.](#532-a-single-color-setter-function-for-draw-fill-text-and-gap)
+  - [5.3.3. A single fluid wrapper function for all the GDI drawing functions.](#533-a-single-fluid-wrapper-function-for-all-the-gdi-drawing-functions)
+  - [5.3.4. A fluid drawing wrapper that expands `RECT`, `POINT`, `SIZE`, `string` and `string_view` arguments.](#534-a-fluid-drawing-wrapper-that-expands-rect-point-size-string-and-string_view-arguments)
+  - [5.3.5. Examples of fluent style GDI graphics.](#535-examples-of-fluent-style-gdi-graphics)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -448,43 +453,43 @@ auto fg( const Pen_color color ) -> Dc& { return use( color ); }
 
 The GDI offers a number of straight and curved line drawing functions:
 
-| *Function:*          | *Microsoft’s description:*                                                                        |
-|:-------------------- |:------------------------------------------------------------------------------------------------- |
-| `Polyline`           | Draws a series of line segments by connecting the points in the specified array.                  |
-| `PolyPolyline`       | Draws multiple series of connected line segments.                                                 |
-|                      |                                                                                                   |
-| `PolyBezier`         | Draws one or more Bézier curves.                                                                  |
-| `PolyDraw`           | Draws a set of line segments and Bézier curves.                                                   |
-|                      |                                                                                                   |
-| `AngleArc`           | Draws a line segment and an arc.                                                                  |
-| `Arc`                | Draws an elliptical arc.                                                                          |
-|                      |                                                                                                   |
-| `MoveToEx`           | Updates the current position to the specified point and optionally returns the previous position. |
-| `LineTo`             | Draws a line from the current position up to, but not including, the specified point.             |
-| `PolylineTo`         | Draws one or more straight lines.                                                                 |
-| `PolyBezierTo`       | Draws one or more Bézier curves.                                                                  |
-| `ArcTo`              | Draws an elliptical arc.                                                                          |
+| *Function:*    | *Microsoft’s description:*                                                                        |
+|:-------------- |:------------------------------------------------------------------------------------------------- |
+| `Polyline`     | Draws a series of line segments by connecting the points in the specified array.                  |
+| `PolyPolyline` | Draws multiple series of connected line segments.                                                 |
+|                |                                                                                                   |
+| `PolyBezier`   | Draws one or more Bézier curves.                                                                  |
+| `PolyDraw`     | Draws a set of line segments and Bézier curves.                                                   |
+|                |                                                                                                   |
+| `AngleArc`     | Draws a line segment and an arc.                                                                  |
+| `Arc`          | Draws an elliptical arc.                                                                          |
+|                |                                                                                                   |
+| `MoveToEx`     | Updates the current position to the specified point and optionally returns the previous position. |
+| `LineTo`       | Draws a line from the current position up to, but not including, the specified point.             |
+| `PolylineTo`   | Draws one or more straight lines.                                                                 |
+| `PolyBezierTo` | Draws one or more Bézier curves.                                                                  |
+| `ArcTo`        | Draws an elliptical arc.                                                                          |
 
 In addition there’s a number of filled shape functions (these include our beloved `Ellipse` function):
 
-| *Function:*          | *Microsoft’s description:*                                                                 |
-|:-------------------- |:------------------------------------------------------------------------------------------ |
-| `FillRect`           | Fills a rectangle using a brush.                                                           |
-| `FrameRect`          | Draws a border around a rectangle using a brush.                                           |
-| `InvertRect`         | Inverts the color values of the pixels in a rectangle.                                     |
-| `Rectangle`          | Draws a rectangle.                                                                         |
-| `RoundRect`          | Draws a rectangle with rounded corners.                                                    |
-|                      |                                                                                            |
-| `Polygon`            | Draws a polygon.                                                                           |
-| `PolyPolygon`        | Draws a series of closed polygons.                                                         |
-|                      |                                                                                            |
-| `Chord`              | Draws an area bounded by an ellipse and a line segment.                                    |
-| `Ellipse`            | Draws an ellipse.                                                                          |
-| `Pie`                | Draws a pie-shaped wedge bounded by an ellipse and two radials.                            |
-|                      |                                                                                            |
-| `FillRgn`            | Fills a region by using the specified brush.                                               |
-| `FrameRgn`           | Draws a border around the specified region by using the specified brush.                   |
-| `PaintRgn`           | Paints the specified region by using the brush currently selected into the device context. |
+| *Function:*   | *Microsoft’s description:*                                                                 |
+|:------------- |:------------------------------------------------------------------------------------------ |
+| `FillRect`    | Fills a rectangle using a brush.                                                           |
+| `FrameRect`   | Draws a border around a rectangle using a brush.                                           |
+| `InvertRect`  | Inverts the color values of the pixels in a rectangle.                                     |
+| `Rectangle`   | Draws a rectangle.                                                                         |
+| `RoundRect`   | Draws a rectangle with rounded corners.                                                    |
+|               |                                                                                            |
+| `Polygon`     | Draws a polygon.                                                                           |
+| `PolyPolygon` | Draws a series of closed polygons.                                                         |
+|               |                                                                                            |
+| `Chord`       | Draws an area bounded by an ellipse and a line segment.                                    |
+| `Ellipse`     | Draws an ellipse.                                                                          |
+| `Pie`         | Draws a pie-shaped wedge bounded by an ellipse and two radials.                            |
+|               |                                                                                            |
+| `FillRgn`     | Fills a region by using the specified brush.                                               |
+| `FrameRgn`    | Draws a border around the specified region by using the specified brush.                   |
+| `PaintRgn`    | Paints the specified region by using the brush currently selected into the device context. |
 
 And of course there are text drawing functions (though they don’t support UTF-8):
 
@@ -525,6 +530,8 @@ canvas.draw( Ellipse, area );
 And the slightly “smarter” `.draw` function enables that by replacing every `RECT` in the argument list with the 4 `int` values that it carries. It also replaces any `POINT`, `SIZE`, `string` or `string_view` argument with corresponding part arguments. However, this *usage simplification* yields far more intricate and verbose implementation code, which is why I chose to also define `simple_draw` and to present that function first.
 
 A C style solution could instead be to require the caller to add a macro invocation that e.g. would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) for each type, and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, but it’s transparent to the caller, with natural-for-C++ usage as shown.
+
+---
 
 #### 5.3.4. A fluid drawing wrapper that expands `RECT`, `POINT`, `SIZE`, `string` and `string_view` arguments.
 
@@ -627,14 +634,14 @@ namespace cpp::util {
             static constexpr bool value = (... or is_same_v< U, Types >);
         };
     };
-        
+
     namespace impl::types {
         // Logic to find the index of the first T in a list of types, or -1 if none.
 
         constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
 
         template< template <class> class Is_match_, class... Args > struct First_match_;
-        
+
         template< template <class> class Is_match_ > struct First_match_< Is_match_> { enum{ index = -1 }; };
 
         template< template <class> class Is_match_, class First, class... More_args >
@@ -674,4 +681,6 @@ namespace cpp::util {
 }  // namespace cpp::util
 ```
 
-asd
+---
+
+#### 5.3.5. Examples of fluent style GDI graphics.
