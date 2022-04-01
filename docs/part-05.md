@@ -476,7 +476,7 @@ In addition there’s a number of filled shape functions (these include our belo
 | `RoundRect`          | Draws a rectangle with rounded corners.                                                    |
 |                      |                                                                                            |
 | `Polygon`            | Draws a polygon.                                                                           |
-| `PolyPolygon`        | draws a series of closed polygons.                                                         |
+| `PolyPolygon`        | Draws a series of closed polygons.                                                         |
 |                      |                                                                                            |
 | `Chord`              | Draws an area bounded by an ellipse and a line segment.                                    |
 | `Ellipse`            | Draws an ellipse.                                                                          |
