@@ -80,6 +80,16 @@ namespace cpp::util {
     template< class T >
     using Const_ = const T;
     
+    template< class... Types >
+    struct Is_one_of_
+    {
+        template< class U >
+        struct Result_
+        {
+            static constexpr bool value = (... or is_same_v< U, Types >);
+        };
+    };
+        
     namespace impl::types {
         // Logic to find the index of the first T in a list of types, or -1 if none.
 
@@ -99,16 +109,6 @@ namespace cpp::util {
             };
         };
 
-        template< class... Types >
-        struct Is_one_of_
-        {
-            template< class U >
-            struct Result_
-            {
-                static constexpr bool value = (... or is_same_v< U, Types >);
-            };
-        };
-        
         template< class T, class... Args >
         constexpr int index_of_first_ = First_match_< Is_one_of_<T>::Result_, Args... >::index;
 
@@ -126,6 +126,10 @@ namespace cpp::util {
 
         template< class T >
         static constexpr int index_of_first_ = impl::types::index_of_first_< T, Types... >;
+
+        template< class... T >
+        static constexpr int index_of_first_of_ =
+            impl::types::index_of_first_match_< Is_one_of_<T...>::Result_, Types... >;
     };
 
     template< class T, class Arg >

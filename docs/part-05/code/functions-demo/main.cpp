@@ -6,12 +6,16 @@
 namespace gdi = winapi::gdi;
 using gdi::Dc, gdi::Screen_dc, gdi::Pen_color, gdi::Brush_color;
 
+#include <string_view>
+using namespace std::string_view_literals;
+
 void draw_on( Dc& canvas, const RECT& area )
 {
     using namespace gdi::color_names;
     using gdi::Text_color;
     canvas.bg( blue ).fill( area );
-    canvas.use( Text_color( yellow ) ).draw( TextOut, area.left + 10, area.top + 10, "Hello, world!", 13 );
+    const POINT position = {area.left + 10, area.top + 10};
+    canvas.use( Text_color( yellow ) ).draw( TextOut, position, "Hello, world!"sv );
 }
 
 auto main() -> int

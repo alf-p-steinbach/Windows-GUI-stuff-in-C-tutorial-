@@ -6,16 +6,20 @@
 
 #include <stddef.h>         // size_t
 
+#include <string>           // std::string
+#include <string_view>      // std::string_view
 #include <tuple>            // std::(get, tie, tuple)
 #include <type_traits>      // std::is_same_v
-#include <utility>          // std::(index_sequence, 
+#include <utility>          // std::(index_sequence, make_index_sequence)
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
     using   cu::hopefully, cu::No_copying, cu::Types_;
-    using   std::get, std::tie, std::tuple,
-            std::index_sequence,
-            std::make_index_sequence;
+    using   std::string,
+            std::string_view,
+            std::get, std::tie, std::tuple,
+            std::is_same_v,
+            std::index_sequence, std::make_index_sequence;
 
     inline void make_practical( const HDC dc )
     {
@@ -109,20 +113,50 @@ namespace winapi::gdi {
         )
     {
         constexpr int replacement_arg_index = sizeof...( indices_before_replacement );
-        const RECT& r = get<replacement_arg_index>( args_tuple );
-        draw(
-            api_func,
-            get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
-            r.left, r.top, r.right, r.bottom,
-            get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
-            );
+        const auto& arg = get<replacement_arg_index>( args_tuple );
+        if constexpr( is_same_v< decltype( arg ), const RECT& > ) {
+            draw(
+                api_func,
+                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                arg.left, arg.top, arg.right, arg.bottom,
+                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                );
+        } else if constexpr( is_same_v< decltype( arg ), const POINT& > ) {
+            draw(
+                api_func,
+                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                arg.x, arg.y,
+                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                );
+        } else if constexpr( is_same_v< decltype( arg ), const SIZE& > ) {
+            draw(
+                api_func,
+                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                arg.cx, arg.cy,
+                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                );
+        } else if constexpr( 0
+            or is_same_v< decltype( arg ), const string& >
+            or is_same_v< decltype( arg ), const string_view& >
+            ) {
+            draw(
+                api_func,
+                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                arg.data(), static_cast<int>( arg.size() ),
+                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                );
+        } else {
+            static_assert( false, "Unsupported type for argument expansion." );
+        }
     }
 
     template< class Api_func, class... Args >
     inline auto Dc::draw( const Api_func api_func, const Args&... args )
         -> Dc&
     {
-        const int i_first_replacement = Types_< Args... >::template index_of_first_< RECT >;
+        const int i_first_replacement = Types_< Args... >::template index_of_first_of_<
+            RECT, POINT, SIZE, string, string_view
+            >;
         if constexpr( i_first_replacement < 0 ) {
             api_func( m_handle, args... );
         } else {
