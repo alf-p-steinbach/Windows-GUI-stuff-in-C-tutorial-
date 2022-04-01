@@ -458,11 +458,14 @@ The GDI offers a number of straight and curved line drawing functions:
 | `Polyline`     | Draws a series of line segments by connecting the points in the specified array.                  |
 | `PolyPolyline` | Draws multiple series of connected line segments.                                                 |
 |                |                                                                                                   |
+|                |                                                                                                   |
 | `PolyBezier`   | Draws one or more Bézier curves.                                                                  |
 | `PolyDraw`     | Draws a set of line segments and Bézier curves.                                                   |
 |                |                                                                                                   |
+|                |                                                                                                   |
 | `AngleArc`     | Draws a line segment and an arc.                                                                  |
 | `Arc`          | Draws an elliptical arc.                                                                          |
+|                |                                                                                                   |
 |                |                                                                                                   |
 | `MoveToEx`     | Updates the current position to the specified point and optionally returns the previous position. |
 | `LineTo`       | Draws a line from the current position up to, but not including, the specified point.             |
