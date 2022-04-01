@@ -647,7 +647,7 @@ namespace cpp::util {
         };
 
         template< class T, class... Args >
-        constexpr int index_of_first_ = First_match_< Is_one_of_<T>::Result_, Args... >::index;
+        constexpr int index_of_first_ = First_match_< Is_one_of_<T>::template Result_, Args... >::index;
 
         template< template<class> class Is_match_, class... Args >
         constexpr int index_of_first_match_ = First_match_< Is_match_, Args... >::index;
@@ -666,7 +666,7 @@ namespace cpp::util {
 
         template< class... T >
         static constexpr int index_of_first_of_ =
-            impl::types::index_of_first_match_< Is_one_of_<T...>::Result_, Types... >;
+            impl::types::index_of_first_match_< Is_one_of_<T...>::template Result_, Types... >;
     };
 
     ⋮
