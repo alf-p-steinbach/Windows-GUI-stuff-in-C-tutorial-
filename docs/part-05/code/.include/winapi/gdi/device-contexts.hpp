@@ -35,7 +35,7 @@ namespace winapi::gdi {
 
         // Internal helper for expanding a RECT argument into its 4 member values as arguments.
         template< class Api_func, class... Args, size_t... i_before, size_t... i_after>
-        inline void call_draw_with_rect_arg_expanded(
+        inline void call_draw_with_replacable_arg_expanded(
             const Api_func                          api_func,
             const tuple<const Args&...>&            args_tuple,
             index_sequence<i_before...>  ,
@@ -102,38 +102,38 @@ namespace winapi::gdi {
     template<
         class       Api_func,
         class...    Args,
-        size_t...   indices_before_replacement,
-        size_t...   indices_after_replacement       // 0-based, i.e. minus offset
+        size_t...   indices_before_replacable,
+        size_t...   indices_after_replacable        // 0-based, i.e. minus offset
         >
-    inline void Dc::call_draw_with_rect_arg_expanded(
-        const Api_func                          api_func,
-        const tuple<const Args&...>&            args_tuple,
-        index_sequence<indices_before_replacement...>  ,
-        index_sequence<indices_after_replacement...>
+    inline void Dc::call_draw_with_replacable_arg_expanded(
+        const Api_func                  api_func,
+        const tuple<const Args&...>&    args_tuple,
+        index_sequence<indices_before_replacable...>,
+        index_sequence<indices_after_replacable...>
         )
     {
-        constexpr int replacement_arg_index = sizeof...( indices_before_replacement );
-        const auto& arg = get<replacement_arg_index>( args_tuple );
+        constexpr int replacable_arg_index = sizeof...( indices_before_replacable );
+        const auto& arg = get<replacable_arg_index>( args_tuple );
         if constexpr( is_same_v< decltype( arg ), const RECT& > ) {
             draw(
                 api_func,
-                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
                 arg.left, arg.top, arg.right, arg.bottom,
-                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
                 );
         } else if constexpr( is_same_v< decltype( arg ), const POINT& > ) {
             draw(
                 api_func,
-                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
                 arg.x, arg.y,
-                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
                 );
         } else if constexpr( is_same_v< decltype( arg ), const SIZE& > ) {
             draw(
                 api_func,
-                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
                 arg.cx, arg.cy,
-                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
                 );
         } else if constexpr( 0
             or is_same_v< decltype( arg ), const string& >
@@ -141,9 +141,9 @@ namespace winapi::gdi {
             ) {
             draw(
                 api_func,
-                get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
+                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
                 arg.data(), static_cast<int>( arg.size() ),
-                get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
+                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
                 );
         } else {
             static_assert( false, "Unsupported type for argument expansion." );
@@ -160,7 +160,7 @@ namespace winapi::gdi {
         if constexpr( i_first_replacement < 0 ) {
             api_func( m_handle, args... );
         } else {
-            call_draw_with_rect_arg_expanded(
+            call_draw_with_replacable_arg_expanded(
                 api_func,
                 tie( args... ),
                 make_index_sequence<i_first_replacement>(),

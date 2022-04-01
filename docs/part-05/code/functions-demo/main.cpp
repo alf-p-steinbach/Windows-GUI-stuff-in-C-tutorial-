@@ -14,8 +14,8 @@ void draw_on( Dc& canvas, const RECT& area )
     using namespace gdi::color_names;
     using gdi::Text_color;
     canvas.bg( blue ).fill( area );
-    const POINT position = {area.left + 10, area.top + 10};
-    canvas.use( Text_color( yellow ) ).draw( TextOut, position, "Hello, world!"sv );
+    const auto text_position = POINT{ area.left + 10, area.top + 10 };
+    canvas.use( Text_color( yellow ) ).draw( TextOut, text_position, "Hello, world!"sv );
 }
 
 auto main() -> int

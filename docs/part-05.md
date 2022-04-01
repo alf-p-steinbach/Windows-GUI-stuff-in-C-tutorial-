@@ -522,57 +522,87 @@ But ideally a call should be like just
 canvas.draw( Ellipse, area );
 ```
 
-And the slightly “smarter” `.draw` function enables that by replacing every `RECT` in the argument list with the 4 `int` values that it carries. However, this *usage simplification* yields far more intricate implementation code. That’s why I chose to also define `simple_draw` and to present that function first.
+And the slightly “smarter” `.draw` function enables that by replacing every `RECT` in the argument list with the 4 `int` values that it carries. It also replaces any `POINT`, `SIZE`, `string` or `string_view` argument with corresponding part arguments. However, this *usage simplification* yields far more intricate and verbose implementation code, which is why I chose to also define `simple_draw` and to present that function first.
 
-A C style solution could instead be to require the caller to add a macro invocation that would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, but it’s transparent to the caller, with natural-for-C++ usage as shown.
+A C style solution could instead be to require the caller to add a macro invocation that e.g. would expand a `RECT` into its 4 `int` member values. That’s simple but adds a macro (which is generally [Evil™](https://isocpp.org/wiki/faq/big-picture#defn-evil)) for each typem and it still adds *some* verbosity at every call site. Doing this expansion instead via obscure C++ TMP magic is complex, but it’s transparent to the caller, with natural-for-C++ usage as shown.
 
 #### 5.3.4. A fluid drawing wrapper that expands `RECT` arguments.
 
-First, a `private` helper function `call_draw_with_rect_arg_expanded`:
+First, a `private` helper function `call_draw_with_replacable_arg_expanded`:
 
 ```cpp
 template<
     class       Api_func,
     class...    Args,
-    size_t...   indices_before_rect,
-    size_t...   indices_after_rect       // 0-based, i.e. minus offset
+    size_t...   indices_before_replacable,
+    size_t...   indices_after_replacable        // 0-based, i.e. minus offset
     >
-inline void Dc::call_draw_with_rect_arg_expanded(
-    const Api_func                          api_func,
-    const tuple<const Args&...>&            args_tuple,
-    index_sequence<indices_before_rect...>  ,
-    index_sequence<indices_after_rect...>
+inline void Dc::call_draw_with_replacable_arg_expanded(
+    const Api_func                  api_func,
+    const tuple<const Args&...>&    args_tuple,
+    index_sequence<indices_before_replacable...>,
+    index_sequence<indices_after_replacable...>
     )
 {
-    constexpr int rect_arg_index = sizeof...( indices_before_rect );
-    const RECT& r = get<rect_arg_index>( args_tuple );
-    draw(
-        api_func,
-        get<indices_before_rect>( args_tuple )...,     // Can be empty, works.
-        r.left, r.top, r.right, r.bottom,
-        get< rect_arg_index + 1 + indices_after_rect >( args_tuple )...
-        );
+    constexpr int replacable_arg_index = sizeof...( indices_before_replacable );
+    const auto& arg = get<replacable_arg_index>( args_tuple );
+    if constexpr( is_same_v< decltype( arg ), const RECT& > ) {
+        draw(
+            api_func,
+            get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
+            arg.left, arg.top, arg.right, arg.bottom,
+            get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
+            );
+    } else if constexpr( is_same_v< decltype( arg ), const POINT& > ) {
+        draw(
+            api_func,
+            get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
+            arg.x, arg.y,
+            get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
+            );
+    } else if constexpr( is_same_v< decltype( arg ), const SIZE& > ) {
+        draw(
+            api_func,
+            get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
+            arg.cx, arg.cy,
+            get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
+            );
+    } else if constexpr( 0
+        or is_same_v< decltype( arg ), const string& >
+        or is_same_v< decltype( arg ), const string_view& >
+        ) {
+        draw(
+            api_func,
+            get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
+            arg.data(), static_cast<int>( arg.size() ),
+            get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
+            );
+    } else {
+        static_assert( false, "Unsupported type for argument expansion." );
+    }
 }
 ```
 
-It uses two `std::index_sequence` arguments to make the compiler infer two `size_t` value sequences template argument packs, which are used to specify the parts of the argument tuple that comes before a `RECT` argument, and the parts that come after.
+It uses two `std::index_sequence` arguments to make the compiler infer two `size_t` value sequences template argument packs, which are used to specify the parts of the argument tuple that comes before a replacable argument, and the parts that come after.
 
-The main `draw` function finds the position of the first `RECT`  argument (if any) and calls the helper, which calls it back recursively to expand any remaining `RECT` arguments:
+The main `draw` function finds the position of the first replacable argument (if any) and calls the helper, which calls it back recursively to expand any remaining replacable arguments:
 
 ```cpp
 template< class Api_func, class... Args >
 inline auto Dc::draw( const Api_func api_func, const Args&... args )
     -> Dc&
 {
-    const int i_first_rect = Types_< Args... >::template index_of_first_< RECT >;
-    if constexpr( i_first_rect < 0 ) {
+    const int i_first_replacement = Types_< Args... >::template index_of_first_of_<
+        RECT, POINT, SIZE, string, string_view
+        >;
+    if constexpr( i_first_replacement < 0 ) {
         api_func( m_handle, args... );
     } else {
-        call_draw_with_rect_arg_expanded(
+        call_draw_with_replacable_arg_expanded(
             api_func,
             tie( args... ),
-            make_index_sequence<i_first_rect>(),
-            make_index_sequence<sizeof...( Args ) - (i_first_rect + 1)>()
+            make_index_sequence<i_first_replacement>(),
+            make_index_sequence<sizeof...( Args ) - (i_first_replacement + 1)>()
             );
     }
     return *this;
@@ -586,27 +616,41 @@ The `Types_` template is a simple list of types that defines `index_of_first_` a
 ```cpp
 namespace cpp::util {
     ⋮
+
+    template< class... Types >
+    struct Is_one_of_
+    {
+        template< class U >
+        struct Result_
+        {
+            static constexpr bool value = (... or is_same_v< U, Types >);
+        };
+    };
+        
     namespace impl::types {
         // Logic to find the index of the first T in a list of types, or -1 if none.
 
         constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
 
-        template< class T, class... Args > struct First_T_;
+        template< template <class> class Is_match_, class... Args > struct First_match_;
+        
+        template< template <class> class Is_match_ > struct First_match_< Is_match_> { enum{ index = -1 }; };
 
-        template< class T > struct First_T_< T > { enum{ index = -1 }; };
-
-        template< class T, class First, class... More_args >
-        struct First_T_< T, First, More_args... >
+        template< template <class> class Is_match_, class First, class... More_args >
+        struct First_match_< Is_match_, First, More_args... >
         {
             enum
-            { index = is_same_v< First, T >
+            { index = Is_match_< First >::value
                 ? 0
-                : successor_if_not_negative( First_T_< T, More_args... >::index )
+                : successor_if_not_negative( First_match_< Is_match_, More_args... >::index )
             };
         };
 
         template< class T, class... Args >
-        constexpr int index_of_first_ = First_T_< T, Args... >::index;
+        constexpr int index_of_first_ = First_match_< Is_one_of_<T>::Result_, Args... >::index;
+
+        template< template<class> class Is_match_, class... Args >
+        constexpr int index_of_first_match_ = First_match_< Is_match_, Args... >::index;
     }  // namespace impl::types
 
     template< class... Types >
@@ -615,10 +659,14 @@ namespace cpp::util {
         static constexpr int count = static_cast<int>( sizeof...( Types ) );
 
         template< class T >
-        static constexpr bool contain_ = (... or is_same_v<T, Types>);
+        static constexpr bool contain_ = (... or is_same_v< T, Types >);
 
         template< class T >
-        static constexpr int index_of_first_ = impl::types::index_of_first_<T, Types...>;
+        static constexpr int index_of_first_ = impl::types::index_of_first_< T, Types... >;
+
+        template< class... T >
+        static constexpr int index_of_first_of_ =
+            impl::types::index_of_first_match_< Is_one_of_<T...>::Result_, Types... >;
     };
 
     ⋮
