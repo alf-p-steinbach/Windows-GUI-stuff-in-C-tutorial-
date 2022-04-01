@@ -452,13 +452,13 @@ The GDI offers a number of straight and curved line drawing functions:
 |:-------------------- |:------------------------------------------------------------------------------------------------- |
 | `Polyline`           | Draws a series of line segments by connecting the points in the specified array.                  |
 | `PolyPolyline`       | Draws multiple series of connected line segments.                                                 |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
+|                      |                                                                                                   |
 | `PolyBezier`         | Draws one or more Bézier curves.                                                                  |
 | `PolyDraw`           | Draws a set of line segments and Bézier curves.                                                   |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
+|                      |                                                                                                   |
 | `AngleArc`           | Draws a line segment and an arc.                                                                  |
 | `Arc`                | Draws an elliptical arc.                                                                          |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                                                   |
+|                      |                                                                                                   |
 | `MoveToEx`           | Updates the current position to the specified point and optionally returns the previous position. |
 | `LineTo`             | Draws a line from the current position up to, but not including, the specified point.             |
 | `PolylineTo`         | Draws one or more straight lines.                                                                 |
@@ -477,11 +477,11 @@ In addition there’s a number of filled shape functions (these include our belo
 |                      |                                                                                            |
 | `Polygon`            | Draws a polygon.                                                                           |
 | `PolyPolygon`        | draws a series of closed polygons.                                                         |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                                            |
+|                      |                                                                                            |
 | `Chord`              | Draws an area bounded by an ellipse and a line segment.                                    |
 | `Ellipse`            | Draws an ellipse.                                                                          |
 | `Pie`                | Draws a pie-shaped wedge bounded by an ellipse and two radials.                            |
-| &nbsp;&nbsp;&nbsp; ≈ |                                                                                            |
+|                      |                                                                                            |
 | `FillRgn`            | Fills a region by using the specified brush.                                               |
 | `FrameRgn`           | Draws a border around the specified region by using the specified brush.                   |
 | `PaintRgn`           | Paints the specified region by using the brush currently selected into the device context. |
