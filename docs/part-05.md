@@ -473,8 +473,7 @@ In addition there’s a number of filled shape functions (these include our belo
 | `FrameRect`          | Draws a border around a rectangle using a brush.                                           |
 | `InvertRect`         | Inverts the color values of the pixels in a rectangle.                                     |
 | `Rectangle`          | Draws a rectangle.                                                                         |
-| `RoundRect`          | Draws a rectangle with rounded corners.                                                    |
-| <hr> |
+<u>| `RoundRect`          | Draws a rectangle with rounded corners.                                                    |</u>
 | &nbsp;&nbsp;&nbsp; ≈ |                                                                                            |
 | `Polygon`            | Draws a polygon.                                                                           |
 | `PolyPolygon`        | draws a series of closed polygons.                                                         |
