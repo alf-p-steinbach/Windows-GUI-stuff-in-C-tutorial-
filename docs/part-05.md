@@ -474,6 +474,7 @@ In addition there’s a number of filled shape functions (these include our belo
 | `InvertRect`         | Inverts the color values of the pixels in a rectangle.                                     |
 | `Rectangle`          | Draws a rectangle.                                                                         |
 | `RoundRect`          | Draws a rectangle with rounded corners.                                                    |
+|:-------------------- |:------------------------------------------------------------------------------------------ |
 | &nbsp;&nbsp;&nbsp; ≈ |                                                                                            |
 | `Polygon`            | Draws a polygon.                                                                           |
 | `PolyPolygon`        | draws a series of closed polygons.                                                         |
