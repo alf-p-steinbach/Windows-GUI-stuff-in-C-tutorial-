@@ -85,22 +85,35 @@ namespace cpp::util {
 
         constexpr auto successor_if_not_negative( const int v ) -> int { return (v < 0? v : 1 + v); }
 
-        template< class T, class... Args > struct First_T_;
+        template< template <class> class Is_match_, class... Args > struct First_match_;
         
-        template< class T > struct First_T_< T > { enum{ index = -1 }; };
+        template< template <class> class Is_match_ > struct First_match_< Is_match_> { enum{ index = -1 }; };
 
-        template< class T, class First, class... More_args >
-        struct First_T_< T, First, More_args... >
+        template< template <class> class Is_match_, class First, class... More_args >
+        struct First_match_< Is_match_, First, More_args... >
         {
             enum
-            { index = is_same_v< First, T >
+            { index = Is_match_< First >::value
                 ? 0
-                : successor_if_not_negative( First_T_< T, More_args... >::index )
+                : successor_if_not_negative( First_match_< Is_match_, More_args... >::index )
             };
         };
 
+        template< class... Types >
+        struct Is_one_of_
+        {
+            template< class U >
+            struct Result_
+            {
+                static constexpr bool value = (... or is_same_v< U, Types >);
+            };
+        };
+        
         template< class T, class... Args >
-        constexpr int index_of_first_ = First_T_< T, Args... >::index;
+        constexpr int index_of_first_ = First_match_< Is_one_of_<T>::Result_, Args... >::index;
+
+        template< template<class> class Is_match_, class... Args >
+        constexpr int index_of_first_match_ = First_match_< Is_match_, Args... >::index;
     }  // namespace impl::types
 
     template< class... Types >
@@ -109,10 +122,10 @@ namespace cpp::util {
         static constexpr int count = static_cast<int>( sizeof...( Types ) );
 
         template< class T >
-        static constexpr bool contain_ = (... or is_same_v<T, Types>);
+        static constexpr bool contain_ = (... or is_same_v< T, Types >);
 
         template< class T >
-        static constexpr int index_of_first_ = impl::types::index_of_first_<T, Types...>;
+        static constexpr int index_of_first_ = impl::types::index_of_first_< T, Types... >;
     };
 
     template< class T, class Arg >

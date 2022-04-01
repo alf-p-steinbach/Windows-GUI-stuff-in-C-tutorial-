@@ -98,23 +98,23 @@ namespace winapi::gdi {
     template<
         class       Api_func,
         class...    Args,
-        size_t...   indices_before_rect,
-        size_t...   indices_after_rect       // 0-based, i.e. minus offset
+        size_t...   indices_before_replacement,
+        size_t...   indices_after_replacement       // 0-based, i.e. minus offset
         >
     inline void Dc::call_draw_with_rect_arg_expanded(
         const Api_func                          api_func,
         const tuple<const Args&...>&            args_tuple,
-        index_sequence<indices_before_rect...>  ,
-        index_sequence<indices_after_rect...>
+        index_sequence<indices_before_replacement...>  ,
+        index_sequence<indices_after_replacement...>
         )
     {
-        constexpr int rect_arg_index = sizeof...( indices_before_rect );
-        const RECT& r = get<rect_arg_index>( args_tuple );
+        constexpr int replacement_arg_index = sizeof...( indices_before_replacement );
+        const RECT& r = get<replacement_arg_index>( args_tuple );
         draw(
             api_func,
-            get<indices_before_rect>( args_tuple )...,     // Can be empty, works.
+            get<indices_before_replacement>( args_tuple )...,     // Can be empty, works.
             r.left, r.top, r.right, r.bottom,
-            get< rect_arg_index + 1 + indices_after_rect >( args_tuple )...
+            get< replacement_arg_index + 1 + indices_after_replacement >( args_tuple )...
             );
     }
 
@@ -122,15 +122,15 @@ namespace winapi::gdi {
     inline auto Dc::draw( const Api_func api_func, const Args&... args )
         -> Dc&
     {
-        const int i_first_rect = Types_< Args... >::template index_of_first_< RECT >;
-        if constexpr( i_first_rect < 0 ) {
+        const int i_first_replacement = Types_< Args... >::template index_of_first_< RECT >;
+        if constexpr( i_first_replacement < 0 ) {
             api_func( m_handle, args... );
         } else {
             call_draw_with_rect_arg_expanded(
                 api_func,
                 tie( args... ),
-                make_index_sequence<i_first_rect>(),
-                make_index_sequence<sizeof...( Args ) - (i_first_rect + 1)>()
+                make_index_sequence<i_first_replacement>(),
+                make_index_sequence<sizeof...( Args ) - (i_first_replacement + 1)>()
                 );
         }
         return *this;
