@@ -486,7 +486,7 @@ In addition there’s a number of filled shape functions (these include our belo
 | `FrameRgn`           | Draws a border around the specified region by using the specified brush.                   |
 | `PaintRgn`           | Paints the specified region by using the brush currently selected into the device context. |
 
-And of course there are text drawing functions:
+And of course there are text drawing functions (though they don’t support UTF-8):
 
 | *Function:*     | *Microsoft’s description:*                                                   |
 |:--------------- |:---------------------------------------------------------------------------- |
