@@ -483,12 +483,15 @@ In addition there’s a number of filled shape functions (these include our belo
 | `Rectangle`   | Draws a rectangle.                                                                         |
 | `RoundRect`   | Draws a rectangle with rounded corners.                                                    |
 |               |                                                                                            |
+|               |                                                                                            |
 | `Polygon`     | Draws a polygon.                                                                           |
 | `PolyPolygon` | Draws a series of closed polygons.                                                         |
+|               |                                                                                            |
 |               |                                                                                            |
 | `Chord`       | Draws an area bounded by an ellipse and a line segment.                                    |
 | `Ellipse`     | Draws an ellipse.                                                                          |
 | `Pie`         | Draws a pie-shaped wedge bounded by an ellipse and two radials.                            |
+|               |                                                                                            |
 |               |                                                                                            |
 | `FillRgn`     | Fills a region by using the specified brush.                                               |
 | `FrameRgn`    | Draws a border around the specified region by using the specified brush.                   |
