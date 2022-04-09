@@ -3,8 +3,8 @@
 #include <winapi/com/failure-checking.hpp>      // winapi::com::failure_checking::operator>>
 #include <winapi/com/Ptr_.hpp>                  // winpai::com::Ptr_
 #include <winapi/ole/B_string.hpp>              // winapi::ole::B_string
-#include <wrapped-winapi/ocidl-h.hpp>           // IPictureDisp
-#include <wrapped-winapi/olectl-h.hpp>          // OleCreatePictureIndirect
+#include <wrapped-winapi-headers/ocidl-h.hpp>           // IPictureDisp
+#include <wrapped-winapi-headers/olectl-h.hpp>          // OleCreatePictureIndirect
 
 namespace winapi::ole {
     namespace com   = winapi::com;

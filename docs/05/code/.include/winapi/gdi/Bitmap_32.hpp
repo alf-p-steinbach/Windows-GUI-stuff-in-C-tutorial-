@@ -60,9 +60,7 @@ namespace winapi::gdi {
         Bitmap_32( bitmap::Handle_and_memory&& pieces ):
             Bitmap( move( pieces.handle ) ),
             m_p_bits( pieces.p_bits )
-        {
-            // TODO: format check.
-        }
+        {}  // TODO: format check.
 
         Bitmap_32( const int w, const int h ):
             Bitmap_32( bitmap::create_rgb32( w, h ) )

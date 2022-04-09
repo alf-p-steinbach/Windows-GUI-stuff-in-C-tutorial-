@@ -1,7 +1,7 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <cpp/util.hpp>                             // cpp::util::(hopefully, fail)
 #include <winapi/kernel/encoding-conversions.hpp>   // winapi::kernel::to_utf16
-#include <wrapped-winapi/oleauto-h.hpp>             // BSTR, SysAllocStringLen, SysFreeString
+#include <wrapped-winapi-headers/oleauto-h.hpp>             // BSTR, SysAllocStringLen, SysFreeString
 
 #include <string_view>      // std::(string_view, wstring_view)
 

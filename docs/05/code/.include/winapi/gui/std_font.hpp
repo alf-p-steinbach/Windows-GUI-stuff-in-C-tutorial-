@@ -1,6 +1,6 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 #include <winapi/gdi/Object_.hpp>           // winapi::gdi::Font
-#include <wrapped-winapi/windowsx-h.hpp>    // windows.h + SetWindowFont    
+#include <wrapped-winapi-headers/windowsx-h.hpp>    // windows.h + SetWindowFont    
 
 namespace winapi::gui {
     inline auto create_std_font()

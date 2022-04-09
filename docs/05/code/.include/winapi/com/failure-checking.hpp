@@ -1,6 +1,6 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <cpp/util.hpp>                     // cpp::util::Success
-#include <wrapped-winapi/windows-h.hpp>     // HRESULT, SetLastError, GetLastError
+#include <wrapped-winapi-headers/windows-h.hpp>     // HRESULT, SetLastError, GetLastError
 
 namespace winapi::com {
     namespace cu = cpp::util;

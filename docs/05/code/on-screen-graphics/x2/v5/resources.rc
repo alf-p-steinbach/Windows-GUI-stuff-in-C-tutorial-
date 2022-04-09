@@ -1,9 +1,0 @@
-﻿#pragma code_page( 65001 )  // UTF-8
-#include <windows.h>
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Neutral resources
-LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
-
-CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"

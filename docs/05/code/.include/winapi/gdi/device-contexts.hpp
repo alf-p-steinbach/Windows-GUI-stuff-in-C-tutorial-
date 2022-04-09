@@ -2,15 +2,12 @@
 #include <cpp/util.hpp>                         // cpp::util::(hopefully, No_copying, Types_)
 #include <winapi/gdi/color-usage-classes.hpp>   // winapi::gdi::(Brush_color, Pen_color, Gap_color)
 #include <winapi/gui/std_font.hpp>              // winapi::gui::std_font
-#include <wrapped-winapi/windows-h.hpp>         // General Windows API.
+#include <wrapped-winapi-headers/windows-h.hpp>         // General Windows API.
 
 #include <stddef.h>         // size_t
 
 #include <string>           // std::string
 #include <string_view>      // std::string_view
-#include <tuple>            // std::(get, tie, tuple)
-#include <type_traits>      // std::is_same_v
-#include <utility>          // std::(index_sequence, make_index_sequence)
 
 namespace winapi::gdi {
     namespace cu = cpp::util;
@@ -33,23 +30,22 @@ namespace winapi::gdi {
     {
         const HDC   m_handle;
 
-        // Internal helper for expanding a RECT argument into its 4 member values as arguments.
-        template< class Api_func, class... Args, size_t... i_before, size_t... i_after>
-        inline void call_draw_with_replacable_arg_expanded(
-            const Api_func                          api_func,
-            const tuple<const Args&...>&            args_tuple,
-            index_sequence<i_before...>  ,
-            index_sequence<i_after...>
-            );
-
     protected:
+        struct No_extended_init {};
+
         inline virtual ~Dc() = 0;                           // Derived-class responsibility.
 
-        Dc( HDC&& handle, const bool do_extended_init = true ):
+        Dc( HDC&& handle, No_extended_init ):
             m_handle( handle )
         {
-            hopefully( m_handle != 0 ) or CPPUTIL_FAIL( "Device context handle is 0." );
-            if( do_extended_init ) { make_practical( m_handle ); }
+            hopefully( m_handle != 0 )
+                or CPPUTIL_FAIL( "Device context handle is 0." );
+        }
+
+        Dc( HDC&& handle ):
+            Dc( move( handle ), No_extended_init() )
+        {
+            make_practical( m_handle );
         }
 
     public:
@@ -57,14 +53,11 @@ namespace winapi::gdi {
         inline auto use( const Args&... colors ) -> Dc&;
      
         // Convenience special cases.
-        auto bg( const Brush_color color ) -> Dc& { return use( color ); }
-        auto fg( const Pen_color color ) -> Dc& { return use( color ); }
+        auto bg( const Brush_color color )  -> Dc&  { return use( color ); }
+        auto fg( const Pen_color color )    -> Dc&  { return use( color ); }
         
         inline auto fill( const RECT& area ) -> Dc&;
         
-        template< class Api_func, class... Args >
-        inline auto simple_draw( const Api_func f, const Args&... args ) -> Dc&;
-
         template< class Api_func, class... Args >
         inline auto draw( const Api_func f, const Args&... args ) -> Dc&;
 
@@ -92,85 +85,12 @@ namespace winapi::gdi {
     }
     
     template< class Api_func, class... Args >
-    inline auto Dc::simple_draw( const Api_func api_func, const Args&... args )
+    inline auto Dc::draw( const Api_func api_func, const Args&... args )
         -> Dc&
     {
         api_func( m_handle, args... );
         return *this;
     }
-
-    template<
-        class       Api_func,
-        class...    Args,
-        size_t...   indices_before_replacable,
-        size_t...   indices_after_replacable        // 0-based, i.e. minus offset
-        >
-    inline void Dc::call_draw_with_replacable_arg_expanded(
-        const Api_func                  api_func,
-        const tuple<const Args&...>&    args_tuple,
-        index_sequence<indices_before_replacable...>,
-        index_sequence<indices_after_replacable...>
-        )
-    {
-        constexpr int replacable_arg_index = sizeof...( indices_before_replacable );
-        const auto& arg = get<replacable_arg_index>( args_tuple );
-        if constexpr( is_same_v< decltype( arg ), const RECT& > ) {
-            draw(
-                api_func,
-                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
-                arg.left, arg.top, arg.right, arg.bottom,
-                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
-                );
-        } else if constexpr( is_same_v< decltype( arg ), const POINT& > ) {
-            draw(
-                api_func,
-                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
-                arg.x, arg.y,
-                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
-                );
-        } else if constexpr( is_same_v< decltype( arg ), const SIZE& > ) {
-            draw(
-                api_func,
-                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
-                arg.cx, arg.cy,
-                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
-                );
-        } else if constexpr( 0
-            or is_same_v< decltype( arg ), const string& >
-            or is_same_v< decltype( arg ), const string_view& >
-            ) {
-            draw(
-                api_func,
-                get<indices_before_replacable>( args_tuple )...,     // Can be empty, works.
-                arg.data(), static_cast<int>( arg.size() ),
-                get< replacable_arg_index + 1 + indices_after_replacable >( args_tuple )...
-                );
-        } else {
-            arg = (void*)0;
-            //static_assert( false, "Unsupported type for argument expansion." );   // g++ problem.
-        }
-    }
-
-    template< class Api_func, class... Args >
-    inline auto Dc::draw( const Api_func api_func, const Args&... args )
-        -> Dc&
-    {
-        const int i_first_replacement = Types_< Args... >::template index_of_first_of_<
-            RECT, POINT, SIZE, string, string_view
-            >;
-        if constexpr( i_first_replacement < 0 ) {
-            api_func( m_handle, args... );
-        } else {
-            call_draw_with_replacable_arg_expanded(
-                api_func,
-                tie( args... ),
-                make_index_sequence<i_first_replacement>(),
-                make_index_sequence<sizeof...( Args ) - (i_first_replacement + 1)>()
-                );
-        }
-        return *this;
-    }
-
 
     class Window_dc: public Dc
     {
@@ -187,6 +107,26 @@ namespace winapi::gdi {
     {
     public:        
         Screen_dc(): Window_dc( 0 ) {}                      // Main screen specified implicitly.
+    };
+
+    // Instantiate this in response to a `WM_PAINT` message.
+    class Client_rect_dc: public Dc
+    {
+        HWND            m_window;
+        PAINTSTRUCT     m_paint_info;
+
+    public:
+        ~Client_rect_dc() override
+        {
+            EndPaint( m_window, &m_paint_info );
+        }
+        
+        Client_rect_dc( const HWND window ):
+            Dc( BeginPaint( window, &paint_info ) ),
+            m_window( window )
+        {}
+        
+        auto info() const -> const PAINTSTRUCT& { return m_paint_info; }
     };
 
 

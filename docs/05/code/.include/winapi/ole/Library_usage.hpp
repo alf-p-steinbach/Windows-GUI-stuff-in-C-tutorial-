@@ -1,7 +1,7 @@
 ﻿#pragma once    // Source encoding: UTF-8 with BOM (π is a lowercase Greek "pi").
 #include <cpp/util.hpp>                     // CPPUTIL_FAIL, cpp::util::hopefully
 #include <winapi/com/failure-checking.hpp>  // winapi::com::failure_checking::(success, >>)
-#include <wrapped-winapi/ole2-h.hpp>        // OleInitialize, OleUninitialize
+#include <wrapped-winapi-headers/ole2-h.hpp>        // OleInitialize, OleUninitialize
 
 namespace winapi::ole {
     using namespace winapi::com::failure_checking;

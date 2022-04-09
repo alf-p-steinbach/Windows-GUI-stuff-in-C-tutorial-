@@ -1,8 +1,8 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 
 #include <winapi/gui/std_font.hpp>          // winapi::gui::"font stuff"
-#include <wrapped-winapi/windowsx-h.hpp>    // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
-#include <wrapped-winapi/commctrl-h.hpp>    // InitCommonControlsEx
+#include <wrapped-winapi-headers/windowsx-h.hpp>    // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
+#include <wrapped-winapi-headers/commctrl-h.hpp>    // InitCommonControlsEx
 
 #include <initializer_list>         // For using range-based `for` over initializer list.
 #include <string>

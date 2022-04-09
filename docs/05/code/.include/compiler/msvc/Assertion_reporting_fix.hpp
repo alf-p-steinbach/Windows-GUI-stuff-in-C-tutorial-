@@ -4,7 +4,7 @@
 #   include <stop-compilation>
 #endif
 
-#include <wrapped-winapi/windows-h.hpp>
+#include <wrapped-winapi-headers/windows-h.hpp>
 
 #include <process.h>            // Microsoft - _set_app_type
 
