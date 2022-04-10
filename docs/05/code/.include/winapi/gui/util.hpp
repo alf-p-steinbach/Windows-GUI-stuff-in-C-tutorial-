@@ -1,4 +1,5 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
+#include <winapi/kernel/util.hpp>                   // winapi::kernel::(this_exe, Resource_id)
 
 #include <winapi/gui/std_font.hpp>                  // winapi::gui::"font stuff"
 #include <wrapped-winapi-headers/windowsx-h.hpp>    // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
@@ -8,6 +9,7 @@
 #include <string>
 
 namespace winapi::gui {
+    using kernel::this_exe, kernel::Resource_id;
     using std::string;
 
     // Invokes various <windowsx.h> “message cracker” macros like `HANDLE_WM_CLOSE`. Each such
@@ -16,19 +18,16 @@ namespace winapi::gui {
     #define HANDLER_OF_WM( msg_name, m, handler_func ) \
         HANDLE_WM_##msg_name( m.hwnd, m.wParam, m.lParam, handler_func )
 
-    inline const HINSTANCE this_exe = GetModuleHandle( nullptr );
-
+    // Modern Windows has five to seven standard icon sizes. Small and big are the original.
     struct Icon_size{ enum Enum{ small = ICON_SMALL, big = ICON_BIG }; };
 
-    struct Resource_id
-    {
-        int value;
-        auto as_pseudo_ptr() const -> const char* { return MAKEINTRESOURCE( value ); }
-    };
+    inline auto pixel_size_of( const Icon_size::Enum size )
+        -> int
+    { return (size == Icon_size::small? 16 : 32); }
 
     inline void set_icon( const HWND window, const Icon_size::Enum size, const Resource_id id )
     {
-        const int       pixel_size  = (size == Icon_size::small? 16 : 32);
+        const int       pixel_size  = pixel_size_of( size );
         const HANDLE    icon        = LoadImage(
             this_exe, id.as_pseudo_ptr(), IMAGE_ICON, pixel_size, pixel_size, {}
             );
@@ -45,7 +44,7 @@ namespace winapi::gui {
 
     // Supports a Windows 11 workaround hack. The window is assumed to presently be a “topmost”
     // window. The effect is then to bring the window to the top of the ordinary window Z-order.
-    void remove_topmost_style_for( const HWND window )
+    inline void remove_topmost_style_for( const HWND window )
     {
         SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
     }

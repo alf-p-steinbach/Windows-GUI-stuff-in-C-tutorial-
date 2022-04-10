@@ -1,10 +1,10 @@
-﻿#include "resources.h"          // Resource identifier macros.
+﻿#include "resources.h"                  // Resource identifier macros.
 
-#include <winapi/gdi/color_names.hpp>
-#include <winapi/gui/util.hpp>  // winapi::util::*
+#include <winapi/gdi/color_names.hpp>   // winapi::gdi::color_names::*
+#include <winapi/gui/util.hpp>          // winapi::util::*, winapi::kernel::*
 
 namespace color = winapi::gdi::color_names;
-namespace wu    = winapi::gui;
+namespace wk    = winapi::kernel;
 
 #include <assert.h>
 
@@ -92,8 +92,8 @@ auto CALLBACK dialog_message_handler(
 auto main() -> int
 {
     DialogBox(
-        wu::this_exe,
-        wu::Resource_id{ IDD_MAIN_WINDOW }.as_pseudo_ptr(),
+        wk::this_exe,
+        wk::Resource_id{ IDD_MAIN_WINDOW }.as_pseudo_ptr(),
         HWND(),             // Parent window, a zero handle is "no parent".
         &dialog_message_handler
         );
