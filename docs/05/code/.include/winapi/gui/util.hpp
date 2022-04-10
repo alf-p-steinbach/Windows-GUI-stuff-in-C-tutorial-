@@ -1,6 +1,6 @@
 ﻿#pragma once    // Source encoding: utf-8  --  π is (or should be) a lowercase greek pi.
 
-#include <winapi/gui/std_font.hpp>          // winapi::gui::"font stuff"
+#include <winapi/gui/std_font.hpp>                  // winapi::gui::"font stuff"
 #include <wrapped-winapi-headers/windowsx-h.hpp>    // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
 #include <wrapped-winapi-headers/commctrl-h.hpp>    // InitCommonControlsEx
 
@@ -23,14 +23,14 @@ namespace winapi::gui {
     struct Resource_id
     {
         int value;
-        auto as_ptr() const -> const char* { return MAKEINTRESOURCE( value ); }
+        auto as_pseudo_ptr() const -> const char* { return MAKEINTRESOURCE( value ); }
     };
 
     inline void set_icon( const HWND window, const Icon_size::Enum size, const Resource_id id )
     {
         const int       pixel_size  = (size == Icon_size::small? 16 : 32);
         const HANDLE    icon        = LoadImage(
-            this_exe, id.as_ptr(), IMAGE_ICON, pixel_size, pixel_size, {}
+            this_exe, id.as_pseudo_ptr(), IMAGE_ICON, pixel_size, pixel_size, {}
             );
 
         SendMessage( window, WM_SETICON, size, reinterpret_cast<LPARAM>( icon ) );

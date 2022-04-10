@@ -39,7 +39,7 @@ void set_client_area_size( const HWND window, const int width, const int height 
     const bool has_menu = (GetMenu( window ) != 0);
     AdjustWindowRect( &r, window_style, has_menu ); // Find window size for given client rect.
 
-    SetWindowPos( window, HWND(), 0, 0, r.right, r.bottom, SWP_NOMOVE | SWP_NOZORDER );
+    SetWindowPos( window, HWND(), 0, 0, r.right, r.bottom, SWP_NOMOVE|SWP_NOZORDER );
 }
 
 namespace on_wm {
@@ -61,13 +61,13 @@ namespace on_wm {
         if( const HDC dc = BeginPaint( window, &info ) ) {
             SelectObject( dc, GetStockObject( DC_PEN ) );
             SelectObject( dc, GetStockObject( DC_BRUSH ) );
-            ::paint( window, dc );
+            paint( window, dc );
         }
         EndPaint( window, &info );  // Docs say this must be called for each BeginPaint.
     }
 }  // namespace on_wm
 
-auto CALLBACK message_handler(
+auto CALLBACK dialog_message_handler(
     const HWND      window,
     const UINT      msg_id,
     const WPARAM    w_param,
@@ -92,8 +92,9 @@ auto CALLBACK message_handler(
 auto main() -> int
 {
     DialogBox(
-        wu::this_exe, wu::Resource_id{ IDD_MAIN_WINDOW }.as_ptr(),
+        wu::this_exe,
+        wu::Resource_id{ IDD_MAIN_WINDOW }.as_pseudo_ptr(),
         HWND(),             // Parent window, a zero handle is "no parent".
-        message_handler
+        &dialog_message_handler
         );
 }
