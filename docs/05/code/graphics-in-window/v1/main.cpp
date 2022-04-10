@@ -61,7 +61,7 @@ namespace on_wm {
         if( const HDC dc = BeginPaint( window, &info ) ) {
             SelectObject( dc, GetStockObject( DC_PEN ) );
             SelectObject( dc, GetStockObject( DC_BRUSH ) );
-            paint( window, dc );
+            ::paint( window, dc );
         }
         EndPaint( window, &info );  // Docs say this must be called for each BeginPaint.
     }
@@ -79,9 +79,9 @@ auto CALLBACK dialog_message_handler(
     #define HANDLE_WM( name, handler_func ) \
         HANDLE_WM_##name( window, w_param, ell_param, handler_func )
     switch( msg_id ) {
-        case WM_CLOSE:      result = HANDLE_WM( CLOSE, on_wm::close ); break;
+        case WM_CLOSE:      result = HANDLE_WM( CLOSE,      on_wm::close ); break;
         case WM_INITDIALOG: result = HANDLE_WM( INITDIALOG, on_wm::initdialog ); break;
-        case WM_PAINT:      result = HANDLE_WM( PAINT, on_wm::paint ); break;
+        case WM_PAINT:      result = HANDLE_WM( PAINT,      on_wm::paint ); break;
     }
     #undef HANDLE_WM
 
