@@ -1,9 +1,10 @@
 ﻿#include "resources.h"                  // Resource identifier macros.
 
 #include <winapi/gdi/color_names.hpp>   // winapi::gdi::color_names::*
-#include <winapi/gui/util.hpp>          // winapi::util::*, winapi::kernel::*
+#include <winapi/gui/util.hpp>          // winapi::gui::*, winapi::kernel::*
 
 namespace color = winapi::gdi::color_names;
+namespace wg    = winapi::gui;
 namespace wk    = winapi::kernel;
 
 #include <stdlib.h>     // EXIT_...
@@ -51,7 +52,9 @@ namespace on_wm {
     auto initdialog( const HWND window, const HWND /*focus*/, const LPARAM /*ell_param*/ )
         -> bool
     {
+        wg::remove_topmost_style_for( window );
         set_client_area_size( window, 400, 400 );
+        
         return true;    // `true` sets focus to the `focus` control.
     }
 
