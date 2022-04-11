@@ -6,7 +6,7 @@
 namespace color = winapi::gdi::color_names;
 namespace wk    = winapi::kernel;
 
-#include <assert.h>
+#include <stdlib.h>     // EXIT_...
 
 #include <string>
 #include <optional>
@@ -91,10 +91,12 @@ auto CALLBACK dialog_message_handler(
 
 auto main() -> int
 {
-    DialogBox(
+    // The `DialogBox` return value is misdocumented per 2022, but is like `DialogBoxParam`.
+    const auto dialogbox_result = DialogBox(
         wk::this_exe,
         wk::Resource_id{ IDD_MAIN_WINDOW }.as_pseudo_ptr(),
         HWND(),             // Parent window, a zero handle is "no parent".
         &dialog_message_handler
         );
+    return (dialogbox_result <= 0? EXIT_FAILURE : EXIT_SUCCESS);
 }
