@@ -9,6 +9,7 @@ I haven’t decided how far to take this. I’ll add more as I have free time to
 - [2. Use resources to provide an icon.](02.md)
 - [3. A Tic-Tac-Toe game in a dialog window.](03.md)
 - [4. UTF-8 as the one and only text encoding.](04.md)
+- [5. GDI graphics: Basics.](05.md)
 
 *Full contents:*
 
@@ -38,6 +39,10 @@ I haven’t decided how far to take this. I’ll add more as I have free time to
     - [4.3. Specify UTF-8 as the “.rc” resource script code page.](04.md#43-specify-utf-8-as-the-rc-resource-script-code-page)
     - [4.4. Adapt the C++ source code to UTF-8.](04.md#44-adapt-the-c-source-code-to-utf-8)
     - [4.5. Build with UTF-8 encoding throughout.](04.md#45-build-with-utf-8-encoding-throughout)
+- [5. GDI graphics: Basics.](05.md)
+    - [5.1. Draw on the screen, via a device context.](05.md#51-draw-on-the-screen-via-a-device-context)
+    - [5.2 Use “DC colors” to reduce the drawing code.](05.md#52-use-dc-colors-to-reduce-the-drawing-code)
+    - [5.3. Present graphics in a window by handling `WM_PAINT`.](05.md#53-present-graphics-in-a-window-by-handling-wm_paint)
 
 Perhaps a useful link: [The tutorial’s Github project.](https://github.com/alf-p-steinbach/Windows-GUI-stuff-in-C-tutorial-)
 
