@@ -1,0 +1,16 @@
+#pragma code_page( 1252 )   // Windows ANSI Western encoding, an extension of Latin 1.
+#include "resources.h"
+#include <windows.h>
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+IDD_MAIN_WINDOW DIALOGEX 0, 0, 40, 30
+STYLE DS_SETFONT | DS_CENTER | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_OVERLAPPEDWINDOW | WS_EX_TOPMOST
+CAPTION "GDI-graphics in a resizable window"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+END
