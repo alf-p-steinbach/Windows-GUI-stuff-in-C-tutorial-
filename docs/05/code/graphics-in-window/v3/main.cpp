@@ -39,7 +39,7 @@ void draw_ellipse( const HDC canvas, const RECT& bounds, const calc::Radians ang
     const auto translation = SIZE{ bounds.left + w/2, bounds.top + h/2 };
     const float c = cosf( angle.as_float() );
     const float s = sinf( angle.as_float() );
-    XFORM transform =
+    const XFORM transform =
     {
         c, s,       // eM11, eM12
         -s, c,      // eM21, eM22
@@ -47,7 +47,7 @@ void draw_ellipse( const HDC canvas, const RECT& bounds, const calc::Radians ang
     };
     const int original_mode = SetGraphicsMode( canvas, GM_ADVANCED );
     assert( original_mode == GM_COMPATIBLE );               // Ensures MM_TEXT mapping mode.
-    SetWorldTransform(canvas, &transform );
+    SetWorldTransform( canvas, &transform );
     Ellipse(
         canvas,
         bounds.left - translation.cx, bounds.top - translation.cy,
