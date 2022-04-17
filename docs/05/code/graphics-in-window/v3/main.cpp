@@ -73,40 +73,37 @@ void draw_on( const HDC canvas, const RECT& area )
     draw_ellipse( canvas, area, angle );
 }
 
+auto dc_colors_enabled( const HDC dc )
+    -> HDC
+{
+    SelectObject( dc, GetStockObject( DC_PEN ) );
+    SelectObject( dc, GetStockObject( DC_BRUSH ) );
+    return dc;
+}
+
 void paint( const HWND window, const HDC dc )
 {
     RECT client_rect;
     GetClientRect( window, &client_rect );
-    const auto [width, height] = SIZE{ client_rect.right, client_rect.bottom };
 
-    // Create an off-screen DC with a compatible bitmap, for double-buffering.
-    // See <url: http://www.catch22.net/tuts/win32/flicker-free-drawing> for some background.
-    const HDC memory_dc = CreateCompatibleDC( dc );
-    SelectObject( memory_dc, GetStockObject( DC_PEN ) );
-    SelectObject( memory_dc, GetStockObject( DC_BRUSH ) );
-    const HBITMAP bitmap = CreateCompatibleBitmap( dc, width, height );
-    const HGDIOBJ original_bitmap = SelectObject( memory_dc, bitmap );
+    #ifndef NO_DOUBLEBUFFERING_PLEASE
+        const auto [width, height] = SIZE{ client_rect.right, client_rect.bottom };
 
-        draw_on( memory_dc, client_rect );
-        BitBlt( dc, 0, 0, width, height, memory_dc, 0, 0, SRCCOPY );
+        // Create an off-screen DC with a compatible bitmap, for double-buffering.
+        // See <url: http://www.catch22.net/tuts/win32/flicker-free-drawing> for some background.
+        const HDC memory_dc = dc_colors_enabled( CreateCompatibleDC( dc ) );
+        const HBITMAP bitmap = CreateCompatibleBitmap( dc, width, height );
+        const HGDIOBJ original_bitmap = SelectObject( memory_dc, bitmap );
 
-    SelectObject( memory_dc, original_bitmap );
-    DeleteObject( bitmap );
-    DeleteDC( memory_dc);
-}
+            draw_on( memory_dc, client_rect );
+            BitBlt( dc, 0, 0, width, height, memory_dc, 0, 0, SRCCOPY );
 
-void set_client_area_size( const HWND window, const int width, const int height )
-{
-    RECT r = {0, 0, width, height};                 // Desired client area.
-
-    const LONG window_style = GetWindowLong( window, GWL_STYLE );
-    const LONG window_ex_style = GetWindowLong( window, GWL_EXSTYLE );
-    const bool has_menu = (GetMenu( window ) != 0);
-    
-     // Find window size for given client rect.
-    AdjustWindowRectEx( &r, window_style, has_menu, window_ex_style );
-
-    SetWindowPos( window, HWND(), 0, 0, r.right - r.left, r.bottom - r.top, SWP_NOMOVE|SWP_NOZORDER );
+        SelectObject( memory_dc, original_bitmap );
+        DeleteObject( bitmap );
+        DeleteDC( memory_dc);
+    #else
+        draw_on( dc_colors_enabled( dc ), client_rect );
+    #endif
 }
 
 namespace on_wm {
@@ -128,7 +125,7 @@ namespace on_wm {
         ignore = focus; ignore = ell_param;
 
         wg::remove_topmost_style_for( window );
-        set_client_area_size( window, 400, 400 );
+        wg::set_client_area_size( window, 400, 400 );
 
         const int timer_id = 1;             // Arbitrary.
         const int n_millisecs = 1000/50;    // Sufficient for smooth animation.

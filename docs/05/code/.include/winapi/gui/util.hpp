@@ -49,6 +49,20 @@ namespace winapi::gui {
         SetWindowPos( window, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE );
     }
 
+    inline void set_client_area_size( const HWND window, const int width, const int height )
+    {
+        RECT r = {0, 0, width, height};                 // Desired client area.
+
+        const LONG window_style = GetWindowLong( window, GWL_STYLE );
+        const LONG window_ex_style = GetWindowLong( window, GWL_EXSTYLE );
+        const bool has_menu = (GetMenu( window ) != 0);
+        
+         // Find window size for given client rect.
+        AdjustWindowRectEx( &r, window_style, has_menu, window_ex_style );
+
+        SetWindowPos( window, HWND(), 0, 0, r.right - r.left, r.bottom - r.top, SWP_NOMOVE|SWP_NOZORDER );
+    }
+
     constexpr DWORD basic_common_controls = ICC_STANDARD_CLASSES | ICC_WIN95_CLASSES;
 
     inline auto init_common_controls( const DWORD which = basic_common_controls )
