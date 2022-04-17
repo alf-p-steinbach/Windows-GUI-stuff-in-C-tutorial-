@@ -111,6 +111,13 @@ namespace on_wm {
         EndDialog( window, IDOK );
     }
 
+    auto erasebkgnd( const HWND window, const HDC dc )
+        -> bool
+    {
+        ignore = window;  ignore = dc;
+        return true;        // Prevents background erasure which can cause flicker.
+    }
+
     auto initdialog( const HWND window, const HWND focus, const LPARAM ell_param )
         -> bool
     {
@@ -162,6 +169,7 @@ auto CALLBACK dialog_message_handler(
         HANDLE_WM_##name( window, w_param, ell_param, handler_func )
     switch( msg_id ) {
         case WM_CLOSE:      result = HANDLE_WM( CLOSE, on_wm::close ); break;
+        case WM_ERASEBKGND: result = HANDLE_WM( ERASEBKGND, on_wm::erasebkgnd ); break;
         case WM_INITDIALOG: result = HANDLE_WM( INITDIALOG, on_wm::initdialog ); break;
         case WM_PAINT:      result = HANDLE_WM( PAINT, on_wm::paint ); break;
         case WM_SIZE:       result = HANDLE_WM( SIZE, on_wm::size ); break;
