@@ -153,7 +153,6 @@ namespace on_wm {
     {
         ignore = id;
         InvalidateRect( window, nullptr, false );
-        // RedrawWindow( window, nullptr, nullptr, RDW_NOERASE | RDW_UPDATENOW );
     }
 }  // namespace on_wm
 
