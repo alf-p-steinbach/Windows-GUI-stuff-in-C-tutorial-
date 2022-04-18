@@ -43,8 +43,8 @@ I haven’t decided how far to take this. I’ll add more as I have free time to
     - [5.1. Draw on the screen, via a device context.](05.md#51-draw-on-the-screen-via-a-device-context)
     - [5.2 Use “DC colors” to reduce the drawing code.](05.md#52-use-dc-colors-to-reduce-the-drawing-code)
     - [5.3. Present graphics in a window by handling `WM_PAINT`.](05.md#53-present-graphics-in-a-window-by-handling-wm_paint)
-    - [5.4. Support a dynamic window sized ellipse via `WM_SIZE` + `InvalidateRect`.](05.#54-support-a-dynamic-window-sized-ellipse-via-wm_size--invalidaterect)
-    - [5.5. Avoid animation flicker by handling `WM_ERASEBKGND` and using double buffering.](05.#55-avoid-animation-flicker-by-handling-wm_erasebkgnd-and-using-double-buffering)
+    - [5.4. Support a dynamic window sized ellipse via `WM_SIZE` + `InvalidateRect`.](05.md#54-support-a-dynamic-window-sized-ellipse-via-wm_size--invalidaterect)
+    - [5.5. Avoid animation flicker by handling `WM_ERASEBKGND` and using double buffering.](05.md#55-avoid-animation-flicker-by-handling-wm_erasebkgnd-and-using-double-buffering)
 
 Perhaps a useful link: [The tutorial’s Github project.](https://github.com/alf-p-steinbach/Windows-GUI-stuff-in-C-tutorial-)
 
