@@ -29,15 +29,15 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "Comments",         "Created for the Windows API stuff tutorial’s README file.\0"
-            VALUE "CompanyName",      "\0"
+            VALUE "Comments",         "Created for the Windows API stuff tutorial’s README file."
+            VALUE "CompanyName",      ""
             VALUE "FileDescription",  "A minimal app with icon and version info."
-            VALUE "FileVersion",      "\0"
-            VALUE "InternalName",     "\0"
-            VALUE "LegalCopyright",   "Copyright © 2020 Alf P. Steinbach.\0"
-            VALUE "OriginalFilename", "hello.exe\0"
-            VALUE "ProductName",      "MinimalApp\0"
-            VALUE "ProductVersion",   "1.0\0"
+            VALUE "FileVersion",      ""
+            VALUE "InternalName",     ""
+            VALUE "LegalCopyright",   "Copyright © 2020 Alf P. Steinbach."
+            VALUE "OriginalFilename", "hello.exe"
+            VALUE "ProductName",      "MinimalApp"
+            VALUE "ProductVersion",   "1.0"
         END
     END
 
