@@ -1,5 +1,6 @@
-#pragma code_page( 65001 )  // UTF-8
+﻿#pragma code_page( 65001 )  // UTF-8
 #include <windows.h>
+#include "resource-ids.h"   // IDI_MAIN
 
 /////////////////////////////////////////////////////////////////////////////
 // Neutral resources
@@ -7,6 +8,40 @@ LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
 // The icon with lowest ID value should be placed first to ensure that the
 // application icon (executable's file icon) remains consistent on all systems.
-100         ICON    "resources/app.ico"
+IDI_MAIN    ICON    "resources/main.ico"
 
 CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION     0
+PRODUCTVERSION  0
+FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+FILEFLAGS       VS_FF_DEBUG
+#else
+FILEFLAGS       0x0L
+#endif
+FILEOS          VOS__WINDOWS32
+FILETYPE        VFT_APP
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "000004b0"
+        BEGIN
+            VALUE "FileDescription",  "A minimal app with icon and version info.\0"
+            VALUE "LegalCopyright",   "Copyright © 2020 Alf P. Steinbach.\0"
+            VALUE "CompanyName",      "n/a\0"
+            VALUE "FileVersion",      "1.0\0"
+            VALUE "ProductName",      "\0"
+            VALUE "ProductVersion",   "1.0\0"
+            VALUE "InternalName",     "n/a\0"
+            VALUE "OriginalFilename", "hello.exe\0"
+            VALUE "Comments",         "\0"
+        END
+    END
+
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0, 1200
+    END
+END
