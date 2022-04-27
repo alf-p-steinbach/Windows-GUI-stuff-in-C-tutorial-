@@ -21,7 +21,7 @@ I haven’t decided how far to take this. I’ll add more as I have free time to
     - [1.5. Find required libraries and headers.](01.md#15-find-required-libraries-and-headers)
     - [1.6. Run the program via commands and via mouse clicking.](01.md#16-run-the-program-via-commands-and-via-mouse-clicking)
     - [1.7. Varying behaviors of programs when you run them in Windows 11.](01.md#17-varying-behaviors-of-programs-when-you-run-them-in-windows-11)
-- [2. Use resources to provide an icon.](02.md)
+- [2. Use data resources to provide an icon.](02.md)
     - [2.1. File icons.](02.md#21-file-icons)
     - [2.2. Icon files.](02.md#22-icon-files)
     - [2.3. Package the icon in a linker friendly binary file, via a resource script.](02.md#23-package-the-icon-in-a-linker-friendly-binary-file-via-a-resource-script)

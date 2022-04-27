@@ -1,0 +1,12 @@
+#pragma code_page( 65001 )  // UTF-8
+#include <windows.h>
+
+/////////////////////////////////////////////////////////////////////////////
+// Neutral resources
+LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
+
+// The icon with lowest ID value should be placed first to ensure that the
+// application icon (executable's file icon) remains consistent on all systems.
+100         ICON    "resources/app.ico"
+
+CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"

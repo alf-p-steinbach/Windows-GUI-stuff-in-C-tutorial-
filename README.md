@@ -14,7 +14,7 @@ Table of contents:
 Individual main parts, with links for reading in this repository:
 
 - [1. A Windows GUI “Hello, world!”.](docs/01.md)
-- [2. Use resources to provide an icon.](docs/02.md)
+- [2. Use data resources to provide an icon.](docs/02.md)
 - [3. A Tic-Tac-Toe game in a dialog window.](docs/03.md)
 - [4. UTF-8 as the one and only text encoding.](docs/04.md)
 - [5. GDI graphics: Basics.](docs/05.md)
