@@ -2,7 +2,7 @@
 
 Desktop Windows API level programming from the ground up, in C++17.
 
-![An "Hello, world!" message box](docs/02/images/sshot.part-2-message-box.png)
+[![A "Hello, world!" message box](README.md.files/images/sshot-1.png)](README.md.files/hello-world)
 
 Table of contents:
 

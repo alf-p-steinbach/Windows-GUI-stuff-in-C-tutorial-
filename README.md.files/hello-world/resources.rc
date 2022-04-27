@@ -1,4 +1,5 @@
 ﻿#pragma code_page( 65001 )  // UTF-8
+
 #include <windows.h>
 #include "resource-ids.h"   // IDI_MAIN
 
@@ -6,8 +7,8 @@
 // Neutral resources
 LANGUAGE LANG_NEUTRAL, SUBLANG_NEUTRAL
 
-// The icon with lowest ID value should be placed first to ensure that the
-// application icon (executable's file icon) remains consistent on all systems.
+    // The icon with lowest ID value should be placed first to ensure that the
+    // application icon (executable's file icon) remains consistent on all systems.
 IDI_MAIN    ICON    "resources/main.ico"
 
 CREATEPROCESS_MANIFEST_RESOURCE_ID      RT_MANIFEST "resources/app-manifest.xml"
@@ -28,15 +29,15 @@ BEGIN
     BEGIN
         BLOCK "000004b0"
         BEGIN
-            VALUE "FileDescription",  "A minimal app with icon and version info.\0"
+            VALUE "Comments",         "Created for the Windows API stuff tutorial’s README file.\0"
+            VALUE "CompanyName",      "\0"
+            VALUE "FileDescription",  "A minimal app with icon and version info."
+            VALUE "FileVersion",      "\0"
+            VALUE "InternalName",     "\0"
             VALUE "LegalCopyright",   "Copyright © 2020 Alf P. Steinbach.\0"
-            VALUE "CompanyName",      "n/a\0"
-            VALUE "FileVersion",      "1.0\0"
-            VALUE "ProductName",      "\0"
-            VALUE "ProductVersion",   "1.0\0"
-            VALUE "InternalName",     "n/a\0"
             VALUE "OriginalFilename", "hello.exe\0"
-            VALUE "Comments",         "\0"
+            VALUE "ProductName",      "MinimalApp\0"
+            VALUE "ProductVersion",   "1.0\0"
         END
     END
 
