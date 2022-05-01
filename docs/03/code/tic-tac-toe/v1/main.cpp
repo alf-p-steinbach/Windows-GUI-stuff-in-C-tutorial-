@@ -2,6 +2,7 @@
 
 #include <windows.h>
 #include "resources.h"
+using Char_ptr = const char*;
 
 auto CALLBACK message_handler(
     const HWND              window,
@@ -19,9 +20,8 @@ auto CALLBACK message_handler(
 
 auto main() -> int
 {
-    using C_str = const char*;
-    const HINSTANCE this_executable     = GetModuleHandle( nullptr );
-    const C_str     resource_id_as_ptr  = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
+    const HINSTANCE this_executable             = GetModuleHandle( nullptr );
+    const Char_ptr  resource_id_as_pseudo_ptr   = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
 
-    DialogBox( this_executable, resource_id_as_ptr, HWND(), message_handler );
+    DialogBox( this_executable, resource_id_as_pseudo_ptr, HWND(), message_handler );
 }
