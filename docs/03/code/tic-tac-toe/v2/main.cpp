@@ -6,7 +6,7 @@
 
 #include "resources.h"              // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW, ...
 
-using C_str = const char*;
+using Char_ptr = const char*;
 
 
 //------------------------------------------- Support machinery:
@@ -19,10 +19,10 @@ namespace icon_sizes{
 
 void set_icon( const HWND window, const icon_sizes::Enum size, const int resource_id )
 {
-    const C_str     id_as_ptr   = MAKEINTRESOURCE( resource_id );
-    const int       pixel_size  = (size == icon_sizes::small? 16 : 32);
-    const HANDLE    icon        = LoadImage(
-        this_exe, id_as_ptr, IMAGE_ICON, pixel_size, pixel_size, {}
+    const Char_ptr  id_as_pseudo_ptr    = MAKEINTRESOURCE( resource_id );
+    const int       pixel_size          = (size == icon_sizes::small? 16 : 32);
+    const HANDLE    icon                = LoadImage(
+        this_exe, id_as_pseudo_ptr, IMAGE_ICON, pixel_size, pixel_size, {}
         );
     SendMessage( window, WM_SETICON, size, reinterpret_cast<LPARAM>( icon ) );
 }
@@ -73,6 +73,6 @@ auto CALLBACK message_handler(
 
 auto main() -> int
 {
-    const C_str id_as_ptr = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
-    DialogBox( this_exe, id_as_ptr, HWND(), message_handler );
+    const Char_ptr id_as_pseudo_ptr = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
+    DialogBox( this_exe, id_as_pseudo_ptr, HWND(), message_handler );
 }
