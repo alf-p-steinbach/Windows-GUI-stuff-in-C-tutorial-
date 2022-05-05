@@ -9,9 +9,9 @@
 using Char_ptr = const char*;
 
 
-//------------------------------------------- Support machinery:
+//------------------------------------------- API support machinery:
 
-const HINSTANCE this_exe = GetModuleHandle( nullptr );
+const HINSTANCE this_executable = GetModuleHandle( nullptr );
 
 namespace icon_sizes{
     enum Enum{ small = ICON_SMALL, large = ICON_BIG };       // WM_SETICON values.
@@ -22,7 +22,7 @@ void set_icon( const HWND window, const icon_sizes::Enum size, const int resourc
     const Char_ptr  id_as_pseudo_ptr    = MAKEINTRESOURCE( resource_id );
     const int       pixel_size          = (size == icon_sizes::small? 16 : 32);
     const HANDLE    icon                = LoadImage(
-        this_exe, id_as_pseudo_ptr, IMAGE_ICON, pixel_size, pixel_size, {}
+        this_executable, id_as_pseudo_ptr, IMAGE_ICON, pixel_size, pixel_size, {}
         );
     SendMessage( window, WM_SETICON, size, reinterpret_cast<LPARAM>( icon ) );
 }
@@ -39,7 +39,7 @@ void set_app_icon( const HWND window )
 void set_rules_text( const HWND window )
 {
     char text[2048];
-    LoadString( this_exe, IDS_RULES, text, sizeof( text ) );
+    LoadString( this_executable, IDS_RULES, text, sizeof( text ) );
     const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
     SetWindowText( rules_display, text );
 }
@@ -73,6 +73,11 @@ auto CALLBACK message_handler(
 
 auto main() -> int
 {
-    const Char_ptr id_as_pseudo_ptr = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
-    DialogBox( this_exe, id_as_pseudo_ptr, HWND(), message_handler );
+    const Char_ptr  resource_id_as_pseudo_ptr   = MAKEINTRESOURCE( IDD_MAIN_WINDOW );
+
+    // Note: that there /is/ a return value is undocumented. Can fail if no dialog resource.
+    const auto return_value = DialogBox(
+        this_executable, resource_id_as_pseudo_ptr, HWND( 0 ), message_handler
+        );
+    return (return_value <= 0? EXIT_FAILURE : EXIT_SUCCESS);
 }
