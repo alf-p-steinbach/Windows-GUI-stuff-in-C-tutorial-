@@ -1,11 +1,15 @@
 ﻿#pragma once
-#include "wrapped-windows-h.hpp"    // Safer and faster. Safe = e.g. no `small` macro.    
-#include <windowsx.h>               // E.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
+#include "wrapped-windowsx-h.hpp"   // The "x" = e.g. HANDLE_WM_CLOSE, HANDLE_WM_INITDIALOG
 
 #include <initializer_list>         // For using range-based `for` over initializer list.
 
-namespace winapi_util {
-    inline const HINSTANCE this_exe = GetModuleHandle( nullptr );
+#define WSM_HANDLE_WM( name, handler_func ) \
+    HANDLE_WM_##name( msg.hwnd, msg.wParam, msg.lParam, handler_func )
+// E.g., `WSM_HANDLE_WM( CLOSE, a_wm_close_handler )` expands to `HANDLE_WM_CLOSE( ...`, a
+// <windowsx.h> macro that in turns calls `a_wm_close_handler` with appropriate arguments.
+
+namespace winapi_support_machinery {
+    inline const HINSTANCE this_executable = GetModuleHandle( nullptr );
 
     namespace icon_sizes{
         enum Enum{ small = ICON_SMALL, large = ICON_BIG };
@@ -14,14 +18,14 @@ namespace winapi_util {
     struct Resource_id
     {
         int value;
-        auto as_ptr() const -> const char* { return MAKEINTRESOURCE( value ); }
+        auto as_pseudo_ptr() const -> const char* { return MAKEINTRESOURCE( value ); }
     };
 
     inline void set_icon( const HWND window, const icon_sizes::Enum size, const Resource_id id )
     {
         const int       pixel_size  = (size == icon_sizes::small? 16 : 32);
         const HANDLE    icon        = LoadImage(
-            this_exe, id.as_ptr(), IMAGE_ICON, pixel_size, pixel_size, {}
+            this_executable, id.as_pseudo_ptr(), IMAGE_ICON, pixel_size, pixel_size, {}
             );
 
         SendMessage( window, WM_SETICON, size, reinterpret_cast<LPARAM>( icon ) );
@@ -33,4 +37,4 @@ namespace winapi_util {
             set_icon( window, icon_size, id );
         }
     }
-}  // namespace winapi_util
+}  // namespace winapi_support_machinery
