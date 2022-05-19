@@ -3,7 +3,7 @@
 // v2 - Missing window parts added programmatically: the rules text; the window icon.
 // v1 - Roughly minimum code to display a window based on a dialog template resource.
 
-#include "winapi_support_machinery.hpp" // winapi_support_machinery::*, <windowsx.h>
+#include "winapi_support_machinery.hpp" // winapi_support_machinery::*, WSM_HANDLE_WM
 #include "resources.h"                  // IDS_RULES, IDC_RULES_DISPLAY, IDD_MAIN_WINDOW, ...
 
 #include <optional>         // std::optional
