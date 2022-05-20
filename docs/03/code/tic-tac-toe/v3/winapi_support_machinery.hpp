@@ -5,8 +5,9 @@
 
 #define WSM_HANDLE_WM( name, handler_func ) \
     HANDLE_WM_##name( msg.hwnd, msg.wParam, msg.lParam, handler_func )
-// E.g., `WSM_HANDLE_WM( CLOSE, a_wm_close_handler )` expands to `HANDLE_WM_CLOSE( ...`, a
-// <windowsx.h> macro that in turns calls `a_wm_close_handler` with appropriate arguments.
+// E.g., `WSM_HANDLE_WM( CLOSE, ...` expands to `HANDLE_WM_CLOSE( ...`, which calls the
+// <windowsx.h> macro HANDLE_WM_CLOSE that in turns calls the specified `WM_CLOSE` handler
+// with appropriate arguments extracted from the data in a `MSG` variable called `msg`.
 
 namespace winapi_support_machinery {
     inline const HINSTANCE this_executable = GetModuleHandle( nullptr );
@@ -18,10 +19,17 @@ namespace winapi_support_machinery {
     struct Resource_id
     {
         int value;
-        auto as_pseudo_ptr() const -> const char* { return MAKEINTRESOURCE( value ); }
+
+        auto as_pseudo_ptr() const
+            -> const char*
+        { return MAKEINTRESOURCE( value ); }
     };
 
-    inline void set_icon( const HWND window, const icon_sizes::Enum size, const Resource_id id )
+    inline void set_icon(
+        const HWND              window,
+        const icon_sizes::Enum  size,
+        const Resource_id       id
+        )
     {
         const int       pixel_size  = (size == icon_sizes::small? 16 : 32);
         const HANDLE    icon        = LoadImage(
@@ -33,8 +41,8 @@ namespace winapi_support_machinery {
 
     inline void set_icon( const HWND window, const Resource_id id )
     {
-        for( const auto icon_size: {icon_sizes::small, icon_sizes::large} ) {
-            set_icon( window, icon_size, id );
+        for( const auto size: {icon_sizes::small, icon_sizes::large} ) {
+            set_icon( window, size, id );
         }
     }
 }  // namespace winapi_support_machinery
