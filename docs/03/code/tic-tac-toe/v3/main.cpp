@@ -51,7 +51,7 @@ auto handling_of( const MSG& msg )
         case WM_CLOSE:          return WSM_HANDLE_WM( CLOSE, on_wm::close );
         case WM_INITDIALOG:     return WSM_HANDLE_WM( INITDIALOG, on_wm::initdialog );
     }
-    return {};
+    return {};  // Empty `optional` indicates message not handled.
 }
 
 auto CALLBACK message_handler_callback(
