@@ -105,7 +105,7 @@ auto message_handler( const MSG& msg )
     return {};
 }
 
-auto CALLBACK dlg_proc(
+auto CALLBACK dlgproc(
     const HWND      window,
     const UINT      msg_id,
     const WPARAM    w_param,
@@ -131,7 +131,7 @@ auto main() -> int
 
     // Note: that there /is/ a return value is undocumented. Can fail if no dialog resource.
     const auto return_value = DialogBox(
-        this_executable, resource_id_as_pseudo_ptr, HWND( 0 ), dlg_proc
+        this_executable, resource_id_as_pseudo_ptr, HWND( 0 ), dlgproc
         );
     return (return_value <= 0? EXIT_FAILURE : EXIT_SUCCESS);
 }
