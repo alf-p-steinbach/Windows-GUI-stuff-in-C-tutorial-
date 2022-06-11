@@ -10,7 +10,6 @@
 
 #include <stdlib.h>                 // EXIT_...
 
-#include <algorithm>                // std::find
 #include <iterator>                 // std::(begin, end)
 #include <optional>                 // std::optional
 
@@ -18,8 +17,7 @@ namespace csm   = cpp_support_machinery;
 namespace wsm   = winapi_support_machinery;
 
 using   csm::contains_;
-using   std::find, std::begin, std::end, std::optional;
-using   Char_ptr = const char*;
+using   std::optional;
 
 void set_app_icon( const HWND window )
 {
