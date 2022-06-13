@@ -6,7 +6,7 @@
 
 namespace winapi_support_machinery:: dialog_message {
     namespace csm = cpp_support_machinery;
-    using   csm::contains_;
+    using   csm::contains;
     using   std::optional;
 
     using Result = optional<INT_PTR>;
@@ -22,7 +22,7 @@ namespace winapi_support_machinery:: dialog_message {
             WM_QUERYDRAGICON, WM_INITDIALOG
         };
 
-        return contains_( msg_id, msgs );
+        return contains( msg_id, msgs );
     }
 
     using Message_handler_func = auto( const MSG& ) -> Result;
