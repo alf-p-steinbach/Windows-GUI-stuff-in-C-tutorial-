@@ -16,7 +16,7 @@
 namespace csm   = cpp_support_machinery;
 namespace wsm   = winapi_support_machinery;
 
-using   csm::contains_;
+using   csm::assert_type_is_;
 using   std::optional;
 
 void set_app_icon( const HWND window )
@@ -60,12 +60,13 @@ auto message_handler( const MSG& msg )
 
 auto main() -> int
 {
-    // Note: that there /is/ a return value is undocumented. Can fail if no dialog resource.
     const auto spec = wsm::resource::Location( IDD_MAIN_WINDOW );
     const auto return_value = DialogBox(
         spec.module(), spec.id().as_pseudo_ptr(),
         HWND( 0 ),
         &wsm::dialog_message::callback_<message_handler>
         );
+    // Note: that there /is/ a return value is undocumented. Can fail if no dialog resource.
+    assert_type_is_<INT_PTR>( return_value );
     return (return_value <= 0? EXIT_FAILURE : EXIT_SUCCESS);
 }

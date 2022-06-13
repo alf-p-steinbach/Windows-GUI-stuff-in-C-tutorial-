@@ -1,17 +1,15 @@
 ﻿#pragma once
 #include <wrapped-windows-h.hpp>        // Safer and faster. Safe = e.g. no `small` macro.
-#include <cpp_support_machinery.hpp>
+#include <cpp_support_machinery.hpp>    // Supports range-based `for` over initializer list.
 #include <winapi_support_machinery/resource.hpp>
 
 #include <assert.h>                     // assert
 
 #include <array>                        // std::array
-#include <initializer_list>             // For using range-based `for` over initializer list.
 
 namespace winapi_support_machinery:: icon {
     namespace csm = cpp_support_machinery;
 
-    using   csm::contains, csm::Int_range;
     using   std::array;
 
     namespace size_names {

@@ -7,7 +7,7 @@
 namespace winapi_support_machinery:: resource {
     namespace csm = cpp_support_machinery;
 
-    using   csm::contains, csm::Int_range;
+    using   csm::is_in, csm::Int_range;
 
     class Id
     {
@@ -18,7 +18,7 @@ namespace winapi_support_machinery:: resource {
 
         Id( const int value ):
             m_value( value )
-        { assert( contains( value, Int_range{ 1, max_value } ) ); }
+        { assert( is_in( Int_range{ 1, max_value }, value ) ); }
 
         auto as_number() const -> int { return m_value; }
         auto as_pseudo_ptr() const -> const char* { return MAKEINTRESOURCE( m_value ); }
