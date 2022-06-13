@@ -3,8 +3,9 @@
 #include <iterator>         // std::(begin, end)
 #include <type_traits>      // std::is_same_v;
 
-// Convenience include:
+// Convenience includes for full core language functionality:
 #include <initializer_list> // For using range-based `for` over initializer list.
+#include <typeinfo>         // For using `typeid` operator.
 
 namespace cpp_support_machinery {
     using   std::find,
