@@ -3,6 +3,7 @@
 #include <cpp_support_machinery.hpp>    // cpp_support_machinery::*
 
 #include <assert.h>             // assert
+#include <stdint.h>             // INT16_MAX
 
 namespace winapi_support_machinery:: resource {
     namespace csm = cpp_support_machinery;

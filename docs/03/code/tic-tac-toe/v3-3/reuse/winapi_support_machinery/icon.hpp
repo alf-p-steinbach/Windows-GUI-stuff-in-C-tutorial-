@@ -3,8 +3,6 @@
 #include <cpp_support_machinery.hpp>    // Supports range-based `for` over initializer list.
 #include <winapi_support_machinery/resource.hpp>
 
-#include <assert.h>                     // assert
-
 #include <array>                        // std::array
 
 namespace winapi_support_machinery:: icon {
