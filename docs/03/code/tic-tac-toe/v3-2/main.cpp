@@ -48,7 +48,7 @@ void set_icon( const HWND window, const icon_sizes::Enum size, const int resourc
 
 namespace dialog_message {
     using Result = optional<INT_PTR>;
-    constexpr auto was_processed_indication = Result( 0 );  // 0 is a dummy, could be any value.
+    constexpr auto processed = Result( 0 );     // 0 is a dummy, could be any value.
     
     auto uses_dlgproc_return_value( const unsigned msg_id )
         -> bool
@@ -97,7 +97,7 @@ auto on_wm_initdialog( const HWND window )
 auto message_handler( const MSG& msg )
     -> optional<INT_PTR>
 {
-    const auto& processed = dialog_message::was_processed_indication;
+    const auto& processed = dialog_message::processed;
     switch( msg.message ) {
         case WM_CLOSE:          on_wm_close( msg.hwnd ); return processed;
         case WM_INITDIALOG:     return on_wm_initdialog( msg.hwnd );
