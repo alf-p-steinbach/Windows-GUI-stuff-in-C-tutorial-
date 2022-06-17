@@ -46,7 +46,7 @@ namespace on_wm {
     void HScroll( HWND hwnd, HWND hwndCtl, UINT code, int pos );
     void HScrollClipboard( HWND hwnd, HWND hwndCBViewer, UINT code, int pos );
     auto IconEraseBkgnd( HWND hwnd, HDC hdc ) -> bool;
-    auto InitDialog( HWND hwnd, HWND hwndFocus, ARAM* lParam ) -> bool;
+    auto InitDialog( HWND hwnd, HWND hwndFocus, LPARAM lParam ) -> bool;
     void InitMenu( HWND hwnd, HMENU hMenu );
     void InitMenuPopup( HWND hwnd, HMENU hMenu, UINT item, bool fSystemMenu );
     void Key( HWND hwnd, UINT vk, bool fDown, int cRepeat, UINT flags );
