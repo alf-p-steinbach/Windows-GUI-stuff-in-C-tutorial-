@@ -54,12 +54,10 @@ auto message_handler( const MSG& msg )
     -> optional<INT_PTR>
 {
     switch( msg.message ) {
-        case WM_CLOSE:          return HANDLE_WM_CLOSE(
-            msg.hwnd, msg.wParam, msg.lParam, &on_wm_close
-            );
-        case WM_INITDIALOG:     return HANDLE_WM_INITDIALOG(
-            msg.hwnd, msg.wParam, msg.lParam, &on_wm_initdialog
-            );
+        case WM_CLOSE:
+            return HANDLE_WM_CLOSE( msg.hwnd, msg.wParam, msg.lParam, &on_wm_close );
+        case WM_INITDIALOG:
+            return HANDLE_WM_INITDIALOG( msg.hwnd, msg.wParam, msg.lParam, &on_wm_initdialog );
     }
     return {};
 }
