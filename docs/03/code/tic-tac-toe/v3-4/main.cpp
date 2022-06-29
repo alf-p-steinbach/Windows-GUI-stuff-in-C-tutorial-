@@ -29,7 +29,7 @@ void set_app_icon( const HWND window )
 void set_rules_text( const HWND window )
 {
     char text[2048];
-    { const auto spec = wsm::resource::Location( IDS_RULES );
+    {   const auto spec = wsm::resource::Location( IDS_RULES );
         LoadString( spec.module(), spec.id(), text, sizeof( text ) );
     }
     const HWND rules_display = GetDlgItem( window, IDC_RULES_DISPLAY );
